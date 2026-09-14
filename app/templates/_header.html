@@ -1,0 +1,21 @@
+<div class="topbar"><div class="wrap">
+  <div><span>상담 09:00–19:00 · 토요일 예약제</span><span>수원지방법원 앞 <b>원희캐슬광교 D동 10층</b></span></div>
+  <div><span>상담 전화 <b>{{ site.phone }}</b></span><span><a href="{{ url_for('contact.contact') }}#form">상담 신청</a></span></div>
+</div></div>
+
+<header class="hdr"><div class="wrap">
+  <a class="logo" href="{{ url_for('main.index') }}">{{ site.brand }}<small>{{ site.brand_en }}</small></a>
+  <nav class="gnb">
+    <a href="{{ url_for('main.about') }}"{% if request.path == '/about/' %} class="on"{% endif %}>사무소 소개</a>
+    <a href="{{ url_for('main.service_rehab') }}"{% if request.path.startswith('/service/rehab') %} class="on"{% endif %}>개인회생</a>
+    <a href="{{ url_for('main.service_bankruptcy') }}"{% if request.path.startswith('/service/bankruptcy') %} class="on"{% endif %}>개인파산</a>
+    <a href="{{ url_for('main.service_cost') }}"{% if request.path.startswith('/service/cost') %} class="on"{% endif %}>비용 안내</a>
+    <a href="{{ url_for('board.case_list') }}"{% if request.path.startswith('/사례') %} class="on"{% endif %}>진행 사례</a>
+    <a href="{{ url_for('ko.area_hub') }}"{% if request.path.startswith('/지역별') %} class="on"{% endif %}>지역별 안내</a>
+    <a href="{{ url_for('ko.job_hub') }}"{% if request.path.startswith('/직업별') or request.path.startswith('/상황별') %} class="on"{% endif %}>직업별 안내</a>
+    <a href="{{ url_for('main.faq') }}"{% if request.path.startswith('/faq') %} class="on"{% endif %}>자주 묻는 질문</a>
+    <a href="{{ url_for('contact.contact') }}"{% if request.path.startswith('/contact') %} class="on"{% endif %}>상담 신청</a>
+  </nav>
+  <div class="hdr-tel"><span>상담 전화</span><b>{{ site.phone }}</b></div>
+  <button class="menu-btn" aria-label="메뉴" aria-expanded="false">메뉴</button>
+</div></header>

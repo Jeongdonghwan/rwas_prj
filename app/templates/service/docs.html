@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}준비서류 안내 | {{ site.brand }}{% endblock %}
+{% block meta_desc %}개인회생 준비서류 목록. 부채증명서, 소득증빙, 재산 자료를 어디서 어떻게 발급받는지 정리했습니다.{% endblock %}
+
+{% block content %}
+{% with crumbs=[('준비서류', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+<div class="wrap">
+  <div class="page-head">
+    <p class="cat">업무 안내</p>
+    <h1>준비서류 안내</h1>
+    <p class="lead">서류 준비에 보통 2–3주가 걸립니다. 상담 후 본인 상황에 맞는 체크리스트를 드리고, 발급이 어려운 서류는 함께 준비합니다.</p>
+  </div>
+</div>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><h2>채무 관련</h2></div>
+  <table class="tbl" style="margin-bottom:56px">
+    <tr><th>부채증명서</th><td>채권 금융사별로 각각 발급<small>은행·카드사는 앱/지점, 대부업체는 유선 요청. 발급처 목록은 상담 시 제공</small></td></tr>
+    <tr><th>신용정보 조회서</th><td>올크레딧·나이스 크레딧 조회<small>빠뜨린 채권자를 찾는 용도</small></td></tr>
+    <tr><th>독촉장·압류 관련 서류</th><td>지급명령, 압류·추심 통지서 등 받은 것 전부</td></tr>
+  </table>
+
+  <div class="sec-head"><h2>소득 관련</h2></div>
+  <table class="tbl" style="margin-bottom:56px">
+    <tr><th>급여소득자</th><td>최근 1년 급여명세서, 재직증명서<small>본인이 발급받으므로 회사에 알려지지 않습니다</small></td></tr>
+    <tr><th>사업소득자</th><td>소득금액증명원, 부가세 과세표준증명원<small>홈택스 발급</small></td></tr>
+    <tr><th>프리랜서(3.3%)</th><td>소득금액증명원, 원천징수 내역, 입금 통장 거래내역</td></tr>
+    <tr><th>일용직·현금소득</th><td>통장 거래내역, 일용근로소득 지급명세<small>증빙이 약해도 방법이 있으니 상담에서 확인</small></td></tr>
+  </table>
+
+  <div class="sec-head"><h2>재산·가족 관련</h2></div>
+  <table class="tbl" style="margin-bottom:56px">
+    <tr><th>기본 서류</th><td>주민등록등본·초본(주소 이력 포함), 가족관계증명서, 혼인관계증명서</td></tr>
+    <tr><th>주거</th><td>임대차계약서 또는 등기부등본<small>무상거주 시 무상거주확인서</small></td></tr>
+    <tr><th>재산</th><td>예금 잔액증명, 보험 해약환급금 확인서, 자동차등록증·시세 자료, 퇴직금 추정 자료</td></tr>
+    <tr><th>통장</th><td>주거래 계좌 최근 1년 거래내역</td></tr>
+  </table>
+
+  <div class="sec-head"><h2>서류 준비 순서</h2></div>
+  <ol class="steps" style="grid-template-columns:repeat(4,1fr)">
+    <li><em>1</em><b>상담</b>상황 확인 후 맞춤 체크리스트 제공</li>
+    <li><em>2</em><b>본인 발급분</b>등본·홈택스·앱 발급 서류부터 준비</li>
+    <li><em>3</em><b>부채증명서</b>금융사별 발급. 어려운 곳은 사무소가 안내</li>
+    <li><em>4</em><b>검토·보완</b>사무소에서 누락 확인 후 신청서 작성 착수</li>
+  </ol>
+</div></section>
+{% endblock %}

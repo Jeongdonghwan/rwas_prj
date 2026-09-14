@@ -1,0 +1,39 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>진행 사례 관리</title>
+<style>
+body{font-family:Pretendard,sans-serif;padding:24px;color:#1a1d24;max-width:1000px;margin:0 auto}
+h1{font-size:22px;margin-bottom:4px}
+.nav{margin:10px 0 20px;font-size:14px}
+.nav a{margin-right:14px;color:#2b62c4;text-decoration:none;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border:1px solid #dfe3e8;padding:8px 10px;text-align:left;vertical-align:middle}
+th{background:#f5f7fa}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700}
+.on{background:#e3f0e9;color:#1c7a4d}.off{background:#f3f4f6;color:#8a8f98}
+.btn{display:inline-block;padding:8px 16px;border-radius:8px;background:#1c3d6e;color:#fff;text-decoration:none;font-size:13.5px;font-weight:600;border:0;cursor:pointer}
+form{display:inline}
+.sm{padding:4px 10px;font-size:12.5px;background:#fff;color:#374151;border:1px solid #d7dbe0}
+.sm.danger{color:#b3402f;border-color:#e3b7af}
+</style>
+<h1>진행 사례 관리</h1>
+<p class="nav"><a href="{{ url_for('admin.inquiries') }}">상담 접수</a><a href="{{ url_for('board.case_list') }}" target="_blank">게시판 보기 ↗</a></p>
+<p style="margin-bottom:16px"><a class="btn" href="{{ url_for('admin.case_new') }}">+ 새 사례 작성</a></p>
+<table>
+  <tr><th style="width:44%">제목</th><th>발행일</th><th>공개</th><th>조회</th><th style="width:220px">관리</th></tr>
+  {% for p in posts %}
+  <tr>
+    <td><a href="{{ url_for('board.case_view', slug=p.slug) }}" target="_blank" style="color:inherit">{{ p.title }}</a></td>
+    <td>{{ p.published_at.strftime('%Y-%m-%d') }}</td>
+    <td><span class="badge {{ 'on' if p.is_public else 'off' }}">{{ '공개' if p.is_public else '비공개' }}</span></td>
+    <td>{{ p.view_count or 0 }}</td>
+    <td>
+      <a class="btn sm" href="{{ url_for('admin.case_edit', post_id=p.id) }}">수정</a>
+      <form method="post" action="{{ url_for('admin.case_toggle', post_id=p.id) }}"><button class="btn sm">{{ '비공개로' if p.is_public else '공개로' }}</button></form>
+      <form method="post" action="{{ url_for('admin.case_delete', post_id=p.id) }}" onsubmit="return confirm('삭제할까요? 되돌릴 수 없습니다.')"><button class="btn sm danger">삭제</button></form>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5" style="text-align:center;color:#8a8f98;padding:32px">아직 작성된 사례가 없습니다.</td></tr>
+  {% endfor %}
+</table>

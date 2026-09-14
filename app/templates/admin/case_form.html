@@ -1,0 +1,87 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>{{ '사례 수정' if post and post.id else '새 사례 작성' }}</title>
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+<style>
+body{font-family:Pretendard,sans-serif;padding:24px;color:#1a1d24;max-width:900px;margin:0 auto}
+h1{font-size:22px;margin-bottom:16px}
+label{display:block;font-size:13.5px;font-weight:700;margin:16px 0 6px}
+input[type=text],input[type=date]{width:100%;padding:10px 12px;border:1px solid #d7dbe0;border-radius:8px;font:inherit;font-size:15px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.btn{display:inline-block;padding:12px 26px;border-radius:8px;background:#1c3d6e;color:#fff;border:0;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+.btn.line{background:#fff;color:#374151;border:1px solid #d7dbe0;text-decoration:none}
+.err{background:#fdf4f2;color:#b3402f;border:1px solid #e3b7af;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:14px}
+.hint{font-size:12.5px;color:#8a8f98;font-weight:400;margin-left:6px}
+.thumb-now{margin-top:8px;max-width:240px;border-radius:8px}
+.check{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:600;margin-top:18px}
+.actions{margin-top:24px;display:flex;gap:10px}
+</style>
+
+<h1>{{ '사례 수정' if post and post.id else '새 사례 작성' }}</h1>
+{% if error %}<p class="err">{{ error }}</p>{% endif %}
+
+<form method="post" enctype="multipart/form-data" id="pform">
+  <label>제목</label>
+  <input type="text" name="title" required maxlength="200" value="{{ post.title if post else '' }}" placeholder="예: 영통구 40대 직장인, 채무 1억 2천 회생 인가 사례">
+
+  <label>본문</label>
+  <div id="editor"></div>
+  <input type="hidden" name="body_html" id="body_html">
+
+  <div class="row">
+    <div>
+      <label>요약 <span class="hint">비우면 본문 앞 120자 자동</span></label>
+      <input type="text" name="excerpt" maxlength="300" value="{{ post.excerpt if post else '' }}">
+    </div>
+    <div>
+      <label>발행일</label>
+      <input type="date" name="published_at" value="{{ post.published_at.strftime('%Y-%m-%d') if post and post.published_at else '' }}">
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label>썸네일 이미지 <span class="hint">960px webp로 자동 변환</span></label>
+      <input type="file" name="thumb" accept="image/*">
+      {% if post and post.thumb_path %}<img class="thumb-now" src="{{ post.thumb_path }}" alt="">{% endif %}
+    </div>
+    <div>
+      <label>썸네일 설명(alt) <span class="hint">비우면 제목 사용</span></label>
+      <input type="text" name="thumb_alt" maxlength="200" value="{{ post.thumb_alt if post else '' }}">
+    </div>
+  </div>
+
+  <label class="check"><input type="checkbox" name="is_public" value="1" {{ 'checked' if (post and post.is_public) or not post }}> 공개</label>
+
+  <div class="actions">
+    <button class="btn" type="submit">저장</button>
+    <a class="btn line" href="{{ url_for('admin.cases') }}">목록으로</a>
+  </div>
+</form>
+
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+var initial = {{ (post.body_html if post else '') | tojson }};
+var editor = new toastui.Editor({
+  el: document.querySelector('#editor'),
+  height: '540px',
+  initialEditType: 'wysiwyg',
+  initialValue: '',
+  language: 'ko-KR',
+  hooks: {
+    addImageBlobHook: function (blob, callback) {
+      var fd = new FormData();
+      fd.append('image', blob);
+      fetch('{{ url_for("admin.upload") }}', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (d) { if (d.url) callback(d.url, ''); else alert('업로드 실패'); })
+        .catch(function () { alert('업로드 실패'); });
+      return false;
+    }
+  }
+});
+if (initial) editor.setHTML(initial);
+document.getElementById('pform').addEventListener('submit', function () {
+  document.getElementById('body_html').value = editor.getHTML();
+});
+</script>

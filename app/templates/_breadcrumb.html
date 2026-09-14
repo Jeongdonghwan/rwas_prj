@@ -1,0 +1,7 @@
+{# crumbs: [(label, url|None), ...] — 마지막 항목은 url 없이 #}
+<div class="wrap">
+  <div class="crumb">
+    <a href="{{ url_for('main.index') }}">홈</a>
+    {%- for label, url in crumbs %}<i>›</i>{% if url %}<a href="{{ url }}">{{ label }}</a>{% else %}{{ label }}{% endif %}{% endfor %}
+  </div>
+</div>

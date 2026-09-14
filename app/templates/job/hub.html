@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}직업별 개인회생 안내 | {{ site.brand }}{% endblock %}
+{% block meta_desc %}직장인·자영업자·프리랜서·공무원 등 직업별 개인회생 안내. 소득 증빙 방법과 직업 유지 여부를 직업별로 정리했습니다.{% endblock %}
+
+{% block content %}
+{% with crumbs=[('직업별 개인회생', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+<div class="wrap">
+  <div class="page-head">
+    <p class="cat">직업별 안내</p>
+    <h1>직업별 개인회생 안내</h1>
+    <p class="lead">직업에 따라 소득 증빙 방법, 변제금 산정 기준, 직업·자격 유지 여부가 다릅니다. 본인 직업을 선택하면 해당 기준을 확인할 수 있습니다.</p>
+  </div>
+</div>
+
+<section class="sec"><div class="wrap">
+  {% for category, jobs in categories %}
+  <div style="margin-bottom:48px">
+    <h2 style="padding-bottom:12px;border-bottom:2px solid var(--navy);margin-bottom:16px">{{ category }}</h2>
+    <div class="linklist">
+      {% for j in jobs %}<a href="{{ url_for('ko.page', name=j.slug_ko) }}">{{ j.name }} 개인회생</a>{% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <div style="border:1px solid var(--line);padding:28px;margin-top:16px">
+    <h3 style="margin-bottom:6px">해당하는 직업이 없나요?</h3>
+    <p style="color:var(--ink-2);margin-bottom:16px">어떤 형태든 계속적인 소득이 있으면 개인회생을 검토할 수 있습니다. 소득 형태만 알려주시면 증빙 방법부터 안내해드립니다.</p>
+    <a class="btn red" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>
+    <a class="btn" href="{{ url_for('contact.contact') }}#form" style="margin-left:6px">상담 신청</a>
+  </div>
+</div></section>
+{% endblock %}

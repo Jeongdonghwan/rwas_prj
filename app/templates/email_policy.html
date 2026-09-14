@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}이메일무단수집거부 | {{ site.brand }}{% endblock %}
+{% block meta_desc %}{{ site.firm_name }} 이메일무단수집거부 안내.{% endblock %}
+
+{% block content %}
+{% with crumbs=[('이메일무단수집거부', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+<div class="wrap">
+  <div class="page-head"><h1>이메일무단수집거부</h1></div>
+</div>
+
+<section class="sec"><div class="wrap prose" style="max-width:760px">
+  <p>본 웹사이트에 게시된 이메일 주소가 전자우편 수집 프로그램이나 그 밖의 기술적 장치를 이용하여 무단으로 수집되는 것을 거부하며, 이를 위반할 경우 정보통신망 이용촉진 및 정보보호 등에 관한 법률 제50조의2에 의하여 형사처벌될 수 있음을 알려드립니다.</p>
+</div></section>
+{% endblock %}

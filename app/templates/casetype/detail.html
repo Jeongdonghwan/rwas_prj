@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ case.name }} 개인회생 | {{ site.brand }}{% endblock %}
+{% block meta_desc %}{{ case.name }}(으)로 생긴 채무의 개인회생 안내. 면책 가능 여부와 준비할 것을 정리했습니다.{% endblock %}
+{% block head %}{% include "partials/faq_jsonld.html" %}{% endblock %}
+
+{% block content %}
+{% with crumbs=[('상황별 개인회생', url_for('ko.case_hub')), (case.name, None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+<div class="wrap">
+  <div class="page-head">
+    <p class="cat">상황별 안내</p>
+    <h1>{{ case.name }} 개인회생 안내</h1>
+  </div>
+</div>
+
+<section class="sec"><div class="wrap detail">
+  <div>
+    <div class="prose">
+      <h2>{{ case.name }}, 정리할 수 있습니다</h2>
+      <p>{{ case.intro }}</p>
+
+      <h2>개인회생은 어떤 제도인가</h2>
+      {{ blocks.rehab_core | safe }}
+
+      <h2>신청 후 흐름</h2>
+      {{ blocks.after_apply | safe }}
+
+      <h2>{{ site.firm_name }}이 다르게 하는 점</h2>
+      {{ blocks.why_us | safe }}
+    </div>
+
+    <div class="sec-head" style="margin-top:64px"><h2>{{ case.name }} 자주 묻는 질문</h2></div>
+    <dl class="qa">
+      {% for f in faqs %}<dt>{{ f.q }}</dt><dd>{{ f.a }}</dd>{% endfor %}
+    </dl>
+
+    <div class="sec-head" style="margin-top:64px"><h2>다른 상황 보기</h2></div>
+    <div class="linklist">
+      {% for r in related %}<a href="{{ url_for('ko.page', name=r.slug_ko) }}">{{ r.name }} 개인회생</a>{% endfor %}
+      <a href="{{ url_for('ko.case_hub') }}">상황별 안내 전체</a>
+    </div>
+  </div>
+
+  <aside class="side">
+    <div class="aside">
+      <h3>바로 확인</h3>
+      <ul class="kv">
+        <li><b>변제 기간</b><span>원칙 3년</span></li>
+        <li><b>채무 한도</b><span>무담보 10억 이하</span></li>
+        <li><b>관할 법원</b><span>수원회생법원</span></li>
+        <li><b>상담</b><span>{{ site.hours }}</span></li>
+      </ul>
+      <a class="btn red wide" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>
+      <a class="btn wide" href="{{ url_for('contact.contact') }}#form">상담 신청</a>
+    </div>
+  </aside>
+</div></section>
+{% endblock %}
+
+{% block cta %}{% with cta_title = case.name ~ " 문제, 오늘 상담으로 방향부터 잡으세요." %}{% include "_cta.html" %}{% endwith %}{% endblock %}

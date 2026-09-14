@@ -1,0 +1,13 @@
+<footer class="ftr"><div class="wrap">
+  <div>
+    <b>수원개인회생 {{ site.firm_name }}(LEI)</b>
+    대표변호사 {{ site.ceo }} · 광고책임변호사 {{ site.ad_lawyer }} · 사업자등록번호 {{ site.biz_no }}<br>
+    {{ site.address }} · 이메일 {{ site.email }}<br>
+    <div class="links">
+      <a href="{{ url_for('main.privacy') }}">개인정보처리방침</a>
+      <a href="{{ url_for('main.email_policy') }}">이메일무단수집거부</a>
+    </div>
+    © 2026 {{ site.firm_name }}. 본 사이트의 사례는 의뢰인 동의를 받아 사실 위주로 게시하며, 결과를 보장하지 않습니다.
+  </div>
+  <div class="r"><b>{{ site.phone }}</b>{{ site.hours }}</div>
+</div></footer>

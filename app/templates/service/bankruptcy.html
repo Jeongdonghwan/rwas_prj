@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}개인파산 안내 | {{ site.brand }}{% endblock %}
+{% block meta_desc %}개인파산·면책 제도 안내. 개인회생과의 차이, 면책 불허가 사유, 파산 후 달라지는 점을 정리했습니다.{% endblock %}
+
+{% block content %}
+{% with crumbs=[('개인파산', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+<div class="wrap">
+  <div class="page-head">
+    <p class="cat">업무 안내</p>
+    <h1>개인파산 안내</h1>
+    <p class="lead">소득으로 변제가 불가능한 경우 재산을 정리하고 남은 채무 전부를 면책받는 제도입니다.</p>
+  </div>
+</div>
+
+<section class="sec"><div class="wrap detail">
+  <div>
+    <div class="prose">
+      <h2>개인파산이 맞는 경우</h2>
+      <ul>
+        <li>정기 소득이 없거나, 소득이 생계비에도 미치지 못하는 경우</li>
+        <li>고령·질병 등으로 앞으로도 소득 활동이 어려운 경우</li>
+        <li>처분할 재산이 거의 없는 경우</li>
+      </ul>
+      <p>반대로 정기 소득이 있고 직장·영업을 유지해야 한다면 개인회생이 맞는 경우가 많습니다. 어느 쪽이 유리한지는 소득·재산·채무 성격을 보고 판단하며, 상담에서 두 제도를 같은 기준으로 비교해드립니다.</p>
+
+      <h2>절차 흐름</h2>
+      <ul>
+        <li>파산 신청 → 파산 선고 → 파산관재인 선임(대부분 사건)</li>
+        <li>재산 환가·배당 (재산이 없으면 이 단계가 간단해집니다)</li>
+        <li>면책 심문 → 면책 결정 → 채무 소멸</li>
+      </ul>
+      <p>신청부터 면책까지 통상 6개월–1년입니다. 관재인 보수 예납금이 필요하며 금액은 사건에 따라 다릅니다.</p>
+
+      <h2>면책이 불허될 수 있는 경우</h2>
+      <p>재산 은닉, 특정 채권자에게만 변제, 낭비·도박으로 인한 과다 채무, 허위 서류 제출 등은 면책 불허가 사유입니다. 다만 사유가 있어도 경위에 따라 재량 면책이 되는 경우가 많으므로, 해당 사정이 있다면 숨기지 말고 상담에서 미리 말씀해 주시는 것이 중요합니다.</p>
+
+      <h2>파산하면 무엇이 달라지나요</h2>
+      <p>면책 결정으로 채무는 소멸합니다. 파산 선고 후 면책 전까지는 일부 직종(보험설계사, 경비원 등)에 자격 제한이 있으나 면책되면 복권되어 제한이 사라집니다. 공무원 신분은 파산 선고만으로 당연퇴직되지 않으며, 면책 여부가 중요합니다. 직업별 영향은 상담에서 개별 확인이 필요합니다.</p>
+    </div>
+
+    <div class="sec-head" style="margin-top:64px"><h2>자주 묻는 질문</h2></div>
+    <dl class="qa">
+      <dt>파산하면 가족 명의 재산도 처분되나요?</dt><dd>아닙니다. 본인 명의 재산만 파산재단에 포함됩니다.</dd>
+      <dt>임차보증금은 전부 뺏기나요?</dt><dd>주택임대차보호법상 소액 임차보증금은 면제재산으로 보호됩니다. 지역별 보호 한도는 상담에서 확인해드립니다.</dd>
+      <dt>파산 기록은 언제까지 남나요?</dt><dd>면책 후 신용정보원 기록은 5년 이내 삭제됩니다.</dd>
+    </dl>
+  </div>
+
+  <aside class="side">
+    <div class="aside">
+      <h3>회생과 파산, 뭐가 맞을까</h3>
+      <ul class="kv">
+        <li><b>소득 있음</b><span>개인회생 우선 검토</span></li>
+        <li><b>소득 없음</b><span>개인파산 우선 검토</span></li>
+        <li><b>판단 기준</b><span>상담에서 비교표 제공</span></li>
+      </ul>
+      <a class="btn red wide" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>
+      <a class="btn wide" href="{{ url_for('contact.contact') }}#form">상담 신청</a>
+      <a class="btn line wide" href="{{ url_for('main.service_rehab') }}">개인회생 안내 보기</a>
+    </div>
+  </aside>
+</div></section>
+{% endblock %}

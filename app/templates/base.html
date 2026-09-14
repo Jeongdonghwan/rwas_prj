@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ site.brand }} | 수원지방법원 개인회생·개인파산 상담{% endblock %}</title>
+<meta name="description" content="{% block meta_desc %}수원 장안구·권선구·팔달구·영통구 개인회생 상담. 수원지방법원 회생 사건 진행, 준비서류와 비용을 상담 전에 확인하세요.{% endblock %}">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="{{ site.base_url }}{{ request.path }}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ self.title() }}">
+<meta property="og:description" content="{{ self.meta_desc() }}">
+<meta property="og:url" content="{{ site.base_url }}{{ request.path }}">
+{% if site.naver_site_verification %}<meta name="naver-site-verification" content="{{ site.naver_site_verification }}">{% endif %}
+{% if site.google_site_verification %}<meta name="google-site-verification" content="{{ site.google_site_verification }}">{% endif %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+
+{% include "_header.html" %}
+
+{% block content %}{% endblock %}
+
+{% block cta %}{% include "_cta.html" %}{% endblock %}
+
+{% include "_footer.html" %}
+{% include "_mobile_bar.html" %}
+<script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+</body>
+</html>
