@@ -6,11 +6,11 @@
 
 :root{
   --ink:#1c1b18; --ink-2:#63615b; --ink-3:#9c998f;
-  --line:#e7e5df; --line-2:#f1f0ec;
-  --paper:#ffffff; --paper-2:#f8f7f4;
-  --green:#26241f; --green-2:#8f6f38; --green-bright:#b98f4a;
+  --line:#e6e5e1; --line-2:#f1f0ee;
+  --paper:#ffffff; --paper-2:#f7f7f5;
+  --green:#232220; --green-2:#4c4a44; --green-bright:#b98f4a;
   --green-dark:#191813; --green-deep:#121109;
-  --mint:#f4efe4; --mint-2:#e6dcc4;
+  --mint:#f2f1ee; --mint-2:#e3e1dc;
   --gold:#a5854c; --gold-2:#84683a;
   /* 구명칭 별칭 */
   --navy:var(--green); --navy-2:var(--green-2); --red:var(--green-2);
@@ -41,8 +41,8 @@ p{margin:0}
 .sec-head{margin-bottom:42px}
 .sec-head .label{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--green-2);margin-bottom:12px}
 .sec-head .label::before{content:"";width:22px;height:2px;background:var(--green-2)}
-.sec.dark .sec-head .label{color:#d8b878}
-.sec.dark .sec-head .label::before{background:#d8b878}
+.sec.dark .sec-head .label{color:#cfb27e}
+.sec.dark .sec-head .label::before{background:#cfb27e}
 .sec-head h2{margin-bottom:12px}
 .sec-head.center{text-align:center}
 .sec-head.center .label::before{display:none}
@@ -85,7 +85,7 @@ p{margin:0}
 .hdr.scrolled{box-shadow:0 6px 24px rgba(40,36,24,.08);border-bottom-color:var(--line-2)}
 .hdr .wrap{display:flex;align-items:center;height:76px;gap:26px}
 .logo{display:flex;align-items:center;white-space:nowrap}
-.logo img{height:46px;width:auto;display:block}
+.logo img{height:44px;width:auto;display:block;image-rendering:auto}
 .logo small{display:block;font-weight:600;font-size:10.5px;color:var(--ink-3);letter-spacing:.2em;line-height:1.2;margin-top:2px}
 .gnb{display:flex;gap:4px;font-weight:600;font-size:15px;margin-left:auto}
 .gnb a{padding:9px 13px;border-radius:9px;transition:color .15s,background .15s;white-space:nowrap;color:var(--ink-2)}
@@ -182,7 +182,7 @@ p{margin:0}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
 .cards.four{grid-template-columns:repeat(4,1fr)}
 .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:40px 34px;position:relative;overflow:hidden;transition:transform .28s cubic-bezier(.2,.65,.3,1),box-shadow .28s,border-color .28s}
-.card::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--green-2),var(--green-bright));transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.65,.3,1)}
+.card::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--green-bright);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.65,.3,1)}
 .card:hover::before{transform:scaleX(1)}
 .card:hover{transform:translateY(-8px);box-shadow:var(--shadow-lg);border-color:var(--mint-2)}
 .card .num{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:14px;background:var(--mint);color:var(--green-2);font-weight:800;font-size:20px;margin-bottom:22px}
@@ -311,7 +311,7 @@ p{margin:0}
 .quiz{background:#fff;color:var(--ink);border-radius:22px;max-width:740px;margin:0 auto;padding:46px 42px;box-shadow:var(--shadow-lg)}
 .quiz .qnum{font-size:12.5px;font-weight:800;letter-spacing:.1em;color:var(--green-2);margin-bottom:10px}
 .quiz .bar{height:5px;background:var(--line-2);border-radius:99px;margin-bottom:26px;overflow:hidden}
-.quiz .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green-2),var(--green-bright));border-radius:99px;transition:width .4s cubic-bezier(.2,.65,.3,1)}
+.quiz .bar i{display:block;height:100%;background:var(--green-bright);border-radius:99px;transition:width .4s cubic-bezier(.2,.65,.3,1)}
 .quiz h3{font-size:23px;font-weight:800;margin-bottom:26px;min-height:66px}
 .quiz .opts{display:grid;gap:10px}
 .quiz .opts button{text-align:left;border:1px solid var(--line);border-radius:14px;background:#fff;padding:18px 22px;font:inherit;font-size:16.5px;font-weight:600;color:var(--ink-2);cursor:pointer;transition:border-color .15s,background .15s,color .15s,transform .15s}
@@ -527,4 +527,4 @@ body.nav-open .gnb a{padding:15px 4px;border-bottom:1px solid var(--line-2);bord
 }
 
 /* 스크롤 진행바 */
-#progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--green-2),var(--green-bright));z-index:100;pointer-events:none}
+#progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--green-bright);z-index:100;pointer-events:none}
