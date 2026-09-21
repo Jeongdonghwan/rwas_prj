@@ -84,8 +84,13 @@ p{margin:0}
 .hdr{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);position:sticky;top:0;z-index:20;transition:box-shadow .25s;border-bottom:1px solid transparent}
 .hdr.scrolled{box-shadow:0 6px 24px rgba(40,36,24,.08);border-bottom-color:var(--line-2)}
 .hdr .wrap{display:flex;align-items:center;height:76px;gap:26px}
-.logo{display:flex;align-items:center;white-space:nowrap}
-.logo img{height:44px;width:auto;display:block;image-rendering:auto}
+.logo{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.logo img{height:40px;width:auto;display:block}
+.logo .lname{font-weight:800;font-size:19px;letter-spacing:-.01em;color:#8a6a34;line-height:1.15}
+.logo .lname small{display:block;font-weight:600;font-size:9.5px;letter-spacing:.26em;color:#b99a63}
+.ftr .flogo{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ftr .flogo span{font-weight:800;font-size:17px;color:#d9bd8a;line-height:1.15}
+.ftr .flogo span small{display:block;font-weight:600;font-size:9px;letter-spacing:.24em;color:rgba(217,189,138,.65)}
 .logo small{display:block;font-weight:600;font-size:10.5px;color:var(--ink-3);letter-spacing:.2em;line-height:1.2;margin-top:2px}
 .gnb{display:flex;gap:4px;font-weight:600;font-size:15px;margin-left:auto}
 .gnb a{padding:9px 13px;border-radius:9px;transition:color .15s,background .15s;white-space:nowrap;color:var(--ink-2)}
@@ -292,6 +297,92 @@ p{margin:0}
 .corebox{margin-top:24px;background:var(--mint);border-radius:12px;padding:18px 22px;font-size:14.5px;color:var(--ink-2);line-height:1.75}
 .corebox b{color:var(--green-2)}
 
+/* 파스텔 4색 안내 카드 (핵심안내 스타일) */
+.pastel .card{border:0;box-shadow:none}
+.pastel .card.t1{background:#eef4fd}
+.pastel .card.t2{background:#ebf7f0}
+.pastel .card.t3{background:#fdf2ea}
+.pastel .card.t4{background:#f2effd}
+.pastel .card .ico{background:#fff;border-radius:50%}
+.pastel .card.t1 .ico{color:#2f6fe8}
+.pastel .card.t2 .ico{color:#1d9d5f}
+.pastel .card.t3 .ico{color:#e8722a}
+.pastel .card.t4 .ico{color:#7c5cd8}
+.pastel .card .big{font-size:30px}
+.pastel .card.t1 .big{color:#2f6fe8}
+.pastel .card.t2 .big{color:#1d9d5f}
+.pastel .card.t3 .big{color:#e8722a}
+.pastel .card.t4 .big{color:#7c5cd8}
+.pastel .card .big::after{content:"";display:block;width:34px;height:3px;border-radius:2px;background:currentColor;opacity:.55;margin-top:10px}
+.pastel .card h3{font-size:16.5px;color:var(--ink-2)}
+.infobar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#eef4fd;border-radius:14px;padding:18px 24px;margin-top:22px;font-size:15px}
+.infobar .bico{flex:none;width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:#2f6fe8}
+.infobar .bico svg{width:19px;height:19px}
+.infobar b{color:#2f6fe8}
+.infobar .sub2{color:var(--ink-3);font-size:13.5px;margin-left:auto}
+
+/* 제도 비교 3열 컬러 카드 */
+.pcmp{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.pcol{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.pcol .phead{color:#fff;padding:20px 22px;position:relative}
+.pcol.c1 .phead{background:#3b6fe0}
+.pcol.c2 .phead{background:#6b5bd6}
+.pcol.c3 .phead{background:#1e9e63}
+.pcol .phead .pnum{position:absolute;right:16px;top:14px;font-size:12px;font-weight:800;background:rgba(255,255,255,.22);border-radius:8px;padding:3px 9px}
+.pcol .phead .pt{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800}
+.pcol .phead .pt svg{width:22px;height:22px}
+.pcol .phead p{font-size:13px;color:rgba(255,255,255,.85);margin-top:4px}
+.pcol .prows{padding:8px 22px;flex:1}
+.pcol .prows li{display:grid;grid-template-columns:22px 76px 1fr;gap:10px;align-items:start;padding:13px 0;border-bottom:1px solid var(--line-2);font-size:14px}
+.pcol .prows li:last-child{border-bottom:0}
+.pcol .prows li svg{width:17px;height:17px;margin-top:2px;color:var(--ink-3)}
+.pcol.c1 .prows li svg{color:#3b6fe0}
+.pcol.c2 .prows li svg{color:#6b5bd6}
+.pcol.c3 .prows li svg{color:#1e9e63}
+.pcol .prows li i{font-style:normal;color:var(--ink-3);font-weight:600}
+.pcol .prows li b{font-weight:700}
+.pcol .pfoot{margin:0 16px 16px;border-radius:12px;padding:14px 16px;font-size:13px;color:var(--ink-2);text-align:center;line-height:1.7}
+.pcol.c1 .pfoot{background:#eef4fd}
+.pcol.c2 .pfoot{background:#f2effd}
+.pcol.c3 .pfoot{background:#ebf7f0}
+
+/* 진행절차 아이콘 타임라인 */
+.tl{display:grid;grid-template-columns:repeat(7,1fr);gap:0;position:relative;margin-top:10px}
+.tl::before{content:"";position:absolute;left:7%;right:7%;top:31px;height:2px;background:var(--line)}
+.tl li{text-align:center;position:relative;padding:0 6px}
+.tl .tic{width:62px;height:62px;border-radius:50%;background:#fff;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;position:relative;color:var(--green-2);transition:border-color .2s,color .2s,transform .2s}
+.tl .tic svg{width:24px;height:24px}
+.tl li:hover .tic{border-color:var(--green-bright);color:var(--green-bright);transform:translateY(-3px)}
+.tl .tno{position:absolute;top:-6px;right:-2px;background:var(--green);color:#fff;font-size:10.5px;font-weight:800;border-radius:8px;padding:2px 7px}
+.tl b{display:block;font-size:15px;margin-bottom:3px}
+.tl span{font-size:12.5px;color:var(--ink-3);line-height:1.5;display:block}
+
+/* 단계별 상세 rows (process 페이지) */
+.prows2{border-top:2px solid var(--green)}
+.prows2 li{display:grid;grid-template-columns:120px 1fr 250px;gap:26px;padding:26px 4px;border-bottom:1px solid var(--line-2)}
+.prows2 .pn2{display:flex;align-items:flex-start;gap:12px}
+.prows2 .pn2 em{font-style:normal;font-size:30px;font-weight:800;color:var(--mint-2);line-height:1}
+.prows2 .pn2 .tic{width:46px;height:46px;border-radius:12px;background:var(--mint);color:var(--green-2);display:flex;align-items:center;justify-content:center;flex:none}
+.prows2 .pn2 .tic svg{width:20px;height:20px}
+.prows2 h3{font-size:17.5px;margin-bottom:6px}
+.prows2 .pd{font-size:14.5px;color:var(--ink-2)}
+.prows2 .pc{background:var(--paper-2);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--ink-2)}
+.prows2 .pc b{display:block;font-size:12px;color:var(--green-2);letter-spacing:.06em;margin-bottom:6px}
+
+/* 비용 카드형 리스트 */
+.costcard{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.costcard li{display:grid;grid-template-columns:150px 1fr;gap:18px;padding:20px 24px;border-bottom:1px solid var(--line-2);align-items:start}
+.costcard li:last-child{border-bottom:0}
+.costcard li i{font-style:normal;font-weight:700;font-size:15px;padding-top:2px}
+.costcard li b{display:block;font-size:16.5px;font-weight:700}
+.costcard li small{display:block;font-size:13px;color:var(--ink-3);margin-top:3px}
+
+/* 자격진단 뒤로가기 */
+.quiz .qtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.quiz .qback{background:none;border:none;font:inherit;font-size:13px;font-weight:600;color:var(--ink-3);cursor:pointer;padding:2px 0}
+.quiz .qback:hover{color:var(--ink)}
+.quiz .qback:disabled{visibility:hidden}
+
 /* Q&A 아코디언 */
 .qa{display:block}
 .qa dt{font-weight:700;padding:21px 48px 21px 20px;font-size:16.5px;cursor:pointer;position:relative;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff;transition:border-color .2s,background .2s}
@@ -316,6 +407,9 @@ p{margin:0}
 .quiz .opts{display:grid;gap:10px}
 .quiz .opts button{text-align:left;border:1px solid var(--line);border-radius:14px;background:#fff;padding:18px 22px;font:inherit;font-size:16.5px;font-weight:600;color:var(--ink-2);cursor:pointer;transition:border-color .15s,background .15s,color .15s,transform .15s}
 .quiz .opts button:hover{border-color:var(--green-2);background:var(--mint);color:var(--green);transform:translateY(-2px)}
+.quiz .opts button.picked{border-color:var(--green);background:var(--green);color:#fff}
+.quiz .opts .qback{border:none;background:none;padding:0 0 12px;font-size:13px;color:var(--ink-3);cursor:pointer;text-align:left;transform:none}
+.quiz .opts .qback:hover{color:var(--ink);background:none;border:none;transform:none}
 .quiz .result h3{min-height:0}
 .quiz .result p{color:var(--ink-2);font-size:15px;margin-bottom:22px}
 .quiz .result .btn{margin-right:6px}
@@ -471,6 +565,10 @@ body.nav-open .gnb a{padding:15px 4px;border-bottom:1px solid var(--line-2);bord
   .quick form{grid-template-columns:1fr 1fr}
   .quick .btn{grid-column:1/-1}
   .cards,.cards.four{grid-template-columns:1fr 1fr}
+  .pcmp{grid-template-columns:1fr}
+  .tl{grid-template-columns:repeat(4,1fr);row-gap:26px}
+  .tl::before{display:none}
+  .prows2 li{grid-template-columns:1fr;gap:12px}
   .steps{grid-template-columns:repeat(4,1fr)}
   .area-grid{grid-template-columns:1fr 1fr}
   .detail{grid-template-columns:1fr}
@@ -502,6 +600,9 @@ body.nav-open .gnb a{padding:15px 4px;border-bottom:1px solid var(--line-2);bord
   .strip span{font-size:12px}
   .checks{columns:1}
   .cards,.cards.four{grid-template-columns:1fr}
+  .tl{grid-template-columns:repeat(2,1fr)}
+  .costcard li{grid-template-columns:1fr;gap:6px}
+  .infobar .sub2{margin-left:0}
   .steps{grid-template-columns:1fr 1fr}
   .area-grid{grid-template-columns:1fr;gap:16px}
   .points li{grid-template-columns:1fr;gap:6px}

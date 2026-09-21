@@ -10,13 +10,25 @@ def index():
     gus = Gu.query.order_by(Gu.sort).all()
     jobs = Job.query.order_by(Job.sort).all()
     cases = CaseType.query.order_by(CaseType.sort).all()
+    job_groups = []
+    for j in jobs:
+        if not job_groups or job_groups[-1][0] != j.category:
+            job_groups.append((j.category, []))
+        job_groups[-1][1].append(j)
     posts = (
         Post.query.filter_by(is_public=True)
         .order_by(Post.published_at.desc())
         .limit(4)
         .all()
     )
-    return render_template("index.html", gus=gus, jobs=jobs, cases=cases, posts=posts)
+    return render_template(
+        "index.html",
+        gus=gus,
+        jobs=jobs,
+        job_groups=job_groups,
+        cases=cases,
+        posts=posts,
+    )
 
 
 @bp.route("/about/")

@@ -4,7 +4,10 @@
 </div></div>
 
 <header class="hdr"><div class="wrap">
-  <a class="logo" href="{{ url_for('main.index') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="{{ site.brand }}" width="230" height="46"></a>
+  <a class="logo" href="{{ url_for('main.index') }}">
+    <img src="{{ url_for('static', filename='img/emblem.png') }}" alt="" width="42" height="38">
+    <span class="lname">법률사무소 레이<small>LEI LAW OFFICE</small></span>
+  </a>
   <nav class="gnb">
     <a href="{{ url_for('main.about') }}"{% if request.path == '/about/' %} class="on"{% endif %}>사무소 소개</a>
     <a href="{{ url_for('main.service_rehab') }}"{% if request.path.startswith('/service/rehab') %} class="on"{% endif %}>개인회생</a>
