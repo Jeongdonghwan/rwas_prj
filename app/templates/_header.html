@@ -1,10 +1,10 @@
 <div class="topbar"><div class="wrap">
-  <div><span>상담 09:00–19:00 · 토요일 예약제</span><span>수원지방법원 앞 <b>원희캐슬광교 D동 10층</b></span></div>
+  <div><span>상담 24시간 · 주말 예약제</span><span>수원회생법원 앞 <b>원희캐슬광교 D동 10층 1002호</b></span></div>
   <div><span>상담 전화 <b>{{ site.phone }}</b></span><span><a href="{{ url_for('contact.contact') }}#form">상담 신청</a></span></div>
 </div></div>
 
 <header class="hdr"><div class="wrap">
-  <a class="logo" href="{{ url_for('main.index') }}">{{ site.brand }}<small>{{ site.brand_en }}</small></a>
+  <a class="logo" href="{{ url_for('main.index') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="{{ site.brand }}" width="230" height="46"></a>
   <nav class="gnb">
     <a href="{{ url_for('main.about') }}"{% if request.path == '/about/' %} class="on"{% endif %}>사무소 소개</a>
     <a href="{{ url_for('main.service_rehab') }}"{% if request.path.startswith('/service/rehab') %} class="on"{% endif %}>개인회생</a>

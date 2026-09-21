@@ -19,18 +19,18 @@ class Config:
 # 사이트 기본값 (사업자등록증 기준). 이메일·도메인은 확정 시 교체.
 SITE_DEFAULTS = {
     "firm_name": "법률사무소 레이",
-    "brand": "수원개인회생 법률사무소 레이",
-    "brand_en": "LAW OFFICE LEI",
+    "brand": "수원개인회생파산 법률사무소 레이",
+    "brand_en": "LEI LAW OFFICE",
     "phone": "1644-6755",
     "phone_link": "16446755",
-    "address": "경기도 수원시 영통구 광교중앙로248번길 7-2, D동 10층 1001호(하동, 원희캐슬광교)",
-    "address_short": "수원시 영통구 광교중앙로248번길 7-2, 원희캐슬광교 D동 10층",
+    "address": "경기도 수원시 영통구 광교중앙로248번길 7-2, D동 10층 1002호(하동, 원희캐슬광교)",
+    "address_short": "수원시 영통구 광교중앙로248번길 7-2, 원희캐슬광교 D동 10층 1002호",
     "ceo": "이재열",
     "ad_lawyer": "이재열",
     "biz_no": "333-41-00086",
     "since": "2016",  # 개업 2016년 3월 15일
     "email": "info@example.com",  # TODO: 실제 이메일
-    "hours": "평일 09:00–19:00, 토요일 예약제",
+    "hours": "24시간 상담, 주말 예약제",
     "map_embed": "",
     "base_url": "https://example.com",  # 도메인 확정 후 교체 (non-www, https)
     "naver_site_verification": "",

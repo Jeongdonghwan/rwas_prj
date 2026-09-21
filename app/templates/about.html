@@ -15,10 +15,10 @@
 <section class="sec lawyer-sec"><div class="wrap">
   <div class="lawyer-photo reveal">
     <img src="{{ url_for('static', filename='img/lawyer-card.webp') }}" alt="이재열 대표변호사" width="380" height="475">
-    <div class="tag"><b>이재열 변호사</b><span>{{ lawyer.name_en }} · 제1회 변호사시험</span></div>
+    <div class="tag"><b>이재열 변호사</b><span>{{ lawyer.name_en }} · LEI LAW OFFICE</span></div>
   </div>
   <div class="lawyer-bio reveal d1">
-    <div class="sec-head" style="margin-bottom:20px"><span class="label">대표변호사</span><h2>이재열 대표변호사</h2></div>
+    <div class="sec-head" style="margin-bottom:20px"><span class="label">대표변호사</span><h2>이재열 변호사</h2></div>
     <ul>
       {% for e in lawyer.edu %}<li>{{ e }}</li>{% endfor %}
     </ul>
@@ -46,14 +46,6 @@
         <li>비용은 착수 전에 서면으로 안내하고, 분할 납부를 받습니다.</li>
       </ul>
 
-      <h2>사무소 정보</h2>
-      <table class="tbl" style="margin-top:16px">
-        <tr><th>상호</th><td>수원개인회생 {{ site.firm_name }}(LEI)</td></tr>
-        <tr><th>대표변호사</th><td>{{ site.ceo }} (광고책임변호사 {{ site.ad_lawyer }})</td></tr>
-        <tr><th>사업자등록번호</th><td>{{ site.biz_no }}</td></tr>
-        <tr><th>개업</th><td>{{ site.since }}년 3월</td></tr>
-        <tr><th>주소</th><td>{{ site.address }}</td></tr>
-      </table>
     </div>
   </div>
 
@@ -62,7 +54,7 @@
       <h3>상담 안내</h3>
       <ul class="kv">
         <li><b>상담 시간</b><span>{{ site.hours }}</span></li>
-        <li><b>비용</b><span>상담 무료</span></li>
+        <li><b>상담</b><span>전국 비대면·익명 가능</span></li>
         <li><b>위치</b><span>수원지방법원 앞 (광교)</span></li>
       </ul>
       <a class="btn red wide" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>

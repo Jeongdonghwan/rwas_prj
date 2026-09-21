@@ -123,88 +123,252 @@
     });
   });
 
-  // 자가진단
-  var quiz = document.getElementById('quiz');
-  if (quiz) {
-    var QUESTIONS = [
-      { q: '매달 들어오는 소득이 있으신가요? (급여·사업·프리랜서·일용 모두 포함)',
-        opts: ['네, 정기적으로 있습니다', '수입이 불규칙하지만 있습니다', '현재 소득이 없습니다'] },
-      { q: '전체 채무는 어느 정도인가요?',
-        opts: ['3천만 원 이하', '3천만~1억 원', '1억~10억 원', '10억 원 초과'] },
-      { q: '현재 상황과 가장 가까운 것은?',
-        opts: ['아직 연체 전이지만 이자 갚기가 벅차다', '연체가 시작됐고 독촉 연락이 온다', '압류·지급명령 등 법적 조치를 받았다'] },
-      { q: '월 소득에서 대출 상환이 차지하는 비중은?',
-        opts: ['절반 이하', '절반 이상', '소득 대부분 또는 그 이상'] }
-    ];
-    var answers = [];
-    var step = 0;
-    var num = quiz.querySelector('.qnum');
-    var bar = quiz.querySelector('.bar i');
-    var title = quiz.querySelector('h3');
-    var opts = quiz.querySelector('.opts');
+  // 자가진단 (분기형)
+  initQuiz();
+})();
 
-    function renderQ() {
-      var item = QUESTIONS[step];
-      num.textContent = '질문 ' + (step + 1) + ' / ' + QUESTIONS.length;
-      bar.style.width = (step / QUESTIONS.length) * 100 + '%';
-      title.textContent = item.q;
-      opts.innerHTML = '';
-      item.opts.forEach(function (label, idx) {
+
+// ===== 1분 자격진단 — 분기형 =====
+function initQuiz() {
+  var quiz = document.getElementById('quiz');
+  if (!quiz) return;
+
+  var num = quiz.querySelector('.qnum');
+  var bar = quiz.querySelector('.bar i');
+  var title = quiz.querySelector('h3');
+  var opts = quiz.querySelector('.opts');
+
+  var fmt = function (n) { return (n || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); };
+  var toNum = function (v) { return parseInt(String(v).replace(/[^0-9]/g, ''), 10) || 0; };
+
+  var A = {};
+  var queue = [];
+  var count = 0;
+
+  function stepChoice(key, q, note, list, onPick) {
+    return { type: 'choice', key: key, q: q, note: note, list: list, onPick: onPick };
+  }
+  function stepNumber(key, q, note, placeholder) {
+    return { type: 'number', key: key, q: q, note: note, ph: placeholder };
+  }
+
+  function startRehabTrack() {
+    queue = [
+      stepNumber('income', '월평균 실수령액은 얼마인가요?', '세후 기준, 대략적인 금액이면 됩니다.', '예: 3,200,000'),
+      stepNumber('repay', '매달 대출·카드 등으로 상환하는 금액은 얼마인가요?', '이자·원금·카드값을 합친 대략적인 금액.', '예: 1,850,000'),
+      stepChoice('debt', '현재 갚아야 할 전체 채무는 어느 정도인가요?', '대출·카드·대부업·개인채무 등을 모두 포함해 주세요.',
+        ['3천만 원 이하', '3천만~1억 원', '1억~5억 원', '5억 원 이상']),
+      { type: 'multi', key: 'assets', q: '보유하신 재산이 있나요? (해당하는 항목 모두 선택)', note: '선택한 항목에 따라 확인 질문이 이어집니다.',
+        list: ['자동차', '임차보증금', '부동산', '보험해약환급금', '예·적금', '기타', '특별한 재산 없다'] },
+      stepChoice('loan', '최근 1년 이내 새로 받은 대출이 있나요?', null,
+        ['거의 없다', '생활비 등으로 일부 받았다', '여러 차례 추가대출을 받았다', '최근 대출 비중이 상당히 높다'],
+        function (idx) {
+          if (idx > 0) {
+            queue.unshift(
+              stepChoice('loanWhen', '대략 언제 받으셨나요?', null,
+                ['3개월 이내', '3~6개월 전', '6개월~1년 전']),
+              stepChoice('loanUse', '최근 대출의 주요 사용처는 무엇인가요?', null,
+                ['생활비·생계비', '기존 채무를 갚기 위한 상환', '사업 또는 자영업 운영', '투자·주식·코인 등', '기타'])
+            );
+          }
+        }),
+      stepChoice('overdue', '현재 채무 상환 상태는 어떠신가요?', null,
+        ['아직 연체 전이지만 상환이 부담된다', '이미 연체가 시작됐다', '독촉·추심 연락을 받고 있다', '압류·지급명령 등 법적 절차가 진행 중이다']),
+      stepChoice('family', '현재 함께 생활비를 부담하고 있는 가족이 있나요?', null,
+        ['없다', '미성년 자녀가 있다', '배우자와 함께 생활한다', '부모님 등을 부양하고 있다'])
+    ];
+  }
+
+  function startBankruptcyTrack() {
+    queue = [
+      stepChoice('debt', '현재 갚아야 할 전체 채무는 어느 정도인가요?', '대출·카드·대부업·개인채무 등을 모두 포함해 주세요.',
+        ['3천만 원 이하', '3천만~1억 원', '1억~5억 원', '5억 원 이상']),
+      { type: 'multi', key: 'assets', q: '보유하신 재산이 있나요? (해당하는 항목 모두 선택)', note: null,
+        list: ['자동차', '임차보증금', '부동산', '보험해약환급금', '예·적금', '기타', '특별한 재산 없다'] },
+      stepChoice('overdue', '현재 채무 상환 상태는 어떠신가요?', null,
+        ['아직 연체 전이지만 상환이 부담된다', '이미 연체가 시작됐다', '독촉·추심 연락을 받고 있다', '압류·지급명령 등 법적 절차가 진행 중이다'])
+    ];
+  }
+
+  function assetFollowups(selected) {
+    var f = [];
+    if (selected.indexOf('부동산') > -1) f.push(stepNumber('assetHome', '부동산의 대략적인 예상가액은 얼마인가요?', '남은 담보대출이 있다면 상담에서 함께 확인합니다.', '예: 250,000,000'));
+    if (selected.indexOf('자동차') > -1) f.push(stepNumber('assetCar', '차량의 대략적인 현재 가치는 얼마인가요?', '중고 시세 기준, 대략이면 됩니다.', '예: 8,000,000'));
+    return f;
+  }
+
+  function render(step) {
+    count += 1;
+    num.textContent = '질문 ' + count;
+    bar.style.width = Math.min(count / 9, 0.95) * 100 + '%';
+    title.textContent = step.q;
+    opts.innerHTML = '';
+    if (step.note) {
+      var nt = document.createElement('p');
+      nt.className = 'qnote';
+      nt.textContent = step.note;
+      opts.appendChild(nt);
+    }
+
+    if (step.type === 'choice') {
+      step.list.forEach(function (label, idx) {
         var b = document.createElement('button');
         b.type = 'button';
         b.textContent = label;
         b.addEventListener('click', function () {
-          answers[step] = idx;
-          step += 1;
-          if (step < QUESTIONS.length) renderQ();
-          else renderResult();
+          A[step.key] = idx; A[step.key + 'Label'] = label;
+          if (step.onPick) step.onPick(idx);
+          next();
         });
         opts.appendChild(b);
       });
+    } else if (step.type === 'number') {
+      var row = document.createElement('div');
+      row.className = 'inp';
+      var input = document.createElement('input');
+      input.type = 'text'; input.inputMode = 'numeric'; input.placeholder = step.ph || '';
+      input.addEventListener('input', function () {
+        var v = toNum(input.value);
+        input.value = v ? fmt(v) : '';
+      });
+      var unit = document.createElement('span'); unit.className = 'unit'; unit.textContent = '원';
+      var go = document.createElement('button');
+      go.type = 'button'; go.className = 'btn gold'; go.textContent = '다음';
+      go.addEventListener('click', function () {
+        A[step.key] = toNum(input.value);
+        next();
+      });
+      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') go.click(); });
+      row.appendChild(input); row.appendChild(unit); row.appendChild(go);
+      opts.appendChild(row);
+      setTimeout(function () { input.focus(); }, 50);
+    } else if (step.type === 'multi') {
+      var wrap = document.createElement('div');
+      wrap.className = 'multi';
+      var picked = [];
+      step.list.forEach(function (label) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.textContent = label;
+        if (label === '특별한 재산 없다') b.classList.add('none-opt');
+        b.addEventListener('click', function () {
+          if (label === '특별한 재산 없다') {
+            picked = ['특별한 재산 없다'];
+            wrap.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
+            b.classList.add('on');
+          } else {
+            var noneBtn = wrap.querySelector('button.none-opt');
+            if (noneBtn) noneBtn.classList.remove('on');
+            picked = picked.filter(function (x) { return x !== '특별한 재산 없다'; });
+            var i = picked.indexOf(label);
+            if (i > -1) { picked.splice(i, 1); b.classList.remove('on'); }
+            else { picked.push(label); b.classList.add('on'); }
+          }
+        });
+        wrap.appendChild(b);
+      });
+      var go = document.createElement('button');
+      go.type = 'button'; go.className = 'btn gold nextbtn'; go.textContent = '다음';
+      go.addEventListener('click', function () {
+        if (!picked.length) picked = ['특별한 재산 없다'];
+        A[step.key] = picked.slice();
+        var fu = assetFollowups(picked);
+        for (var i = fu.length - 1; i >= 0; i--) queue.unshift(fu[i]);
+        next();
+      });
+      opts.appendChild(wrap);
+      opts.appendChild(go);
     }
-
-    function renderResult() {
-      bar.style.width = '100%';
-      num.textContent = '진단 결과';
-      var noIncome = answers[0] === 2;
-      var overLimit = answers[1] === 3;
-      var msg, sub;
-      if (noIncome) {
-        msg = '개인파산 쪽을 먼저 검토해보시는 것이 좋겠습니다.';
-        sub = '개인회생은 정기 소득이 필요한 제도입니다. 소득이 없는 경우 개인파산·면책으로 정리하는 방법이 있으며, 상담에서 두 제도를 비교해 안내드립니다.';
-      } else if (overLimit) {
-        msg = '채무 규모상 일반회생 등 다른 절차 검토가 필요합니다.';
-        sub = '개인회생은 무담보 10억 원 이하가 대상입니다. 채무 구성에 따라 이용 가능한 절차가 달라지므로 상담에서 정확히 확인해드립니다.';
-      } else {
-        msg = '개인회생 검토 대상에 해당할 가능성이 있습니다.';
-        sub = '정확한 신청 가능 여부와 예상 월 변제금은 채무·소득·재산을 확인해야 계산됩니다. 상담은 무료이며, 전화 10분이면 예상 변제금까지 안내드립니다.';
-      }
-      title.textContent = msg;
-      opts.innerHTML = '';
-      var wrapEl = document.createElement('div');
-      wrapEl.className = 'result';
-      var p = document.createElement('p');
-      p.textContent = sub + ' 본 결과는 참고용이며 법적 판단이 아닙니다.';
-      wrapEl.appendChild(p);
-      var a1 = document.createElement('a');
-      a1.className = 'btn gold';
-      a1.href = quiz.getAttribute('data-contact-url') || '/contact/';
-      a1.textContent = '무료 상담 신청';
-      var a2 = document.createElement('a');
-      a2.className = 'btn line';
-      a2.href = 'tel:' + (quiz.getAttribute('data-tel') || '');
-      a2.textContent = '전화 상담';
-      wrapEl.appendChild(a1);
-      wrapEl.appendChild(a2);
-      var re = document.createElement('button');
-      re.type = 'button';
-      re.className = 'restart';
-      re.textContent = '다시 진단하기';
-      re.addEventListener('click', function () { answers = []; step = 0; renderQ(); });
-      wrapEl.appendChild(re);
-      opts.appendChild(wrapEl);
-    }
-
-    renderQ();
   }
-})();
+
+  function next() {
+    if (queue.length) render(queue.shift());
+    else result();
+  }
+
+  function row(label, value) {
+    return value ? '<li><b>' + label + '</b><span>' + value + '</span></li>' : '';
+  }
+
+  function result() {
+    bar.style.width = '100%';
+    num.textContent = '진단 결과';
+
+    var bankruptcy = A.track === 'bankruptcy';
+    var burden = (A.income && A.repay) ? Math.round(A.repay / A.income * 100) : null;
+    var overdueIdx = A.overdue || 0;
+    var hasAssets = (A.assets || []).length && (A.assets || [])[0] !== '특별한 재산 없다';
+    var recentLoan = (A.loan || 0) > 0;
+
+    var verdict, why;
+    if (bankruptcy) {
+      verdict = '현재 입력하신 내용으로는 개인파산을 우선 검토해볼 수 있는 상황입니다.';
+      why = '개인회생은 계속적인 소득이 필요한 제도입니다. 현재 소득이 거의 없다고 답하셨기 때문에, 재산을 정리하고 잔여 채무를 면책받는 개인파산을 먼저 살펴보는 것이 일반적입니다. 소득이 생길 예정이라면 개인회생도 다시 검토할 수 있습니다.';
+    } else if (burden !== null && burden < 30 && overdueIdx === 0) {
+      verdict = '상환 부담이 아직 크지 않아, 신용회복(워크아웃)부터 개인회생까지 폭넓게 검토해볼 수 있습니다.';
+      why = '월 소득 대비 상환 비중이 약 ' + burden + '%로 아직 감당 범위에 있고 연체 전이기 때문에, 이자 조정 중심의 신용회복과 원금 조정이 가능한 개인회생을 나란히 놓고 비교해보는 단계입니다.';
+    } else {
+      verdict = '현재 입력하신 내용으로는 개인회생을 우선 검토해볼 수 있는 상황입니다.';
+      why = '계속적인 소득이 있다고 답하셨고'
+        + (burden !== null ? ', 월 소득 대비 상환 부담이 약 ' + burden + '%로 높은 편입니다' : '')
+        + (overdueIdx >= 1 ? '. 이미 연체 또는 독촉·법적 절차 단계에 있어 금지명령으로 추심을 멈추는 것이 우선일 수 있습니다' : '')
+        + '. 이 조합에서는 갚을 수 있는 만큼만 갚고 나머지를 면책받는 개인회생이 일반적으로 먼저 검토됩니다.';
+    }
+
+    var html = '<div class="result">';
+    html += '<div class="rcard"><p class="rtitle">나의 채무상황 분석</p><ul class="rgrid">';
+    html += row('월 소득', A.income ? fmt(A.income) + '원' : (bankruptcy ? '거의 없음' : null));
+    html += row('월 상환액', A.repay ? fmt(A.repay) + '원' : null);
+    html += row('상환 부담', burden !== null ? '소득 대비 약 ' + burden + '%' : null);
+    html += row('전체 채무', A.debtLabel);
+    html += row('연체 상태', A.overdueLabel);
+    html += row('재산', (A.assets || []).join(' · ') || null);
+    html += row('최근 대출', A.loanLabel ? (recentLoan ? '있음 (' + (A.loanWhenLabel || '') + (A.loanUseLabel ? ' · ' + A.loanUseLabel : '') + ')' : '거의 없음') : null);
+    html += row('부양가족', A.familyLabel);
+    html += '</ul></div>';
+    html += '<p class="verdict">' + verdict + '</p>';
+
+    html += '<div class="v3">';
+    if (bankruptcy) {
+      html += '<div class="vc warn"><b>! 소득 조건</b><span>현재 소득이 거의 없음</span></div>';
+      html += '<div class="vc ok"><b>✓ 검토 방향</b><span>개인파산·면책 우선</span></div>';
+      html += '<div class="vc warn"><b>! 추가 확인</b><span>' + (hasAssets ? '재산가치 확인 필요' : '면책 요건 확인 필요') + '</span></div>';
+    } else {
+      html += '<div class="vc ok"><b>✓ 소득 조건</b><span>지속적인 소득 있음</span></div>';
+      html += '<div class="vc ' + (burden !== null && burden >= 50 ? 'warn' : 'ok') + '"><b>' + (burden !== null && burden >= 50 ? '! ' : '✓ ') + '상환 부담</b><span>' + (burden !== null ? '소득 대비 약 ' + burden + '%' + (burden >= 50 ? ' — 높은 편' : '') : '입력 기준 확인') + '</span></div>';
+      html += '<div class="vc ' + ((hasAssets || recentLoan) ? 'warn' : 'ok') + '"><b>' + ((hasAssets || recentLoan) ? '! ' : '✓ ') + '추가 확인</b><span>' + ((hasAssets || recentLoan) ? [hasAssets ? '재산가치' : null, recentLoan ? '최근대출' : null].filter(Boolean).join('·') + ' 확인 필요' : '특이사항 없음') + '</span></div>';
+    }
+    html += '</div>';
+
+    html += '<details class="rwhy"><summary>왜 이런 결과가 나왔나요?</summary><p>' + why + '</p></details>';
+    html += '<p class="rnote">자가진단은 여기까지입니다. 실제 진행 가능 여부는 채무·재산 내역을 조금 더 확인해야 판단할 수 있습니다.</p>';
+    html += '</div>';
+
+    title.textContent = '진단이 완료되었습니다';
+    opts.innerHTML = html;
+
+    var acts = document.createElement('div');
+    acts.className = 'racts';
+    var a1 = document.createElement('a');
+    a1.className = 'btn gold'; a1.href = quiz.getAttribute('data-contact-url') || '/contact/'; a1.textContent = '상담 신청';
+    var a2 = document.createElement('a');
+    a2.className = 'btn line'; a2.href = 'tel:' + (quiz.getAttribute('data-tel') || ''); a2.textContent = '전화상담';
+    var re = document.createElement('button');
+    re.type = 'button'; re.className = 'restart'; re.textContent = '다시 진단하기';
+    re.addEventListener('click', start);
+    acts.appendChild(a1); acts.appendChild(a2);
+    opts.appendChild(acts);
+    opts.appendChild(re);
+  }
+
+  function start() {
+    A = {}; queue = []; count = 0;
+    render(stepChoice('incomeType', '현재 정기적으로 발생하는 소득이 있으신가요?', '급여·사업·프리랜서·일용 소득 모두 포함됩니다.',
+      ['매월 일정한 소득이 있다', '월마다 차이가 있지만 계속 소득이 있다', '현재 소득이 거의 없다'],
+      function (idx) {
+        if (idx === 2) { A.track = 'bankruptcy'; startBankruptcyTrack(); }
+        else { A.track = 'rehab'; startRehabTrack(); }
+      }));
+  }
+
+  start();
+}

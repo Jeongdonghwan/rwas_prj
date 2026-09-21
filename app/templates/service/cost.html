@@ -1,35 +1,38 @@
 {% extends "base.html" %}
 {% block title %}비용 안내 | {{ site.brand }}{% endblock %}
-{% block meta_desc %}개인회생 비용 구조 안내. 변호사 보수와 법원 예납금의 차이, 분할 납부 방법을 설명합니다.{% endblock %}
+{% block meta_desc %}개인회생 비용 안내. 변호사 보수와 법원 납부 비용(인지대·송달료·예납금)의 구조, 분할 납부 방법을 설명합니다.{% endblock %}
 
 {% block content %}
 {% with crumbs=[('비용 안내', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
 <div class="wrap">
   <div class="page-head">
     <p class="cat">업무 안내</p>
-    <h1>비용 안내</h1>
-    <p class="lead">비용은 두 항목으로 나뉩니다. 사무소에 내는 변호사 보수와, 법원에 내는 예납금(실비)입니다.</p>
+    <h1>개인회생 비용, 먼저 확인하고 시작하세요</h1>
+    <p class="lead">사건마다 필요한 절차와 상황이 달라 비용에도 차이가 있을 수 있습니다. 상담 후 예상 비용과 납부 방법을 안내해드립니다.</p>
   </div>
 </div>
 
 <section class="sec"><div class="wrap detail">
   <div>
-    <table class="tbl" style="margin-bottom:56px">
-      <tr><th>변호사 보수</th><td>사건 난이도·채무 규모에 따라 상담 시 서면 안내<small>착수 전 총액·분할 일정을 계약서에 명시합니다. 분할 납부 가능</small></td></tr>
-      <tr><th>법원 예납금</th><td>송달료·인지대 등 실비<small>채권자 수에 따라 달라지며, 어느 사무소를 통해도 동일한 법원 납부 금액입니다</small></td></tr>
-      <tr><th>추가 비용</th><td>없음<small>보정서 작성, 채권자 집회 출석 비용을 별도로 청구하지 않습니다</small></td></tr>
+    <table class="tbl" style="margin-bottom:40px">
+      <tr><th>변호사 보수</th><td>사건의 난이도·채권자 수·채무 상황 등을 확인한 후 안내<small>착수 전에 총액과 납부 일정을 서면으로 안내합니다</small></td></tr>
+      <tr><th>법원 납부 비용</th><td>인지대, 송달료, 예납금 등 실제 법원 절차에 필요한 비용<small>어느 사무소를 통해도 동일한 법원 납부 실비입니다</small></td></tr>
+      <tr><th>분할 납부</th><td>초기 비용 부담을 줄일 수 있도록 상담 후 분할 납부 진행 가능</td></tr>
+      <tr><th>추가 비용</th><td>별도 업무나 비용이 필요한 경우 사전에 미리 안내</td></tr>
     </table>
 
+    <div class="corebox" style="margin-bottom:48px">비용만 먼저 결정하지 않습니다. 신청 가능 여부와 예상 변제 부담을 함께 살펴본 뒤, 진행 여부를 판단할 수 있도록 안내합니다.</div>
+
     <div class="prose">
-      <h2>왜 금액을 표시하지 않나요</h2>
-      <p>채권자 수, 채무 구성(담보/무담보), 사업자 여부, 압류 진행 상황에 따라 필요한 업무량이 크게 다르기 때문입니다. 상담에서 사건 내용을 확인한 뒤 총액을 서면으로 안내드리며, 상담 후 비용 때문에 신청을 강요하는 일은 없습니다.</p>
+      <h2>비용은 왜 사건마다 다른가요</h2>
+      <p>채권자 수, 채무 구성(담보/무담보), 사업자 여부, 압류 진행 상황에 따라 필요한 업무량이 크게 다르기 때문입니다. 상담에서 사건 내용을 확인한 뒤 총액을 서면으로 안내드립니다.</p>
 
       <h2>계약 전 확인하실 것</h2>
       <ul>
         <li>총액이 계약서에 적혀 있는지 (구두 안내만 있는 계약은 피하세요)</li>
         <li>분할 일정과 미납 시 처리 방식</li>
-        <li>"보정 비용 별도", "집회 출석비 별도" 문구 유무</li>
-        <li>법원 예납금이 보수에 포함인지 별도인지</li>
+        <li>추가 비용이 발생하는 조건이 명시되어 있는지</li>
+        <li>법원 납부 비용이 보수에 포함인지 별도인지</li>
       </ul>
 
       <h2>비용이 부담될 때</h2>
@@ -41,9 +44,9 @@
     <div class="aside">
       <h3>상담 안내</h3>
       <ul class="kv">
-        <li><b>상담 비용</b><span>무료</span></li>
         <li><b>비용 안내</b><span>상담 시 서면 제공</span></li>
         <li><b>납부</b><span>분할 가능</span></li>
+        <li><b>상담 방식</b><span>방문·전화·비대면</span></li>
       </ul>
       <a class="btn red wide" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>
       <a class="btn wide" href="{{ url_for('contact.contact') }}#form">상담 신청</a>
