@@ -429,7 +429,7 @@ p{margin:0}
 .quiz .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px 22px;font-size:14.5px}
 .quiz .rgrid li{display:flex;gap:10px;min-width:0}
 .quiz .rgrid li b{flex:none;width:72px;color:var(--ink-3);font-weight:600}
-.quiz .rgrid li span{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quiz .rgrid li span{color:var(--ink);font-weight:600}
 .quiz .verdict{font-size:18px;font-weight:800;line-height:1.5;margin-bottom:16px}
 .quiz .v3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
 .quiz .vc{border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:13px}
