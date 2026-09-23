@@ -22,7 +22,7 @@
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
 {% if site.naver_site_verification %}<meta name="naver-site-verification" content="{{ site.naver_site_verification }}">{% endif %}
 {% if site.google_site_verification %}<meta name="google-site-verification" content="{{ site.google_site_verification }}">{% endif %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}?v={{ asset_ver }}">
 {% block head %}{% endblock %}
 </head>
 <body>
@@ -35,6 +35,6 @@
 
 {% include "_footer.html" %}
 {% include "_mobile_bar.html" %}
-<script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/site.js') }}?v={{ asset_ver }}" defer></script>
 </body>
 </html>

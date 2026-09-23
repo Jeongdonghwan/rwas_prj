@@ -16,9 +16,19 @@ def create_app():
 
     from app.config import LAWYER, SITE_DEFAULTS
 
+    import os
+    _static = Path(app.static_folder)
+    try:
+        asset_ver = str(int(max(
+            os.path.getmtime(_static / "css" / "site.css"),
+            os.path.getmtime(_static / "js" / "site.js"),
+        )))
+    except OSError:
+        asset_ver = "1"
+
     @app.context_processor
     def inject_site():
-        return {"site": SITE_DEFAULTS, "lawyer": LAWYER}
+        return {"site": SITE_DEFAULTS, "lawyer": LAWYER, "asset_ver": asset_ver}
 
     from app.routes.main import bp as main_bp
     from app.routes.contact import bp as contact_bp
