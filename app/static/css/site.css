@@ -5,20 +5,20 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
 :root{
-  --ink:#191d24; --ink-2:#5b6472; --ink-3:#96a0ac;
-  --line:#e5e9ef; --line-2:#f0f3f7;
-  --paper:#ffffff; --paper-2:#f6f8fb;
-  --green:#1c3d6e; --green-2:#2b62c4; --green-bright:#2f6fe8;
-  --green-dark:#0e2242; --green-deep:#0a1930;
-  --mint:#eaf1fc; --mint-2:#d5e3f8;
+  --ink:#1d1d1f; --ink-2:#5f6064; --ink-3:#9a9ba0;
+  --line:#e7e6e6; --line-2:#f2f1f1;
+  --paper:#ffffff; --paper-2:#f7f6f6;
+  --green:#7c2231; --green-2:#8e2939; --green-bright:#b13a4a;
+  --green-dark:#17181c; --green-deep:#0f1013;
+  --mint:#f8eef0; --mint-2:#ecd8dc;
   --gold:#a5854c; --gold-2:#84683a;
   /* 구명칭 별칭 */
   --navy:var(--green); --navy-2:var(--green-2); --red:var(--green-2);
   --sans:'Pretendard', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   --serif:var(--sans);
   --r:16px; --r-s:10px;
-  --shadow:0 1px 2px rgba(15,32,64,.05),0 8px 24px rgba(15,32,64,.06);
-  --shadow-lg:0 24px 60px rgba(15,32,64,.14);
+  --shadow:0 1px 2px rgba(30,22,24,.05),0 8px 24px rgba(30,22,24,.06);
+  --shadow-lg:0 24px 60px rgba(30,22,24,.14);
   --w:1140px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -36,13 +36,13 @@ p{margin:0}
 .sec{padding:92px 0}
 .sec.alt{background:var(--paper-2)}
 .sec.dark{background:var(--green-dark);color:#fff}
-.sec.dark.bgimg{background:linear-gradient(rgba(9,22,42,.93),rgba(13,31,60,.95)),url('../img/bg-library.webp') center/cover no-repeat}
+.sec.dark.bgimg{background:linear-gradient(rgba(14,15,18,.93),rgba(24,25,30,.95)),url('../img/bg-library.webp') center/cover no-repeat}
 .sec.dark h2{color:#fff}
 .sec-head{margin-bottom:42px}
 .sec-head .label{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--green-2);margin-bottom:12px}
 .sec-head .label::before{content:"";width:22px;height:2px;background:var(--green-2)}
-.sec.dark .sec-head .label{color:#9dbdf2}
-.sec.dark .sec-head .label::before{background:#9dbdf2}
+.sec.dark .sec-head .label{color:#d9a1ab}
+.sec.dark .sec-head .label::before{background:#d9a1ab}
 .sec-head h2{margin-bottom:12px}
 .sec-head.center{text-align:center}
 .sec-head.center .label::before{display:none}
@@ -50,11 +50,11 @@ p{margin:0}
 .sec.dark .sec-head p{color:rgba(255,255,255,.72)}
 .lead{font-size:17px;color:var(--ink-2);max-width:720px}
 .btn{display:inline-block;padding:15px 28px;font-weight:700;font-size:15px;border:1px solid var(--green);background:var(--green);color:#fff;line-height:1.3;border-radius:var(--r-s);transition:background .18s,transform .18s,box-shadow .18s,border-color .18s;cursor:pointer}
-.btn:hover{background:var(--green-2);border-color:var(--green-2);transform:translateY(-2px);box-shadow:0 10px 24px rgba(20,50,110,.18)}
+.btn:hover{background:var(--green-2);border-color:var(--green-2);transform:translateY(-2px);box-shadow:0 10px 24px rgba(110,35,50,.18)}
 .btn.line{background:#fff;color:var(--green);border-color:var(--line)}
-.btn.line:hover{background:var(--paper-2);box-shadow:0 8px 20px rgba(15,32,64,.08)}
+.btn.line:hover{background:var(--paper-2);box-shadow:0 8px 20px rgba(30,22,24,.08)}
 .btn.red,.btn.gold{background:var(--green-bright);border-color:var(--green-bright);font-weight:800}
-.btn.red:hover,.btn.gold:hover{background:#3d7cf0;border-color:#3d7cf0}
+.btn.red:hover,.btn.gold:hover{background:#c14453;border-color:#c14453}
 .btn.wide{display:block;width:100%;text-align:center}
 :focus-visible{outline:2px solid var(--green-bright);outline-offset:2px}
 
@@ -82,7 +82,7 @@ p{margin:0}
 .topbar span+span{margin-left:18px}
 .topbar b{color:#fff;font-weight:600}
 .hdr{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);position:sticky;top:0;z-index:20;transition:box-shadow .25s;border-bottom:1px solid transparent}
-.hdr.scrolled{box-shadow:0 6px 24px rgba(15,32,64,.08);border-bottom-color:var(--line-2)}
+.hdr.scrolled{box-shadow:0 6px 24px rgba(30,22,24,.08);border-bottom-color:var(--line-2)}
 .hdr .wrap{display:flex;align-items:center;height:76px;gap:26px}
 .logo{display:flex;align-items:center;gap:10px;white-space:nowrap;flex:0 0 auto}
 .logo img{height:40px;width:auto;display:block}
@@ -115,25 +115,25 @@ p{margin:0}
 .hero .bg img{width:100%;height:100%;object-fit:cover;object-position:72% center;animation:kb 10s ease-out both}
 @keyframes kb{from{transform:scale(1)}to{transform:scale(1.07)}}
 .hero::after{content:"";position:absolute;inset:0;z-index:1;background:
-  linear-gradient(0deg,rgba(10,25,48,.5) 0%,transparent 26%),
-  linear-gradient(90deg,var(--green-deep) 0%,var(--green-deep) 38%,rgba(10,25,48,.9) 52%,rgba(10,25,48,.45) 74%,rgba(10,25,48,.22) 100%)}
+  linear-gradient(0deg,rgba(16,17,20,.5) 0%,transparent 26%),
+  linear-gradient(90deg,var(--green-deep) 0%,var(--green-deep) 38%,rgba(16,17,20,.9) 52%,rgba(16,17,20,.45) 74%,rgba(16,17,20,.22) 100%)}
 .hero .wrap{position:relative;z-index:2}
 .hero-copy{max-width:620px;padding:108px 0 116px}
-.hero .kicker{display:block;font-size:13.5px;font-weight:700;letter-spacing:.16em;color:#8ab8ff;margin-bottom:20px;animation:heroUp .8s cubic-bezier(.2,.65,.3,1) both}
+.hero .kicker{display:block;font-size:13.5px;font-weight:700;letter-spacing:.16em;color:#d99aa6;margin-bottom:20px;animation:heroUp .8s cubic-bezier(.2,.65,.3,1) both}
 .hero h1{font-size:49px;color:#fff;margin-bottom:22px;font-weight:800;letter-spacing:-.03em;text-shadow:0 4px 24px rgba(0,0,0,.3);animation:heroUp .8s .1s cubic-bezier(.2,.65,.3,1) both}
-.hero h1 em{font-style:normal;color:#8ab8ff;position:relative;white-space:nowrap}
-.hero h1 em::after{content:"";position:absolute;left:0;bottom:6px;height:12px;width:0;background:rgba(96,165,250,.28);z-index:-1;border-radius:4px;animation:emLine .7s 1s cubic-bezier(.2,.65,.3,1) forwards}
+.hero h1 em{font-style:normal;color:#e79aa6;position:relative;white-space:nowrap}
+.hero h1 em::after{content:"";position:absolute;left:0;bottom:6px;height:12px;width:0;background:rgba(217,120,135,.30);z-index:-1;border-radius:4px;animation:emLine .7s 1s cubic-bezier(.2,.65,.3,1) forwards}
 @keyframes emLine{to{width:100%}}
 .hero .sub{font-size:18.5px;color:rgba(255,255,255,.82);max-width:540px;margin-bottom:36px;animation:heroUp .8s .2s cubic-bezier(.2,.65,.3,1) both}
 .hero .btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:30px;animation:heroUp .8s .3s cubic-bezier(.2,.65,.3,1) both}
 .hero .btns .btn{padding:19px 38px;font-size:17px;border-radius:14px}
 .hero .btns .btn.gold{background:var(--green-bright);border-color:var(--green-bright);font-weight:800}
-.hero .btns .btn.gold:hover{background:#3d7cf0;border-color:#3d7cf0}
-.hero .btns .btn.ghost{background:rgba(10,25,48,.35);border-color:rgba(255,255,255,.35);color:#fff;backdrop-filter:blur(3px)}
+.hero .btns .btn.gold:hover{background:#c14453;border-color:#c14453}
+.hero .btns .btn.ghost{background:rgba(16,17,20,.35);border-color:rgba(255,255,255,.35);color:#fff;backdrop-filter:blur(3px)}
 .hero .btns .btn.ghost:hover{background:rgba(255,255,255,.14)}
 .hero .chips{display:flex;gap:8px;flex-wrap:wrap;animation:heroUp .8s .4s cubic-bezier(.2,.65,.3,1) both}
-.chip{font-size:13.5px;font-weight:600;color:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:7px 15px;background:rgba(10,25,48,.25)}
-.hero .namecard{position:absolute;right:44px;bottom:38px;z-index:3;background:#fff;color:var(--ink);border-radius:14px;padding:13px 22px;box-shadow:0 18px 44px rgba(4,12,30,.4);animation:heroUp .9s .5s cubic-bezier(.2,.65,.3,1) both}
+.chip{font-size:13.5px;font-weight:600;color:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:7px 15px;background:rgba(16,17,20,.25)}
+.hero .namecard{position:absolute;right:44px;bottom:38px;z-index:3;background:#fff;color:var(--ink);border-radius:14px;padding:13px 22px;box-shadow:0 18px 44px rgba(8,8,10,.4);animation:heroUp .9s .5s cubic-bezier(.2,.65,.3,1) both}
 .hero .namecard b{display:block;font-size:17px;font-weight:800;letter-spacing:-.01em}
 .hero .namecard span{font-size:12.5px;color:var(--ink-2)}
 .hero .scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:3;font-size:10.5px;letter-spacing:.24em;color:rgba(255,255,255,.65);writing-mode:vertical-rl;padding-bottom:46px}
@@ -315,10 +315,10 @@ p{margin:0}
 .pastel .card.t4 .big{color:#7c5cd8}
 .pastel .card .big::after{content:"";display:block;width:34px;height:3px;border-radius:2px;background:currentColor;opacity:.55;margin-top:10px}
 .pastel .card h3{font-size:16.5px;color:var(--ink-2)}
-.infobar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#eef4fd;border-radius:14px;padding:18px 24px;margin-top:22px;font-size:15px}
-.infobar .bico{flex:none;width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:#2f6fe8}
+.infobar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#f8eef0;border-radius:14px;padding:18px 24px;margin-top:22px;font-size:15px}
+.infobar .bico{flex:none;width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:#8e2939}
 .infobar .bico svg{width:19px;height:19px}
-.infobar b{color:#2f6fe8}
+.infobar b{color:#8e2939}
 .infobar .sub2{color:var(--ink-3);font-size:13.5px;margin-left:auto}
 
 /* 제도 비교 3열 컬러 카드 */
@@ -463,13 +463,13 @@ p{margin:0}
 .bio-card ul li{padding:7px 0;border-bottom:1px solid var(--line-2);font-size:14.5px;color:var(--ink-2)}
 .bio-card ul li:last-child{border-bottom:0}
 
-.cta-band{background:linear-gradient(rgba(9,22,42,.88),rgba(13,31,60,.92)),url('../img/bg-court.webp') center 30%/cover no-repeat var(--green-dark);color:#fff;padding:88px 0;text-align:center}
+.cta-band{background:linear-gradient(rgba(14,15,18,.88),rgba(24,25,30,.92)),url('../img/bg-court.webp') center 30%/cover no-repeat var(--green-dark);color:#fff;padding:88px 0;text-align:center}
 .cta-band h2{color:#fff;margin-bottom:10px}
 .cta-band p{color:rgba(255,255,255,.75);margin-bottom:28px}
 .cta-band .btn{margin:0 5px;background:#fff;color:var(--green);border-color:#fff;border-radius:12px}
 .cta-band .btn:hover{background:var(--mint);border-color:var(--mint)}
 .cta-band .btn.red{background:var(--green-bright);color:#fff;border-color:var(--green-bright);font-weight:800}
-.cta-band .btn.red:hover{background:#3d7cf0}
+.cta-band .btn.red:hover{background:#c14453}
 
 /* 푸터 */
 .ftr{background:var(--green-deep);color:rgba(255,255,255,.6);padding:48px 0 56px;font-size:13px;line-height:1.9}
@@ -531,10 +531,10 @@ p{margin:0}
 .side-list li a:hover{text-decoration:underline;text-underline-offset:4px}
 
 /* 고정 CTA */
-.mbar{position:fixed;left:0;right:0;bottom:0;height:56px;display:none;grid-template-columns:1fr 1fr;z-index:30;border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(15,32,64,.08)}
+.mbar{position:fixed;left:0;right:0;bottom:0;height:56px;display:none;grid-template-columns:1fr 1fr;z-index:30;border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(30,22,24,.08)}
 .mbar a{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;background:#fff;color:var(--green);border-right:1px solid var(--line)}
 .mbar a.t{background:var(--green);color:#fff;border:none}
-.float{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:40;background:#fff;border-radius:16px;overflow:hidden;width:76px;text-align:center;font-size:11.5px;box-shadow:0 18px 44px rgba(15,32,64,.18)}
+.float{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:40;background:#fff;border-radius:16px;overflow:hidden;width:76px;text-align:center;font-size:11.5px;box-shadow:0 18px 44px rgba(30,22,24,.18)}
 .float a{display:block;padding:14px 4px 12px;border-bottom:1px solid var(--line-2);color:var(--ink-2);font-weight:600;transition:background .2s,color .2s}
 .float a:last-child{border-bottom:0}
 .float a svg{display:block;width:22px;height:22px;margin:0 auto 5px;color:var(--green-2)}
@@ -563,7 +563,7 @@ body.nav-open .gnb a{padding:15px 4px;border-bottom:1px solid var(--line-2);bord
 @media (max-width:960px){
   .hero h1{font-size:33px;text-align:center}
   .hero .bg{width:100%}
-  .hero::after{background:linear-gradient(180deg,rgba(10,25,48,.92) 0%,rgba(10,25,48,.82) 55%,rgba(10,25,48,.9) 100%)}
+  .hero::after{background:linear-gradient(180deg,rgba(16,17,20,.92) 0%,rgba(16,17,20,.82) 55%,rgba(16,17,20,.9) 100%)}
   .hero-copy{max-width:100%;padding:64px 0 72px;text-align:center}
   .hero .sub{margin-left:auto;margin-right:auto}
   .hero .btns{justify-content:center}
