@@ -32,10 +32,15 @@ SITE_DEFAULTS = {
     "email": "info@example.com",  # TODO: 실제 이메일
     "hours": "24시간 상담, 주말 예약제",
     "map_embed": "",
-    # 도메인: .env의 SITE_URL로 덮어씀 (배포 시 SITE_URL=https://도메인)
-    "base_url": os.environ.get("SITE_URL", "https://example.com").rstrip("/"),
-    "naver_site_verification": os.environ.get("NAVER_SITE_VERIFICATION", ""),
-    "google_site_verification": os.environ.get("GOOGLE_SITE_VERIFICATION", ""),
+    # 도메인 (non-www, https). .env의 SITE_URL로 덮어쓸 수 있음
+    "base_url": os.environ.get("SITE_URL", "https://suwonlei.com").rstrip("/"),
+    # 검색엔진 소유확인 메타값 (공개값이라 기본값으로 둠)
+    "naver_site_verification": os.environ.get(
+        "NAVER_SITE_VERIFICATION", "fc590fc0d8e14f3f16b0104f7193ebdf22d7554a"
+    ),
+    "google_site_verification": os.environ.get(
+        "GOOGLE_SITE_VERIFICATION", "WFdQhnriDQxtjgd2f72pkYIKvwzARsIzBX05OQKucgM"
+    ),
     # 검색 노출용 짧은 브랜드 (서브페이지 타이틀 접미사)
     "brand_seo": "수원개인회생 법률사무소 레이",
     # 전 페이지 공통 키워드 (페이지별 키워드는 meta_keywords 블록으로 추가)

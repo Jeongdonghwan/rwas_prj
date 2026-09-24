@@ -93,7 +93,7 @@ seed/                (Phase 3) dong.csv, job.csv, faq.csv
 - **타겟 키워드: `수원개인회생`, `수원개인회생파산`** (네이버 기준). 메인 타이틀이 두 키워드를 모두 정확 매칭, 서브페이지는 "{페이지 키워드} | 수원개인회생 법률사무소 레이" 패턴으로 전 페이지에 `수원개인회생` 포함. description 앞부분에도 키워드 배치. `site.keywords` 공통 + 페이지별 `{% block meta_keywords %}`.
 - **SEO 라우트: `app/routes/seo.py`** — `/robots.txt`(Yeti·Daum 명시 허용, /admin·/inquiry 차단), `/sitemap.xml`(인덱스) + `sitemap-pages|area|job|case|board.xml`, `/rss.xml`(사례 RSS 2.0, content:encoded·enclosure 포함). **한글 URL은 url_for가 주는 퍼센트 인코딩 경로를 그대로 써야 함**(XML 규격).
 - **구조화 데이터**: `partials/schema_org.html`의 LegalService(전 페이지, areaServed 수원 4개구), `_breadcrumb.html`에 BreadcrumbList 자동 생성, 동/구/직업/상황은 FAQPage, 사례글은 Article. 페이지당 평균 2.8블록.
-- **도메인은 `.env`의 `SITE_URL`로 주입** (config base_url). **미설정 시 example.com으로 나가므로 배포 전 반드시 설정** — canonical·og:image·sitemap·RSS 전부 여기서 파생. 소유확인은 `NAVER_SITE_VERIFICATION`/`GOOGLE_SITE_VERIFICATION`.
+- **도메인 확정: `https://suwonlei.com` (non-www), 운영 포트 8038.** config base_url 기본값이며 .env SITE_URL로 덮어쓸 수 있음. 네이버·구글 소유확인 메타값도 config에 기본 반영(공개값).
 - SEO 진단 스크립트 결과(77페이지): 타이틀 평균 28.9자(전부 60자 이내), 설명 평균 71.5자, H1 정확히 1개, 타이틀·설명 중복 0, alt 누락 0, canonical 100%.
 - 오픈 후 할 일: 네이버 서치어드바이저에 사이트 등록 → 소유확인 → 사이트맵·RSS 제출, 구글 서치콘솔 동일. 사례 글 발행 시 RSS 자동 반영(10분 캐시).
 
@@ -104,7 +104,7 @@ seed/                (Phase 3) dong.csv, job.csv, faq.csv
 - **변호사 프로필 리디자인**: 골드 제거(사이트에서 골드 전면 퇴출) — 사진 위 네이비 반투명 네임태그(.lawyer-photo .tag), 약력 2열 리스트, 경력/주요활동 카드는 회색 헤더+파란 바(.bio-card h3::before).
 
 ### 미결 사항
-- **이메일·도메인** → `app/config.py` SITE_DEFAULTS 교체
+- **이메일** → `app/config.py` SITE_DEFAULTS의 info@example.com 교체 (푸터·개인정보처리방침 노출)
 - **동별 transit_note의 소요시간·경로는 추정치** — 오픈 전 실측/지도 확인 필요 (seed/dong.csv 수정 후 재시드)
 - 폰트 self-host(woff2) 전환은 배포 전(Phase 7~9)에 — 현재 CSS @import CDN
 
