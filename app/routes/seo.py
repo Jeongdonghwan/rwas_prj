@@ -26,9 +26,8 @@ def abs_url(endpoint, **kw):
     return base() + url_for(endpoint, **kw)
 
 
-def xml_response(body):
-    return Response(body, mimetype="application/xml; charset=utf-8",
-                    headers={"Cache-Control": CACHE})
+def xml_response(body, mimetype="application/xml; charset=utf-8"):
+    return Response(body, mimetype=mimetype, headers={"Cache-Control": CACHE})
 
 
 def url_entry(loc, lastmod=None, changefreq=None, priority=None):
@@ -67,10 +66,14 @@ def robots():
         "# 네이버 검색로봇",
         "User-agent: Yeti",
         "Allow: /",
+        "Disallow: /admin/",
+        "Disallow: /inquiry",
         "",
         "# 다음 검색로봇",
         "User-agent: Daum",
         "Allow: /",
+        "Disallow: /admin/",
+        "Disallow: /inquiry",
         "",
         "Sitemap: %s/sitemap.xml" % base(),
         "Sitemap: %s/rss.xml" % base(),
@@ -83,6 +86,7 @@ def robots():
 # ---------- sitemap ----------
 
 @bp.route("/sitemap.xml")
+@bp.route("/sitemap")
 def sitemap_index():
     names = ["pages", "area", "job", "case", "board"]
     now = datetime.now().strftime("%Y-%m-%d")
@@ -168,6 +172,9 @@ def sitemap_board():
 # ---------- RSS (네이버 서치어드바이저 RSS 제출용) ----------
 
 @bp.route("/rss.xml")
+@bp.route("/rss")
+@bp.route("/feed")
+@bp.route("/feed.xml")
 def rss():
     site = SITE_DEFAULTS
     posts = (
@@ -216,4 +223,4 @@ def rss():
         + ("\n".join(items) + "\n" if items else "")
         + "  </channel>\n</rss>\n"
     )
-    return xml_response(body)
+    return xml_response(body, "application/rss+xml; charset=utf-8")

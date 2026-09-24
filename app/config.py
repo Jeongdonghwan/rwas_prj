@@ -29,7 +29,7 @@ SITE_DEFAULTS = {
     "ad_lawyer": "이재열",
     "biz_no": "333-41-00086",
     "since": "2016",  # 개업 2016년 3월 15일
-    "email": "info@example.com",  # TODO: 실제 이메일
+    "email": "pasubyeong@naver.com",
     "hours": "24시간 상담, 주말 예약제",
     "map_embed": "",
     # 도메인 (non-www, https). .env의 SITE_URL로 덮어쓸 수 있음
