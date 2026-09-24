@@ -37,6 +37,7 @@ def create_app():
     from app.routes.job import bp as job_bp
     from app.routes.ko import bp as ko_bp
     from app.routes.board import bp as board_bp
+    from app.routes.seo import bp as seo_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(contact_bp)
@@ -45,6 +46,7 @@ def create_app():
     app.register_blueprint(job_bp)
     app.register_blueprint(ko_bp)
     app.register_blueprint(board_bp)
+    app.register_blueprint(seo_bp)
 
     from app.seed import seed_command
 

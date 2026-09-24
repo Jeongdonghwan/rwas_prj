@@ -39,7 +39,7 @@ seed/                (Phase 3) dong.csv, job.csv, faq.csv
 | 4 | /area/ 허브·구·동 31페이지 + variant 로직 | ✅ 완료 |
 | 5 | /job/ 허브·상세 16 + /case-type/ 8 | ✅ 완료 |
 | 6 | 진행 사례 게시판(블로그형, 단일 보드) + 어드민 글쓰기(Toast UI) | ✅ 완료 — 블로그는 사용자 결정으로 생략 |
-| 7 | sitemap·robots·RSS·canonical·JSON-LD·OG | ⬜ 다음 (canonical·OG·FAQPage JSON-LD는 선반영됨) |
+| 7 | sitemap·robots·RSS·canonical·JSON-LD·OG | ✅ 완료 (2026-09-24) |
 | 8 | Claude API 콘텐츠 생성 (선택) | ⬜ |
 | 9 | Cafe24 배포, 서치어드바이저 등록 | ⬜ |
 
@@ -88,6 +88,14 @@ seed/                (Phase 3) dong.csv, job.csv, faq.csv
 - 메인에 "결과가 궁금하다면, 진행 사례부터" 최신 4건 섹션(글 없으면 숨김), GNB에 진행 사례 추가.
 - **주의**: 로컬 dev.db에 예시 사례 3건 있음(디자인 확인용) — **운영 배포 시 이 글들은 없음(flask seed에 post 미포함), 실제 사례는 어드민에서 작성**. 사례 글에는 "사실 위주·결과 보장 없음" 고지 박스가 상세 하단에 자동 출력됨.
 - 본문 HTML은 sanitize 없이 저장(어드민 전용 작성 전제) — 어드민 계정 관리 주의, 필요 시 bleach 추가.
+
+### Phase 7 구현 메모 (SEO, 2026-09-24)
+- **타겟 키워드: `수원개인회생`, `수원개인회생파산`** (네이버 기준). 메인 타이틀이 두 키워드를 모두 정확 매칭, 서브페이지는 "{페이지 키워드} | 수원개인회생 법률사무소 레이" 패턴으로 전 페이지에 `수원개인회생` 포함. description 앞부분에도 키워드 배치. `site.keywords` 공통 + 페이지별 `{% block meta_keywords %}`.
+- **SEO 라우트: `app/routes/seo.py`** — `/robots.txt`(Yeti·Daum 명시 허용, /admin·/inquiry 차단), `/sitemap.xml`(인덱스) + `sitemap-pages|area|job|case|board.xml`, `/rss.xml`(사례 RSS 2.0, content:encoded·enclosure 포함). **한글 URL은 url_for가 주는 퍼센트 인코딩 경로를 그대로 써야 함**(XML 규격).
+- **구조화 데이터**: `partials/schema_org.html`의 LegalService(전 페이지, areaServed 수원 4개구), `_breadcrumb.html`에 BreadcrumbList 자동 생성, 동/구/직업/상황은 FAQPage, 사례글은 Article. 페이지당 평균 2.8블록.
+- **도메인은 `.env`의 `SITE_URL`로 주입** (config base_url). **미설정 시 example.com으로 나가므로 배포 전 반드시 설정** — canonical·og:image·sitemap·RSS 전부 여기서 파생. 소유확인은 `NAVER_SITE_VERIFICATION`/`GOOGLE_SITE_VERIFICATION`.
+- SEO 진단 스크립트 결과(77페이지): 타이틀 평균 28.9자(전부 60자 이내), 설명 평균 71.5자, H1 정확히 1개, 타이틀·설명 중복 0, alt 누락 0, canonical 100%.
+- 오픈 후 할 일: 네이버 서치어드바이저에 사이트 등록 → 소유확인 → 사이트맵·RSS 제출, 구글 서치콘솔 동일. 사례 글 발행 시 RSS 자동 반영(10분 캐시).
 
 ### 확정 사항 (2026-09-14)
 - **상담 전화 1644-6755로 통일** (SITE_DEFAULTS phone/phone_link). **카카오톡 상담은 전면 제거** — 버튼·링크·문구·seed 데이터 모두 삭제, kakao_url 키도 없음. 다시 넣지 말 것.

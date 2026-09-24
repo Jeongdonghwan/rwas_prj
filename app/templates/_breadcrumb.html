@@ -5,3 +5,10 @@
     {%- for label, url in crumbs %}<i>›</i>{% if url %}<a href="{{ url }}">{{ label }}</a>{% else %}{{ label }}{% endif %}{% endfor %}
   </div>
 </div>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"홈","item":"{{ site.base_url }}/"}
+{%- for label, url in crumbs -%}
+,{"@type":"ListItem","position":{{ loop.index + 1 }},"name":{{ label | tojson }}{% if url %},"item":"{{ site.base_url }}{{ url }}"{% else %},"item":"{{ site.base_url }}{{ request.path }}"{% endif %}}
+{%- endfor %}]}
+</script>

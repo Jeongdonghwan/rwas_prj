@@ -32,9 +32,18 @@ SITE_DEFAULTS = {
     "email": "info@example.com",  # TODO: 실제 이메일
     "hours": "24시간 상담, 주말 예약제",
     "map_embed": "",
-    "base_url": "https://example.com",  # 도메인 확정 후 교체 (non-www, https)
-    "naver_site_verification": "",
-    "google_site_verification": "",
+    # 도메인: .env의 SITE_URL로 덮어씀 (배포 시 SITE_URL=https://도메인)
+    "base_url": os.environ.get("SITE_URL", "https://example.com").rstrip("/"),
+    "naver_site_verification": os.environ.get("NAVER_SITE_VERIFICATION", ""),
+    "google_site_verification": os.environ.get("GOOGLE_SITE_VERIFICATION", ""),
+    # 검색 노출용 짧은 브랜드 (서브페이지 타이틀 접미사)
+    "brand_seo": "수원개인회생 법률사무소 레이",
+    # 전 페이지 공통 키워드 (페이지별 키워드는 meta_keywords 블록으로 추가)
+    "keywords": (
+        "수원개인회생, 수원개인회생파산, 수원 개인회생, 수원 개인파산, "
+        "수원개인회생 변호사, 수원회생법원, 개인회생 신청자격, 개인회생 비용, "
+        "채무조정, 법률사무소 레이"
+    ),
 }
 
 # 대표변호사 약력 (about·메인 소개 섹션에서 사용)

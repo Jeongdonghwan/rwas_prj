@@ -1,6 +1,31 @@
 {% extends "base.html" %}
-{% block title %}{{ post.title }} | {{ site.brand }}{% endblock %}
+{% block title %}{{ post.title }} | 수원개인회생 법률사무소 레이{% endblock %}
+{% block meta_keywords %}수원개인회생 사례, {{ post.title }}, {{ site.keywords }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_image %}{% if post.thumb_path %}{{ site.base_url }}{{ post.thumb_path }}{% else %}{{ site.base_url }}{{ url_for('static', filename='img/og.png') }}{% endif %}{% endblock %}
 {% block meta_desc %}{{ post.excerpt }}{% endblock %}
+
+{% block head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ post.title | tojson }},
+  "description": {{ (post.excerpt or '') | tojson }},
+  "image": "{% if post.thumb_path %}{{ site.base_url }}{{ post.thumb_path }}{% else %}{{ site.base_url }}{{ url_for('static', filename='img/og.png') }}{% endif %}",
+  "datePublished": "{{ post.published_at.strftime('%Y-%m-%d') }}",
+  "dateModified": "{{ (post.updated_at or post.published_at).strftime('%Y-%m-%d') }}",
+  "author": { "@type": "Organization", "name": {{ site.firm_name | tojson }} },
+  "publisher": {
+    "@type": "Organization",
+    "name": {{ site.brand | tojson }},
+    "logo": { "@type": "ImageObject", "url": "{{ site.base_url }}{{ url_for('static', filename='img/logo.png') }}" }
+  },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "{{ site.base_url }}{{ request.path }}" },
+  "about": "수원개인회생"
+}
+</script>
+{% endblock %}
 
 {% block content %}
 {% with crumbs=[('진행 사례', url_for('board.case_list')), (post.title[:24] ~ ('…' if post.title|length > 24 else ''), None)] %}{% include "_breadcrumb.html" %}{% endwith %}

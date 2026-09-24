@@ -1,6 +1,7 @@
 {% extends "base.html" %}
-{% block title %}{{ dong.name }} 개인회생 | {{ site.brand }}{% endblock %}
-{% block meta_desc %}{{ gu.name }} {{ dong.name }} 거주자 개인회생 안내. 관할 수원회생법원, 사무소 오시는 길, 준비서류와 예상 기간을 정리했습니다.{% endblock %}
+{% block title %}{{ dong.name }} 개인회생 | 수원개인회생 법률사무소 레이{% endblock %}
+{% block meta_keywords %}{{ dong.name }} 개인회생, 수원 {{ dong.name }} 개인회생, {{ gu.name }} 개인회생, {{ dong.name }} 개인파산, {{ site.keywords }}{% endblock %}
+{% block meta_desc %}수원 {{ gu.name }} {{ dong.name }} 개인회생 안내. 관할 수원회생법원, 오시는 길, 준비서류와 예상 기간을 정리했습니다. 24시간 상담 {{ site.phone }}{% endblock %}
 {% block head %}{% include "partials/faq_jsonld.html" %}{% endblock %}
 
 {% block content %}
