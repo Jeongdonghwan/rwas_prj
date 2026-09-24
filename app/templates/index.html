@@ -92,7 +92,7 @@
       <ul class="prows">
         <li>{{ ico('user') }}<i>신청 조건</i><b>소득이 없거나 매우 적은 경우</b></li>
         <li>{{ ico('coins') }}<i>면책 범위</i><b>모든 채무 면책 가능 <span style="font-weight:400;color:var(--ink-3)">(세금 등 비면책채권 제외)</span></b></li>
-        <li>{{ ico('percent') }}<i>주요 특징</i><b>재산을 정리해 채무를 면제</b></li>
+        <li>{{ ico('percent') }}<i>주요 특징</i><b>재산을 정리해 채무를 변제</b></li>
         <li>{{ ico('landmark') }}<i>진행 기관</i><b>법원</b></li>
       </ul>
       <div class="pfoot">소득이 없어 변제가 어려운 경우,<br>법원의 판단을 통해 채무를 면책받을 수 있는 제도입니다.</div>
@@ -141,14 +141,14 @@
 </div></section>
 
 <section class="sec alt"><div class="wrap">
-  <div class="sec-head reveal"><span class="label">진행 절차</span><h2><span class="thin">개인회생 진행절차,</span> 신청부터 면책까지</h2><p>처음이라 부담스러워도 괜찮습니다. 전체 흐름을 한눈에 확인해보세요. 수원회생법원 기준 평균 4~6개월입니다.</p></div>
+  <div class="sec-head reveal"><span class="label">진행 절차</span><h2><span class="thin">개인회생 진행절차,</span> 신청부터 면책까지</h2><p>처음이라 부담스러워도 괜찮습니다. 전체 흐름을 한눈에 확인해보세요. 개시결정까지는 평균 3~6개월이 걸립니다.</p></div>
   <ol class="tl stagger">
     <li><span class="tic">{{ ico('phone') }}<span class="tno">01</span></span><b>상담·검토</b><span>신청 가능 여부와<br>예상 변제금 확인</span></li>
     <li><span class="tic">{{ ico('file') }}<span class="tno">02</span></span><b>서류 준비</b><span>부채증명서·소득증빙<br>정리 (2~3주)</span></li>
     <li><span class="tic">{{ ico('landmark') }}<span class="tno">03</span></span><b>법원 신청</b><span>수원회생법원에<br>신청서 접수</span></li>
     <li><span class="tic">{{ ico('ban') }}<span class="tno">04</span></span><b>금지명령</b><span>접수 후 1~2주,<br>압류·추심 중단</span></li>
-    <li><span class="tic">{{ ico('search') }}<span class="tno">05</span></span><b>개시 결정</b><span>신청 후 약 1개월,<br>절차 공식 시작</span></li>
-    <li><span class="tic">{{ ico('check') }}<span class="tno">06</span></span><b>변제계획 인가</b><span>확정된 월 변제금<br>납입 시작</span></li>
+    <li><span class="tic">{{ ico('search') }}<span class="tno">05</span></span><b>개시결정</b><span>신청 후 평균 3~6개월,<br>변제계획안에 따라 변제 진행</span></li>
+    <li><span class="tic">{{ ico('check') }}<span class="tno">06</span></span><b>인가결정</b><span>변제계획이<br>인가됨</span></li>
     <li><span class="tic">{{ ico('award') }}<span class="tno">07</span></span><b>면책</b><span>변제 완료 후<br>남은 채무 면제</span></li>
   </ol>
   <p class="more"><a href="{{ url_for('main.process') }}">절차 자세히 보기</a></p>
