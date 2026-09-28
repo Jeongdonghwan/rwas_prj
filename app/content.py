@@ -8,7 +8,8 @@ FNV-1a 해시**로 블록·FAQ·문장을 고르게 분산시킨다. 블록이 �
 
 import hashlib
 
-from jinja2 import Template
+from flask import current_app
+from jinja2 import Environment
 
 from app.models import ContentBlock, Faq
 from app.variants import POOLS
@@ -46,10 +47,49 @@ def get_block(block_key, seed):
     return pick(seed, block_key, rows).body_html
 
 
+# 받침 유무로 갈리는 조사 쌍 — (받침 있음, 받침 없음)
+JOSA_PAIRS = {
+    "은는": ("은", "는"), "이가": ("이", "가"), "을를": ("을", "를"),
+    "과와": ("과", "와"), "으로로": ("으로", "로"), "이라라": ("이라", "라"),
+}
+
+
+def josa(word, pair="은는"):
+    """단어 뒤에 받침에 맞는 조사를 붙여 돌려준다.
+
+        {{ site.firm_name|josa('은는') }} → '법률사무소 레이는'  (레이: 받침 없음)
+        {{ '매탄동'|josa('은는') }}        → '매탄동은'          (동: 받침 있음)
+
+    이름이 DB에서 오기 때문에 '레이은', '매탄동는' 같은 오류가 실제로 있었다.
+    조사가 필요한 자리에는 반드시 이 필터를 쓸 것.
+    """
+    w = str(word or "")
+    if not w:
+        return w
+    a, b = JOSA_PAIRS.get(pair, JOSA_PAIRS["은는"])
+    code = ord(w[-1])
+    if 0xAC00 <= code <= 0xD7A3:          # 한글 음절
+        jong = (code - 0xAC00) % 28
+        # 'ㄹ' 받침은 '로'를 쓴다 (서울로, 시청역으로)
+        if jong == 8 and pair == "으로로":
+            return w + b
+        return w + (a if jong else b)
+    if code in range(0x30, 0x3A):          # 숫자 — 읽는 소리 기준
+        return w + (a if w[-1] in "0136780" else b)
+    return w + b                            # 영문·기호는 받침 없음으로 처리
+
+
 def render_tpl(text, **vars):
+    """문장 풀·DB 템플릿 렌더. 앱의 jinja_env를 쓰는 이유는 josa 같은
+    커스텀 필터를 풀 문장 안에서도 쓸 수 있게 하기 위함이다."""
     if not text:
         return ""
-    return Template(text).render(**vars)
+    try:
+        return current_app.jinja_env.from_string(text).render(**vars)
+    except RuntimeError:                    # 앱 컨텍스트 밖(스크립트 등)
+        env = Environment(autoescape=True)
+        env.filters["josa"] = josa
+        return env.from_string(text).render(**vars)
 
 
 def vtext(seed, key, rank=None, **vars):

@@ -26,7 +26,7 @@
     {% for dong in gu.dongs %}<a href="{{ url_for('ko.page', name=dong.name) }}">{{ dong.name }} 개인회생</a>{% endfor %}
   </div>
   <div class="prose" style="max-width:820px;margin-bottom:64px">
-    <p>{{ gu.name }}에서는 {% for d in gu.dongs %}{{ d.name }}{% if not loop.last %}, {% endif %}{% endfor %} 등 {{ gu.dongs|length }}개 지역의 상담을 진행하고 있습니다. 주소지가 {{ gu.name }}이면 관할은 수원회생법원 한 곳이므로 어느 동에 사시든 신청 법원은 같습니다. 동별 페이지에는 사무소까지 오시는 길과 그 지역에서 자주 나오는 질문을 따로 정리해두었습니다.</p>
+    <p>{{ gu.name }}에서는 {% for d in gu.dongs %}{{ d.name }}{% if not loop.last %}, {% endif %}{% endfor %} 등 {{ gu.dongs|length }}개 지역의 상담을 진행하고 있습니다. 주소지가 {{ gu.name }}에 있으면 관할은 수원회생법원 한 곳이므로 어느 동에 사시든 신청 법원은 같습니다. 동별 페이지에는 사무소까지 오시는 길과 그 지역에서 자주 나오는 질문을 따로 정리해두었습니다.</p>
   </div>
 
   {% with kw = gu.name ~ ' 개인회생' %}

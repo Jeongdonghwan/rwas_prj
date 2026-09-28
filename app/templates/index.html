@@ -169,7 +169,7 @@
       <p class="more"><a href="{{ url_for('main.service_cost') }}">비용 안내 자세히 보기</a></p>
     </div>
     <div class="reveal d1">
-      <div class="sec-head"><h2>{{ site.firm_name }}가 일하는 방식</h2></div>
+      <div class="sec-head"><h2>{{ site.firm_name|josa('이가') }} 일하는 방식</h2></div>
       <ul class="points">
         <li><h3>01 변호사가 직접 확인합니다</h3><p>초기 상담부터 사건의 주요 내용을 변호사가 직접 확인하고, 진행 과정에서 필요한 판단을 함께 살펴봅니다.</p></li>
         <li><h3>02 예상되는 부분부터 설명합니다</h3><p>무조건 가능하다는 설명보다, 소득·재산·채무 상황을 확인하고 진행 과정에서 검토가 필요한 부분을 먼저 안내합니다.</p></li>

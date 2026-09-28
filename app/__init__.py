@@ -30,11 +30,12 @@ def create_app():
     def inject_site():
         return {"site": SITE_DEFAULTS, "lawyer": LAWYER, "asset_ver": asset_ver}
 
-    from app.content import vtext
+    from app.content import josa, vtext
     from app.variants import SECTION_KEYS
 
     app.jinja_env.globals["vtext"] = vtext
     app.jinja_env.globals["lf_sections"] = SECTION_KEYS
+    app.jinja_env.filters["josa"] = josa
 
     from app.routes.main import bp as main_bp
     from app.routes.contact import bp as contact_bp
