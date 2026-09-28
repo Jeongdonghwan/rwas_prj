@@ -2,7 +2,18 @@
    화이트 기반 + 딥그린 브랜드. 부드러운 라운드 카드·소프트 섀도우·볼드 산세리프.
    골드는 약력 카드 헤더에만. 베이지/크림 금지. */
 
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+/* 폰트 self-host — scripts/build_fonts.py가 만든 한국어 서브셋(굵기당 약 180KB).
+   CDN @import를 쓰면 ① site.css를 다 받아야 폰트 CSS를 발견하는 직렬 체인이 생기고
+   ② 그 CSS엔 unicode-range가 없어 굵기마다 전체 한글(750KB)을 통째로 받는다.
+   글자를 바꿔 서브셋에 없는 한글이 필요해지면 build_fonts.py를 다시 돌릴 것. */
+@font-face{font-family:'Pretendard';font-style:normal;font-weight:400;font-display:swap;
+  src:url('../fonts/pretendard-400.woff2') format('woff2')}
+@font-face{font-family:'Pretendard';font-style:normal;font-weight:600;font-display:swap;
+  src:url('../fonts/pretendard-600.woff2') format('woff2')}
+@font-face{font-family:'Pretendard';font-style:normal;font-weight:700;font-display:swap;
+  src:url('../fonts/pretendard-700.woff2') format('woff2')}
+@font-face{font-family:'Pretendard';font-style:normal;font-weight:800;font-display:swap;
+  src:url('../fonts/pretendard-800.woff2') format('woff2')}
 
 :root{
   --ink:#1d1d1f; --ink-2:#5f6064; --ink-3:#9a9ba0;

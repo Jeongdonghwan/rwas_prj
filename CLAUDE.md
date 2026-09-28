@@ -131,6 +131,51 @@ seed/                (Phase 3) dong.csv, job.csv, faq.csv
 - 유사도는 **`<main>` 안쪽에서 `<aside>`를 뺀 본문**으로만 잰다(헤더·푸터·CTA 같은 공통 보일러플레이트는 어느 사이트나 같으므로 중복 판정 대상 아님). 그래서 `base.html`에 `<main id="main">` 래퍼가 있다 — **제거하지 말 것**.
 - 비교 전 엔티티 이름을 지운다(이름만 바꾼 복제를 잡기 위함). 기준값: 손으로 따로 쓴 고정 페이지끼리는 3~11%.
 
+### 크롤링·속도 점검과 수정 (2026-09-28)
+
+크롤러 관점에서 실측한 결과와 고친 것. **재점검 시 같은 항목을 다시 재볼 것.**
+
+**확인된 정상 항목** — 캐러셀은 슬라이드 11개가 원본 HTML에 그대로 있고 `display:none`이 0개라
+JS를 못 돌리는 Yeti도 전부 읽는다(scroll-snap 방식이라 가능. JS로 슬라이드를 복제·은닉하는
+캐러셀로 바꾸면 이 장점이 사라짐). 내부 링크는 77페이지 전부 홈에서 1클릭, 고아 0개,
+동 페이지 평균 피인용 5.8회. 301·404·트레일링 슬래시 308 정상. 타이틀 전부 고유.
+메인의 외부 호스트 참조 38건은 전부 SVG `xmlns`와 JSON-LD `@context`라 실제 네트워크 요청 아님.
+
+**① 사이트맵 lastmod를 실제 수정 시각으로** (`app/routes/seo.py`)
+- 이전엔 전 URL에 `datetime.now()`를 박아 77개가 매일 바뀐다고 주장 → 검색엔진이 신호를 무시한다.
+- `content_mtime()`이 "그 페이지 본문을 만드는 파일들"의 mtime 최대값을 쓴다. 유형별 목록은 `CONTENT_SOURCES`.
+- **`base.html`·헤더·푸터는 일부러 제외.** 메타태그 한 줄 고쳤다고 전 페이지 lastmod가 리셋되면
+  원래 문제로 되돌아간다. 새 소스를 추가할 땐 "본문 내용을 바꾸는 파일인가"로 판단할 것.
+
+**② canonical을 퍼센트 인코딩으로 통일** (`app/__init__.py`의 `canonical_url`)
+- `request.path`는 디코딩된 한글이라 그대로 쓰면 canonical은 원시 한글, 사이트맵은 인코딩으로
+  표기가 갈렸다. context_processor에서 `quote(request.path)`로 만들어 주입하고
+  base.html·board/view.html·_breadcrumb.html이 모두 `{{ canonical_url }}`을 쓴다.
+
+**③ 폰트 self-host + 한국어 서브셋** (`scripts/build_fonts.py`)
+- CDN의 `pretendard.min.css`에는 `unicode-range`가 없어 굵기마다 전체 한글(약 750KB)을 통째로
+  받았다. 400·600·700·800 네 굵기 = **첫 방문에 약 3MB**. 게다가 CSS `@import`라 site.css를
+  다 받은 뒤에야 폰트 CSS를 발견하는 직렬 체인이었다.
+- KS X 1001 상용 2,350자 + 사이트 실사용 글자로 서브셋 → **3.0MB → 722KB (76% 감소)**.
+  `app/static/fonts/pretendard-{400,600,700,800}.woff2`, `@font-face`는 site.css 상단.
+- **글자를 바꿔 서브셋에 없는 한글이 필요해지면 `python scripts/build_fonts.py`를 다시 돌릴 것.**
+  파이썬 `euc-kr` 코덱은 실제로 CP949라 한글 전체를 통과시킨다 → 바이트 영역(선두 0xB0~0xC8)으로 걸러야 2,350자가 나온다.
+- 원본 woff2는 저장소에 두지 않는다(스크립트가 CDN에서 받아 서브셋만 남김).
+
+**④ 응답 압축** (`Flask-Compress`)
+- HTML 51KB→12KB, site.css 52KB→12KB, site.js 25KB→8KB. br·gzip 모두 동작.
+- Flask는 정적 파일을 스트리밍으로 내보내 br만 걸리고 gzip이 빠진다 → `_compressible_static`
+  훅이 CSS·JS만 `get_data()`로 읽어 일반 응답으로 바꾼다. **after_request는 등록 역순 실행이라
+  이 훅은 반드시 `Compress(app)`보다 뒤에 등록해야 한다.**
+
+**⑤ 이미지** — og.png 407KB → og.jpg 97KB(참조처 4곳 교체, png 삭제). 히어로에 `fetchpriority="high"`,
+접힌 화면 아래 이미지에 `loading="lazy"`, 사례 썸네일에 width/height.
+
+**남은 것(코드로 해결 안 되는 것)** — 네이버 "수원개인회생" SERP는 파워링크·플레이스·블로그·카페가
+상단을 차지하고 웹사이트 영역은 아래다. 기술 SEO만으로 네이버 유입에는 천장이 있고, 지역 업종은
+**네이버 스마트플레이스 등록**이 가장 크다(사이트에서 지도를 뺀 결정과는 별개 건). 그리고 사례 글이
+목업뿐이라 신선도 신호가 없다 — RSS·사이트맵 배관은 이미 깔려 있으니 어드민에서 글만 쓰면 된다.
+
 ### 캐러셀 (2026-09-28)
 - 매크로 `partials/carousel.html` — `{% from "partials/carousel.html" import carousel %}` 후 `{% call carousel('id', label='…', per=3, autoplay=6500) %}<div class="carou-item">…{% endcall %}`.
 - **scroll-snap이 실제 이동을 담당하고 JS(site.js 하단)는 화살표·점·자동재생만** 붙인다 → JS가 죽어도 스와이프로 볼 수 있고, 슬라이드는 복제·숨김 없이 전부 DOM에 남아 SEO 영향 없음.

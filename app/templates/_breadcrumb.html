@@ -9,6 +9,6 @@
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
 {"@type":"ListItem","position":1,"name":"홈","item":"{{ site.base_url }}/"}
 {%- for label, url in crumbs -%}
-,{"@type":"ListItem","position":{{ loop.index + 1 }},"name":{{ label | tojson }}{% if url %},"item":"{{ site.base_url }}{{ url }}"{% else %},"item":"{{ site.base_url }}{{ request.path }}"{% endif %}}
+,{"@type":"ListItem","position":{{ loop.index + 1 }},"name":{{ label | tojson }}{% if url %},"item":"{{ site.base_url }}{{ url }}"{% else %},"item":"{{ canonical_url }}"{% endif %}}
 {%- endfor %}]}
 </script>
