@@ -1,0 +1,79 @@
+{% extends "admin/_base.html" %}
+{% block title %}상담 접수{% endblock %}
+
+{% block content %}
+<div class="phead">
+  <h1>상담 접수</h1>
+  <p>총 {{ total }}건{% if q %} · "{{ q }}" 검색 결과{% endif %}</p>
+  <div class="act">
+    <a class="btn line" href="{{ url_for('admin.inquiries_csv', status=status or '', q=q or '') }}">CSV 내려받기</a>
+  </div>
+</div>
+
+<div class="filters">
+  <div class="chips">
+    <a href="{{ url_for('admin.inquiries', q=q or None) }}" {% if not status %}class="on"{% endif %}>전체 <span>{{ counts.all }}</span></a>
+    {% for key, label in status_items %}
+    <a href="{{ url_for('admin.inquiries', status=key, q=q or None) }}" {% if status == key %}class="on"{% endif %}>{{ label }} <span>{{ counts[key] }}</span></a>
+    {% endfor %}
+  </div>
+  <form class="search" method="get">
+    {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+    <input type="text" name="q" value="{{ q or '' }}" placeholder="이름·연락처 검색">
+    <button class="btn line sm" type="submit">검색</button>
+  </form>
+</div>
+
+<div class="card">
+  {% if rows %}
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>접수일시</th><th>이름</th><th>연락처</th>
+        <th class="hide-sm">채무액</th><th class="hide-sm">지역</th><th class="hide-sm">유입</th>
+        <th style="width:330px">상태 · 메모</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td class="num nowrap">{{ r.created_at.strftime('%Y-%m-%d') }}<br>{{ r.created_at.strftime('%H:%M') }}</td>
+        <td class="strong nowrap">{{ r.name }}</td>
+        <td class="nowrap"><a class="ln" href="tel:{{ r.phone }}">{{ r.phone }}</a></td>
+        <td class="hide-sm muted nowrap">{{ r.debt_range or '-' }}</td>
+        <td class="hide-sm muted nowrap">{{ r.area_text or '-' }}</td>
+        <td class="hide-sm muted" style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.source_path or '-' }}</td>
+        <td>
+          <form class="rowform" method="post" action="{{ url_for('admin.inquiry_update', inquiry_id=r.id) }}">
+            <select name="status">
+              {% for key, label in status_items %}
+              <option value="{{ key }}" {% if r.status == key %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <input type="text" name="memo" value="{{ r.memo or '' }}" placeholder="메모">
+            <button class="btn sm" type="submit">저장</button>
+          </form>
+        </td>
+        <td class="nowrap">
+          <form method="post" action="{{ url_for('admin.inquiry_delete', inquiry_id=r.id) }}" onsubmit="return confirm('이 접수 건을 삭제할까요? 되돌릴 수 없습니다.')">
+            <button class="btn sm danger" type="submit">삭제</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty"><b>표시할 접수 건이 없습니다</b>{% if q or status %}검색·필터 조건을 바꿔보세요.{% else %}홈페이지 상담 신청이 들어오면 여기에 쌓입니다.{% endif %}</div>
+  {% endif %}
+</div>
+
+{% if pages > 1 %}
+<nav class="pager">
+  {% for n in range(1, pages + 1) %}
+    {% if n == page %}<b>{{ n }}</b>
+    {% else %}<a href="{{ url_for('admin.inquiries', page=n, status=status or None, q=q or None) }}">{{ n }}</a>{% endif %}
+  {% endfor %}
+</nav>
+{% endif %}
+{% endblock %}

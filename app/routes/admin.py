@@ -1,7 +1,7 @@
 import os
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from functools import wraps
 from pathlib import Path
 
@@ -23,6 +23,9 @@ from app.models import Inquiry, Post
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 STATUSES = ("new", "contacted", "done", "spam")
+STATUS_LABEL = {"new": "신규", "contacted": "연락함", "done": "완료", "spam": "스팸"}
+STATUS_ITEMS = [(k, STATUS_LABEL[k]) for k in STATUSES]
+PER_PAGE = 50
 
 
 def check_auth(auth):
@@ -48,61 +51,120 @@ def requires_auth(f):
 @bp.route("/")
 @requires_auth
 def home():
-    return redirect(url_for("admin.inquiries"))
+    return redirect(url_for("admin.dashboard"))
+
+
+@bp.route("/dashboard")
+@requires_auth
+def dashboard():
+    today_start = datetime.combine(date.today(), datetime.min.time())
+    stats = {
+        "total": Inquiry.query.count(),
+        "today": Inquiry.query.filter(Inquiry.created_at >= today_start).count(),
+        "new": Inquiry.query.filter_by(status="new").count(),
+        "posts": Post.query.filter_by(is_public=True).count(),
+    }
+    recent = Inquiry.query.order_by(Inquiry.created_at.desc()).limit(8).all()
+    posts = Post.query.order_by(Post.published_at.desc()).limit(5).all()
+    return render_template(
+        "admin/dashboard.html",
+        nav="dash",
+        s=stats,
+        recent=recent,
+        posts=posts,
+        status_label=STATUS_LABEL,
+        today=date.today().strftime("%Y년 %m월 %d일"),
+    )
+
+
+def _inquiry_query(status, q):
+    query = Inquiry.query
+    if status in STATUSES:
+        query = query.filter_by(status=status)
+    if q:
+        like = f"%{q}%"
+        query = query.filter(db.or_(Inquiry.name.like(like), Inquiry.phone.like(like)))
+    return query.order_by(Inquiry.created_at.desc())
 
 
 @bp.route("/inquiries")
 @requires_auth
 def inquiries():
     status = request.args.get("status")
-    q = Inquiry.query.order_by(Inquiry.created_at.desc())
-    if status in STATUSES:
-        q = q.filter_by(status=status)
-    rows = q.limit(200).all()
+    q = (request.args.get("q") or "").strip()
+    page = max(request.args.get("page", 1, type=int), 1)
 
-    def esc(s):
-        return (
-            str(s or "")
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-        )
+    query = _inquiry_query(status, q)
+    total = query.count()
+    pages = max((total + PER_PAGE - 1) // PER_PAGE, 1)
+    rows = query.offset((page - 1) * PER_PAGE).limit(PER_PAGE).all()
 
-    tabs = " | ".join(
-        f'<a href="?status={s}">{s}</a>' for s in STATUSES
-    )
-    trs = "".join(
-        f"<tr><td>{r.id}</td><td>{r.created_at:%Y-%m-%d %H:%M}</td>"
-        f"<td>{esc(r.name)}</td><td>{esc(r.phone)}</td><td>{esc(r.debt_range)}</td>"
-        f"<td>{esc(r.area_text)}</td><td>{esc(r.source_path)}</td><td>{esc(r.status)}</td>"
-        f'<td><form method="post" action="{url_for("admin.set_status", inquiry_id=r.id)}">'
-        + "".join(
-            f'<button name="status" value="{s}">{s}</button>' for s in STATUSES
-        )
-        + "</form></td></tr>"
-        for r in rows
-    )
-    return (
-        "<!doctype html><meta charset=utf-8><title>상담 접수</title>"
-        "<style>body{font-family:sans-serif;padding:20px}table{border-collapse:collapse;width:100%}"
-        "th,td{border:1px solid #ccc;padding:6px 8px;font-size:14px}button{margin-right:4px}</style>"
-        f'<h1>상담 접수 목록</h1><p><a href="{url_for("admin.cases")}">→ 진행 사례 관리</a></p>'
-        f'<p><a href="?">전체</a> | {tabs}</p>'
-        "<table><tr><th>ID</th><th>접수일시</th><th>이름</th><th>연락처</th><th>채무액</th>"
-        f"<th>지역</th><th>유입 페이지</th><th>상태</th><th>변경</th></tr>{trs}</table>"
+    counts = {"all": Inquiry.query.count()}
+    for key in STATUSES:
+        counts[key] = Inquiry.query.filter_by(status=key).count()
+
+    return render_template(
+        "admin/inquiries.html",
+        nav="inq",
+        rows=rows,
+        total=total,
+        page=page,
+        pages=pages,
+        status=status if status in STATUSES else None,
+        q=q,
+        counts=counts,
+        status_items=STATUS_ITEMS,
     )
 
 
-@bp.route("/inquiries/<int:inquiry_id>/status", methods=["POST"])
+@bp.route("/inquiries.csv")
 @requires_auth
-def set_status(inquiry_id):
-    status = request.form.get("status")
-    if status in STATUSES:
-        row = db.session.get(Inquiry, inquiry_id) or None
-        if row:
+def inquiries_csv():
+    status = request.args.get("status")
+    q = (request.args.get("q") or "").strip()
+    rows = _inquiry_query(status, q).all()
+
+    def cell(v):
+        v = str(v if v is not None else "")
+        return '"' + v.replace('"', '""') + '"'
+
+    lines = ["접수일시,이름,연락처,채무액,지역,유입페이지,상태,메모"]
+    for r in rows:
+        lines.append(",".join([
+            cell(r.created_at.strftime("%Y-%m-%d %H:%M")),
+            cell(r.name), cell(r.phone), cell(r.debt_range), cell(r.area_text),
+            cell(r.source_path), cell(STATUS_LABEL.get(r.status, r.status)), cell(r.memo),
+        ]))
+    body = "\ufeff" + "\n".join(lines)  # 엑셀 한글 대응 BOM
+    fname = "inquiries_%s.csv" % date.today().strftime("%Y%m%d")
+    return Response(
+        body,
+        mimetype="text/csv; charset=utf-8",
+        headers={"Content-Disposition": "attachment; filename=%s" % fname},
+    )
+
+
+@bp.route("/inquiries/<int:inquiry_id>/update", methods=["POST"])
+@requires_auth
+def inquiry_update(inquiry_id):
+    row = db.session.get(Inquiry, inquiry_id)
+    if row:
+        status = request.form.get("status")
+        if status in STATUSES:
             row.status = status
-            db.session.commit()
-    return redirect(url_for("admin.inquiries"))
+        row.memo = (request.form.get("memo") or "").strip()[:2000]
+        db.session.commit()
+    return redirect(request.referrer or url_for("admin.inquiries"))
+
+
+@bp.route("/inquiries/<int:inquiry_id>/delete", methods=["POST"])
+@requires_auth
+def inquiry_delete(inquiry_id):
+    row = db.session.get(Inquiry, inquiry_id)
+    if row:
+        db.session.delete(row)
+        db.session.commit()
+    return redirect(request.referrer or url_for("admin.inquiries"))
 
 
 # ---------- 진행 사례 게시판 ----------
@@ -173,7 +235,10 @@ def fill_post(post):
 @requires_auth
 def cases():
     posts = Post.query.order_by(Post.published_at.desc()).all()
-    return render_template("admin/cases.html", posts=posts)
+    public_count = sum(1 for p in posts if p.is_public)
+    return render_template(
+        "admin/cases.html", nav="case", posts=posts, public_count=public_count
+    )
 
 
 @bp.route("/cases/new", methods=["GET", "POST"])
@@ -183,11 +248,11 @@ def case_new():
         post = Post()
         fill_post(post)
         if not post.title or not post.body_html.strip():
-            return render_template("admin/case_form.html", post=post, error="제목과 본문을 입력하세요.")
+            return render_template("admin/case_form.html", nav="case", post=post, error="제목과 본문을 입력하세요.")
         db.session.add(post)
         db.session.commit()
         return redirect(url_for("admin.cases"))
-    return render_template("admin/case_form.html", post=None, error=None)
+    return render_template("admin/case_form.html", nav="case", post=None, error=None)
 
 
 @bp.route("/cases/<int:post_id>/edit", methods=["GET", "POST"])
@@ -199,10 +264,10 @@ def case_edit(post_id):
     if request.method == "POST":
         fill_post(post)
         if not post.title or not post.body_html.strip():
-            return render_template("admin/case_form.html", post=post, error="제목과 본문을 입력하세요.")
+            return render_template("admin/case_form.html", nav="case", post=post, error="제목과 본문을 입력하세요.")
         db.session.commit()
         return redirect(url_for("admin.cases"))
-    return render_template("admin/case_form.html", post=post, error=None)
+    return render_template("admin/case_form.html", nav="case", post=post, error=None)
 
 
 @bp.route("/cases/<int:post_id>/delete", methods=["POST"])

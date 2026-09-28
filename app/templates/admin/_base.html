@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>{% block title %}관리자{% endblock %} | {{ site.firm_name }}</title>
+<link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" sizes="48x48">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v={{ asset_ver }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+
+<header class="ahead"><div class="in">
+  <a class="logo" href="{{ url_for('admin.dashboard') }}">
+    <img src="{{ url_for('static', filename='img/emblem.png') }}" alt="">
+    <b>법률사무소 레이<small>LEI LAW OFFICE</small></b>
+  </a>
+  <span class="tag">관리자</span>
+  <div class="right">
+    <a href="{{ url_for('main.index') }}" target="_blank">사이트 보기 ↗</a>
+  </div>
+</div></header>
+
+<nav class="anav"><div class="in">
+  <a href="{{ url_for('admin.dashboard') }}" {% if nav == 'dash' %}class="on"{% endif %}>대시보드</a>
+  <a href="{{ url_for('admin.inquiries') }}" {% if nav == 'inq' %}class="on"{% endif %}>상담 접수</a>
+  <a href="{{ url_for('admin.cases') }}" {% if nav == 'case' %}class="on"{% endif %}>진행 사례</a>
+</div></nav>
+
+<div class="wrap">
+{% block content %}{% endblock %}
+</div>
+
+{% block script %}{% endblock %}
+</body>
+</html>

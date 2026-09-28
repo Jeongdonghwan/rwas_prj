@@ -1,0 +1,146 @@
+/* 관리자 화면 전용 — 사이트 테마(화이트 + 버건디)와 동일 팔레트 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+:root{
+  --ink:#1d1d1f; --ink-2:#5f6064; --ink-3:#9a9ba0;
+  --line:#e7e6e6; --line-2:#f2f1f1;
+  --paper:#f7f6f6; --card:#ffffff;
+  --wine:#7c2231; --wine-2:#8e2939; --wine-3:#b13a4a; --wine-soft:#f8eef0;
+  --ok:#1f7a4d; --ok-soft:#e8f4ee;
+  --warn:#9a6a10; --warn-soft:#fcf3e2;
+  --gray-soft:#f0f0f1;
+  --r:12px;
+  --shadow:0 1px 2px rgba(30,22,24,.05),0 6px 18px rgba(30,22,24,.06);
+  --sans:'Pretendard',-apple-system,'Malgun Gothic',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+input,select,textarea,button{font-family:inherit;font-size:inherit}
+
+/* 헤더 */
+.ahead{background:#fff;border-bottom:1px solid var(--line)}
+.ahead .in{max-width:1240px;margin:0 auto;padding:0 20px;height:62px;display:flex;align-items:center;gap:14px}
+.ahead .logo{display:flex;align-items:center;gap:9px}
+.ahead .logo img{height:32px;width:auto;display:block}
+.ahead .logo b{font-size:16px;font-weight:800;color:#8a6a34;letter-spacing:-.01em;line-height:1.1}
+.ahead .logo b small{display:block;font-size:9px;letter-spacing:.2em;color:#b99a63;font-weight:600}
+.ahead .tag{font-size:12px;font-weight:700;color:var(--wine);background:var(--wine-soft);border-radius:999px;padding:4px 12px}
+.ahead .right{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13.5px}
+.ahead .right a{color:var(--ink-2);padding:8px 12px;border-radius:8px}
+.ahead .right a:hover{background:var(--gray-soft);color:var(--ink)}
+
+/* 탭 내비 */
+.anav{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.anav .in{max-width:1240px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto}
+.anav a{padding:13px 16px;font-size:14.5px;font-weight:600;color:var(--ink-2);border-bottom:2px solid transparent;white-space:nowrap}
+.anav a:hover{color:var(--ink)}
+.anav a.on{color:var(--wine);border-bottom-color:var(--wine)}
+
+/* 레이아웃 */
+.wrap{max-width:1240px;margin:0 auto;padding:26px 20px 60px}
+.phead{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.phead h1{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.phead p{font-size:13.5px;color:var(--ink-3)}
+.phead .act{margin-left:auto;display:flex;gap:8px}
+
+/* 버튼 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;padding:10px 18px;border-radius:9px;background:var(--wine);color:#fff;border:1px solid var(--wine);font-weight:700;font-size:14px;cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--wine-2)}
+.btn.line{background:#fff;color:var(--ink-2);border-color:var(--line)}
+.btn.line:hover{background:var(--gray-soft);color:var(--ink)}
+.btn.sm{padding:6px 12px;font-size:13px;font-weight:600;border-radius:7px}
+.btn.danger{background:#fff;color:#b3402f;border-color:#e6c4bd}
+.btn.danger:hover{background:#fdf3f1}
+
+/* 통계 카드 */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow)}
+.stat .lb{font-size:13px;color:var(--ink-3);font-weight:600;margin-bottom:6px}
+.stat .nm{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.stat .nm small{font-size:14px;font-weight:600;color:var(--ink-3);margin-left:3px}
+.stat.hl .nm{color:var(--wine)}
+
+/* 카드/테이블 */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.card + .card{margin-top:20px}
+.card .ct{padding:16px 20px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:10px}
+.card .ct h2{font-size:16px;font-weight:800}
+.card .ct .more{margin-left:auto;font-size:13px;color:var(--wine);font-weight:600}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th,.tbl td{padding:12px 14px;text-align:left;font-size:14px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.tbl th{background:#fafafa;font-size:12.5px;font-weight:700;color:var(--ink-3);white-space:nowrap}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:#fcfbfb}
+.tbl .num{color:var(--ink-3);font-size:13px}
+.tbl .nowrap{white-space:nowrap}
+.tbl .strong{font-weight:700}
+.tbl .muted{color:var(--ink-3);font-size:13px}
+.tbl a.ln{color:var(--wine);font-weight:600}
+.tbl a.ln:hover{text-decoration:underline}
+.empty{padding:56px 20px;text-align:center;color:var(--ink-3)}
+.empty b{display:block;font-size:16px;color:var(--ink-2);margin-bottom:6px}
+
+/* 상태 뱃지 */
+.bd{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.bd.new{background:var(--wine-soft);color:var(--wine)}
+.bd.contacted{background:var(--warn-soft);color:var(--warn)}
+.bd.done{background:var(--ok-soft);color:var(--ok)}
+.bd.spam{background:var(--gray-soft);color:var(--ink-3)}
+.bd.on{background:var(--ok-soft);color:var(--ok)}
+.bd.off{background:var(--gray-soft);color:var(--ink-3)}
+
+/* 필터 바 */
+.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips a{padding:8px 14px;border:1px solid var(--line);background:#fff;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.chips a.on{background:var(--wine);border-color:var(--wine);color:#fff}
+.chips a span{opacity:.65;margin-left:4px;font-size:12px}
+.search{margin-left:auto;display:flex;gap:6px}
+.search input{width:220px;padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:#fff}
+.search input:focus{outline:none;border-color:var(--wine-3);box-shadow:0 0 0 3px var(--wine-soft)}
+
+/* 인라인 폼 (상태·메모 저장) */
+.rowform{display:flex;gap:6px;align-items:center}
+.rowform select{flex:0 0 auto;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px}
+.rowform input[type=text]{flex:1 1 auto;min-width:0;width:auto;padding:7px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px}
+.rowform select:focus,.rowform input:focus{outline:none;border-color:var(--wine-3)}
+
+/* 페이지네이션 */
+.pager{display:flex;justify-content:center;gap:5px;margin-top:22px}
+.pager a,.pager b{min-width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:14px;font-weight:600;color:var(--ink-2)}
+.pager b{background:var(--wine);border-color:var(--wine);color:#fff}
+.pager a:hover{border-color:var(--wine-3);color:var(--wine)}
+
+/* 폼 (글쓰기) */
+.form label{display:block;font-size:13.5px;font-weight:700;margin:18px 0 6px}
+.form label .hint{font-weight:500;color:var(--ink-3);font-size:12.5px;margin-left:6px}
+.form input[type=text],.form input[type=date],.form input[type=file]{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;background:#fff}
+.form input:focus{outline:none;border-color:var(--wine-3);box-shadow:0 0 0 3px var(--wine-soft)}
+.form .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.form .check{display:flex;align-items:center;gap:8px;margin-top:20px;font-weight:700;font-size:14px}
+.form .check input{width:17px;height:17px;accent-color:var(--wine)}
+.form .thumb{margin-top:10px;max-width:220px;border-radius:9px;border:1px solid var(--line)}
+.form .actions{margin-top:26px;display:flex;gap:8px}
+.alert{background:#fdf3f1;color:#b3402f;border:1px solid #e6c4bd;border-radius:9px;padding:12px 15px;font-size:14px;margin-bottom:16px}
+.note{background:var(--wine-soft);border-radius:9px;padding:13px 16px;font-size:13.5px;color:var(--ink-2);margin-top:16px}
+.note b{color:var(--wine)}
+#editor{border-radius:9px;overflow:hidden}
+
+@media (max-width:900px){
+  .stats{grid-template-columns:1fr 1fr}
+  .search{margin-left:0;width:100%}
+  .search input{flex:1;width:auto}
+  .form .row2{grid-template-columns:1fr}
+  .tbl .hide-sm{display:none}
+}
+@media (max-width:600px){
+  .ahead .in{height:56px}
+  .ahead .logo b small,.ahead .tag{display:none}
+  .stats{grid-template-columns:1fr 1fr;gap:10px}
+  .stat{padding:15px 16px}
+  .stat .nm{font-size:24px}
+  .wrap{padding:18px 14px 50px}
+  .tbl th,.tbl td{padding:10px 10px;font-size:13px}
+}
