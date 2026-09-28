@@ -6,32 +6,34 @@
 <meta name="robots" content="noindex,nofollow">
 <title>{% block title %}관리자{% endblock %} | {{ site.firm_name }}</title>
 <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" sizes="48x48">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="{{ url_for('static', filename='fonts/pretendard-400.woff2') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v={{ asset_ver }}">
 {% block head %}{% endblock %}
 </head>
 <body>
 
-<header class="ahead"><div class="in">
+{# 로고·내비·바로가기를 한 줄로 — 두 줄짜리 헤더는 세로 공간만 먹었다 #}
+<header class="abar"><div class="in">
   <a class="logo" href="{{ url_for('admin.dashboard') }}">
-    <img src="{{ url_for('static', filename='img/emblem.png') }}" alt="">
+    <img src="{{ url_for('static', filename='img/emblem.png') }}" alt="" width="30" height="27">
     <b>법률사무소 레이<small>LEI LAW OFFICE</small></b>
   </a>
-  <span class="tag">관리자</span>
+  <nav>
+    <a href="{{ url_for('admin.dashboard') }}" {% if nav == 'dash' %}class="on"{% endif %}>대시보드</a>
+    <a href="{{ url_for('admin.inquiries') }}" {% if nav == 'inq' %}class="on"{% endif %}>상담 접수</a>
+    <a href="{{ url_for('admin.cases') }}" {% if nav == 'case' %}class="on"{% endif %}>진행 사례</a>
+  </nav>
   <div class="right">
-    <a href="{{ url_for('main.index') }}" target="_blank">사이트 보기 ↗</a>
+    <span class="tag">관리자</span>
+    <a href="{{ url_for('main.index') }}" target="_blank" rel="noopener">사이트 보기 ↗</a>
   </div>
 </div></header>
-
-<nav class="anav"><div class="in">
-  <a href="{{ url_for('admin.dashboard') }}" {% if nav == 'dash' %}class="on"{% endif %}>대시보드</a>
-  <a href="{{ url_for('admin.inquiries') }}" {% if nav == 'inq' %}class="on"{% endif %}>상담 접수</a>
-  <a href="{{ url_for('admin.cases') }}" {% if nav == 'case' %}class="on"{% endif %}>진행 사례</a>
-</div></nav>
 
 <div class="wrap">
 {% block content %}{% endblock %}
 </div>
 
+<script src="{{ url_for('static', filename='js/admin.js') }}?v={{ asset_ver }}" defer></script>
 {% block script %}{% endblock %}
 </body>
 </html>

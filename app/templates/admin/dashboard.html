@@ -6,7 +6,7 @@
   <h1>대시보드</h1>
   <p>{{ today }} 기준</p>
   <div class="act">
-    <a class="btn" href="{{ url_for('admin.case_new') }}">+ 새 사례 작성</a>
+    <a class="btn" href="{{ url_for('admin.case_new') }}">새 사례 작성</a>
   </div>
 </div>
 
@@ -20,21 +20,23 @@
 <div class="card">
   <div class="ct"><h2>최근 상담 접수</h2><a class="more" href="{{ url_for('admin.inquiries') }}">전체 보기 →</a></div>
   {% if recent %}
+  <div class="tblwrap">
   <table class="tbl">
     <thead><tr><th>접수일시</th><th>이름</th><th>연락처</th><th class="hide-sm">채무액</th><th class="hide-sm">지역</th><th>상태</th></tr></thead>
     <tbody>
       {% for r in recent %}
       <tr>
         <td class="num nowrap">{{ r.created_at.strftime('%m-%d %H:%M') }}</td>
-        <td class="strong">{{ r.name }}</td>
-        <td class="nowrap"><a class="ln" href="tel:{{ r.phone }}">{{ r.phone }}</a></td>
-        <td class="hide-sm muted">{{ r.debt_range or '-' }}</td>
-        <td class="hide-sm muted">{{ r.area_text or '-' }}</td>
+        <td class="strong nowrap">{{ r.name }}</td>
+        <td class="nowrap"><a class="tel" href="tel:{{ r.phone }}">{{ r.phone }}</a></td>
+        <td class="hide-sm muted nowrap">{{ r.debt_range or '-' }}</td>
+        <td class="hide-sm muted nowrap">{{ r.area_text or '-' }}</td>
         <td><span class="bd {{ r.status }}">{{ status_label[r.status] }}</span></td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% else %}
   <div class="empty"><b>아직 접수된 상담이 없습니다</b>홈페이지 상담 신청이 들어오면 여기에 표시됩니다.</div>
   {% endif %}
@@ -43,6 +45,7 @@
 <div class="card">
   <div class="ct"><h2>최근 진행 사례</h2><a class="more" href="{{ url_for('admin.cases') }}">전체 보기 →</a></div>
   {% if posts %}
+  <div class="tblwrap">
   <table class="tbl">
     <thead><tr><th>제목</th><th class="hide-sm">발행일</th><th>공개</th><th class="hide-sm">조회</th></tr></thead>
     <tbody>
@@ -56,6 +59,7 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% else %}
   <div class="empty"><b>작성된 사례가 없습니다</b>사례 글을 올리면 홈페이지와 네이버 RSS에 자동 반영됩니다.</div>
   {% endif %}

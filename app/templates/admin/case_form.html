@@ -48,8 +48,17 @@
   <div class="actions">
     <button class="btn" type="submit">저장</button>
     <a class="btn line" href="{{ url_for('admin.cases') }}">취소</a>
+    <span class="sp"></span>
   </div>
 </form>
+{% if post and post.id %}
+{# 삭제는 저장 버튼과 떨어뜨려 둔다 — 실수로 누르지 않게 #}
+<form method="post" action="{{ url_for('admin.case_delete', post_id=post.id) }}"
+      style="margin-top:14px;padding-top:16px;border-top:1px solid var(--line-2)"
+      onsubmit="return confirm('“{{ post.title }}” 글을 삭제할까요? 되돌릴 수 없습니다.')">
+  <button class="btn sm danger" type="submit">이 글 삭제</button>
+</form>
+{% endif %}
 </div>
 {% endblock %}
 

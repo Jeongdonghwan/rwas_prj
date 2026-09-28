@@ -6,36 +6,44 @@
   <h1>진행 사례</h1>
   <p>총 {{ posts|length }}건 · 공개 {{ public_count }}건</p>
   <div class="act">
-    <a class="btn line" href="{{ url_for('board.case_list') }}" target="_blank">게시판 보기 ↗</a>
-    <a class="btn" href="{{ url_for('admin.case_new') }}">+ 새 사례 작성</a>
+    <a class="btn line" href="{{ url_for('board.case_list') }}" target="_blank" rel="noopener">게시판 보기 ↗</a>
+    <a class="btn" href="{{ url_for('admin.case_new') }}">새 사례 작성</a>
   </div>
 </div>
 
 <div class="card">
   {% if posts %}
+  <div class="tblwrap">
   <table class="tbl">
     <thead>
-      <tr><th>제목</th><th class="hide-sm">발행일</th><th>공개</th><th class="hide-sm">조회</th><th style="width:230px">관리</th></tr>
+      <tr>
+        <th>제목</th><th class="hide-sm">발행일</th><th>공개</th>
+        <th class="hide-sm">조회</th><th style="width:210px"></th>
+      </tr>
     </thead>
     <tbody>
       {% for p in posts %}
       <tr>
         <td>
           <a class="ln" href="{{ url_for('admin.case_edit', post_id=p.id) }}">{{ p.title }}</a>
-          <div class="muted" style="margin-top:2px">/사례/{{ p.slug }}/</div>
+          <span class="sub">/사례/{{ p.slug }}/</span>
         </td>
         <td class="hide-sm num nowrap">{{ p.published_at.strftime('%Y-%m-%d') }}</td>
         <td><span class="bd {{ 'on' if p.is_public else 'off' }}">{{ '공개' if p.is_public else '비공개' }}</span></td>
         <td class="hide-sm muted">{{ p.view_count or 0 }}</td>
-        <td class="nowrap">
-          <div class="rowform">
+        <td>
+          {# 행에 마우스를 올려야 또렷해진다 — 목록을 훑을 땐 조용하게 #}
+          <div class="ract">
             <a class="btn sm line" href="{{ url_for('admin.case_edit', post_id=p.id) }}">수정</a>
-            {% if p.is_public %}<a class="btn sm line" href="{{ url_for('board.case_view', slug=p.slug) }}" target="_blank">보기</a>{% endif %}
+            {% if p.is_public %}
+            <a class="btn sm line" href="{{ url_for('board.case_view', slug=p.slug) }}" target="_blank" rel="noopener">보기</a>
+            {% endif %}
             <form method="post" action="{{ url_for('admin.case_toggle', post_id=p.id) }}">
-              <button class="btn sm line" type="submit">{{ '비공개로' if p.is_public else '공개로' }}</button>
+              <button class="btn sm line" type="submit">{{ '숨기기' if p.is_public else '공개' }}</button>
             </form>
-            <form method="post" action="{{ url_for('admin.case_delete', post_id=p.id) }}" onsubmit="return confirm('삭제할까요? 되돌릴 수 없습니다.')">
-              <button class="btn sm danger" type="submit">삭제</button>
+            <form method="post" action="{{ url_for('admin.case_delete', post_id=p.id) }}"
+                  onsubmit="return confirm('“{{ p.title }}” 글을 삭제할까요? 되돌릴 수 없습니다.')">
+              <button class="btn sm ghost" type="submit" title="삭제">삭제</button>
             </form>
           </div>
         </td>
@@ -43,6 +51,7 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% else %}
   <div class="empty">
     <b>아직 작성된 사례가 없습니다</b>
@@ -52,6 +61,8 @@
 </div>
 
 <div class="note">
-  <b>안내</b> 사례 글은 의뢰인 동의를 받아 사실 위주로 작성해 주세요. 변호사 광고규정상 "100% 인가", "무조건 면책" 같은 결과 보장 표현은 사용할 수 없습니다. (글 하단에 결과 비보장 고지는 자동으로 붙습니다.)
+  <b>작성 안내</b> 사례 글은 의뢰인 동의를 받아 사실 위주로 작성해 주세요.
+  변호사 광고규정상 "100% 인가", "무조건 면책" 같은 결과 보장 표현은 사용할 수 없습니다.
+  글 하단에는 결과 비보장 고지가 자동으로 붙습니다.
 </div>
 {% endblock %}

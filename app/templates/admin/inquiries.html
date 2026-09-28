@@ -20,51 +20,72 @@
   <form class="search" method="get">
     {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
     <input type="text" name="q" value="{{ q or '' }}" placeholder="이름·연락처 검색">
-    <button class="btn line sm" type="submit">검색</button>
+    <button class="btn line" type="submit">검색</button>
   </form>
 </div>
 
 <div class="card">
   {% if rows %}
+  <div class="tblwrap">
   <table class="tbl">
     <thead>
       <tr>
-        <th>접수일시</th><th>이름</th><th>연락처</th>
+        <th class="hide-sm">접수일시</th><th>이름</th><th>연락처</th>
         <th class="hide-sm">채무액</th><th class="hide-sm">지역</th><th class="hide-sm">유입</th>
-        <th style="width:330px">상태 · 메모</th><th></th>
+        <th>상태 · 메모</th><th style="width:130px"></th>
       </tr>
     </thead>
     <tbody>
       {% for r in rows %}
-      <tr>
-        <td class="num nowrap">{{ r.created_at.strftime('%Y-%m-%d') }}<br>{{ r.created_at.strftime('%H:%M') }}</td>
-        <td class="strong nowrap">{{ r.name }}</td>
-        <td class="nowrap"><a class="ln" href="tel:{{ r.phone }}">{{ r.phone }}</a></td>
+      {# 읽기 모드가 기본. 편집 버튼을 눌러야 폼이 열린다 (admin.js) #}
+      <tr data-row="{{ r.id }}">
+        <td class="hide-sm num nowrap">{{ r.created_at.strftime('%Y-%m-%d') }} {{ r.created_at.strftime('%H:%M') }}</td>
+        {# 좁은 화면에선 접수일시 열이 숨으므로 이름 아래에 날짜를 보여준다 #}
+        <td class="strong nowrap">{{ r.name }}<span class="sub only-sm">{{ r.created_at.strftime('%m-%d %H:%M') }}</span></td>
+        <td class="nowrap"><a class="tel" href="tel:{{ r.phone }}">{{ r.phone }}</a></td>
         <td class="hide-sm muted nowrap">{{ r.debt_range or '-' }}</td>
         <td class="hide-sm muted nowrap">{{ r.area_text or '-' }}</td>
-        <td class="hide-sm muted" style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.source_path or '-' }}</td>
+        <td class="hide-sm muted src" title="{{ r.source_path or '' }}">{{ r.source_path or '-' }}</td>
         <td>
-          <form class="rowform" method="post" action="{{ url_for('admin.inquiry_update', inquiry_id=r.id) }}">
-            <select name="status">
+          {# 뱃지와 메모를 한 줄에 — 세로로 쌓으면 행이 두 배로 높아진다 #}
+          <div class="statline" data-view>
+            <span class="bd {{ r.status }}">{{ status_label[r.status] }}</span>
+            {% if r.memo %}<span class="memo">{{ r.memo }}</span>{% endif %}
+          </div>
+          <form class="editform" method="post" data-edit hidden
+                action="{{ url_for('admin.inquiry_update', inquiry_id=r.id) }}">
+            <select name="status" aria-label="상태">
               {% for key, label in status_items %}
               <option value="{{ key }}" {% if r.status == key %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
-            <input type="text" name="memo" value="{{ r.memo or '' }}" placeholder="메모">
+            <input type="text" name="memo" value="{{ r.memo or '' }}" placeholder="메모" aria-label="메모">
             <button class="btn sm" type="submit">저장</button>
+            <button class="btn sm ghost" type="button" data-cancel>취소</button>
           </form>
         </td>
-        <td class="nowrap">
-          <form method="post" action="{{ url_for('admin.inquiry_delete', inquiry_id=r.id) }}" onsubmit="return confirm('이 접수 건을 삭제할까요? 되돌릴 수 없습니다.')">
-            <button class="btn sm danger" type="submit">삭제</button>
-          </form>
+        <td>
+          <div class="ract">
+            <div data-view>
+              <button class="btn sm line" type="button" data-editbtn>편집</button>
+            </div>
+            <form method="post" data-edit hidden
+                  action="{{ url_for('admin.inquiry_delete', inquiry_id=r.id) }}"
+                  onsubmit="return confirm('{{ r.name }} 님의 접수 건을 삭제할까요? 되돌릴 수 없습니다.')">
+              <button class="btn sm danger" type="submit">삭제</button>
+            </form>
+          </div>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% else %}
-  <div class="empty"><b>표시할 접수 건이 없습니다</b>{% if q or status %}검색·필터 조건을 바꿔보세요.{% else %}홈페이지 상담 신청이 들어오면 여기에 쌓입니다.{% endif %}</div>
+  <div class="empty">
+    <b>표시할 접수 건이 없습니다</b>
+    {% if q or status %}검색·필터 조건을 바꿔보세요.{% else %}홈페이지 상담 신청이 들어오면 여기에 쌓입니다.{% endif %}
+  </div>
   {% endif %}
 </div>
 

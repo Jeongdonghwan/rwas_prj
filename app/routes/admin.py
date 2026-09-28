@@ -114,6 +114,7 @@ def inquiries():
         q=q,
         counts=counts,
         status_items=STATUS_ITEMS,
+        status_label=STATUS_LABEL,
     )
 
 
