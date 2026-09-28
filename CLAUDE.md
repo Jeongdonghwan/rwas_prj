@@ -45,7 +45,7 @@ seed/                (Phase 3) dong.csv, job.csv, faq.csv
 
 ### Phase 3~5 구현 메모
 - 시드 데이터: `seed/*.csv` + `seed/content_blocks/{key}_{variant}.html`. 수정 후 `FLASK_APP=run.py flask seed`로 재적재(전체 삭제 후 재삽입).
-- 동은 법정동 통합 31개. `dong.adjacent_slugs`(JSON)로 인접 동 링크, `variant_set`(A/B/C)으로 본문 블록·FAQ 회전 선택 → 중복 콘텐츠 방지.
+- 동은 법정동 통합 31개. `dong.adjacent_slugs`(JSON)로 인접 동 링크. ~~`variant_set`(A/B/C)~~ → **해시 회전으로 대체됨**(아래 "중복 콘텐츠 방지" 참고). `variant_set` 컬럼·CSV 값은 남아 있지만 **더 이상 선택에 쓰지 않는다**.
 - FAQ 풀: `faq.kind` = `qa`(Q&A) / `concern`(상단 "자주 묻는 것" 리스트, question_tpl만 사용). 변수는 Jinja(`{{dong}}` `{{gu}}` `{{job}}` `{{name}}`) — `app/content.py`의 `pick_faqs`/`get_block`.
 - 동→직업 크로스링크 3개는 `(dong.id + i*5) % len(jobs)` 회전.
 - FAQPage JSON-LD는 `partials/faq_jsonld.html` (동·구·직업·상황 페이지 head에 포함).
@@ -96,6 +96,47 @@ seed/                (Phase 3) dong.csv, job.csv, faq.csv
 - **도메인 확정: `https://suwonlei.com` (non-www), 운영 포트 8038.** config base_url 기본값이며 .env SITE_URL로 덮어쓸 수 있음. 네이버·구글 소유확인 메타값도 config에 기본 반영(공개값).
 - SEO 진단 스크립트 결과(77페이지): 타이틀 평균 28.9자(전부 60자 이내), 설명 평균 71.5자, H1 정확히 1개, 타이틀·설명 중복 0, alt 누락 0, canonical 100%.
 - 오픈 후 할 일: 네이버 서치어드바이저에 사이트 등록 → 소유확인 → 사이트맵·RSS 제출, 구글 서치콘솔 동일. 사례 글 발행 시 RSS 자동 반영(10분 캐시).
+
+### 중복 콘텐츠 방지 + 롱폼 SEO (2026-09-28)
+
+양산 페이지(동 31·직업 16·상황 8·구 4)가 서로 너무 비슷하면 검색엔진이 양산형으로 판정한다.
+**측정 도구가 정답 — 콘텐츠를 건드렸으면 반드시 `python scripts/seo_qa.py`를 돌리고 PASS를 확인할 것.**
+
+| | 개선 전 | 개선 후 |
+|---|---|---|
+| 동 유사도 | 평균 61% / 최대 90% | 평균 35% / 최대 49% |
+| 구 유사도 | 평균 65% / 최대 67% | 평균 30% / 최대 42% |
+| 동 본문 | 약 1,300자 | 6,000~8,300자 |
+| QA 오류 | 187건 | 0건 |
+
+**① 해시 회전** (`app/content.py`)
+- `stable_hash()` = **blake2b**. ~~FNV-1a~~는 쓰지 말 것 — 하위 비트 확산이 약해 `% 4`가 편향된다. 실제로 `lf_sec1/5/9`가 같은 변형을 골라 두 페이지가 10개 섹션을 **전부** 공유하는 버그가 났다(0x31·0x35·0x39가 모두 4로 나눈 나머지 1).
+- `get_block(key, seed)` / `pick_faqs(scope, seed, ...)` / `vtext(seed, key, **vars)` — 전부 **엔티티 이름을 시드**로 결정적 선택. 같은 페이지는 항상 같은 결과(멱등).
+- `vtext(seed, key, rank=N)` — **페이지 수 ≤ 변형 수**인 유형(구 4개)에서만 rank를 넘긴다. `(hash(key)+rank)%n` 라틴 방진이라 한 섹션도 안 겹친다. 동(31개)처럼 페이지가 더 많으면 rank가 같은 페이지끼리 전부 겹치므로 **절대 넘기지 말 것**.
+- FAQ는 회전(offset)이 아니라 **결정적 셔플** — 페이지마다 질문 구성 자체가 달라진다.
+
+**② 문장 풀** (`app/variants.py` = 템플릿 하드코딩 문장, `app/variants_longform.py` = 롱폼 10섹션)
+- 템플릿에서 `{{ vtext(seed, 'dong_docs', dong=dong.name) }}` 형태로 호출. Jinja 전역 등록은 `app/__init__.py`.
+- 후보끼리 **사실관계가 어긋나면 안 됨**: 변제기간 원칙 3년·최장 5년·사정에 따라 2년까지 단축 / 무담보 10억·담보 15억 이하 / 금지명령 접수 후 1~2주 / 개시결정 평균 3~6개월 / 세금·벌금·양육비 비면책.
+- `seed/content_blocks/{rehab_core,after_apply,why_us}_{A~F}.html` 6종씩 → 216가지 조합.
+
+**③ 롱폼 구조** (경쟁사 `proseolb.kr` 벤치마크 — 사용자가 최우선 참고 지정)
+- 그쪽 방식: **키워드가 들어간 번호 소제목 10개 + 핵심 확인사항 요약 + 비교표 + FAQ**, 본문을 아주 길게. 루트는 원페이지, 양산 페이지는 kboard(`?uid=N`) 2,200여 건.
+- 이식한 파셜: `partials/lf_summary.html`(상단 핵심 요약 박스, AEO/LLM 인용 대상) → `partials/longform.html`(01~10 번호 섹션, 소제목마다 `{{kw}}` 포함) → `partials/lf_table.html`(개인회생·파산·신용회복 비교표).
+- 동·구·직업·상황 4종 상세 템플릿에 모두 들어감. 호출 시 `{% with kw = 이름 ~ ' 개인회생' %}`.
+- CSS는 site.css의 `.lf-sum` / `.prose.lf` / `.lf-tbl`.
+
+**④ QA 게이트** (`scripts/seo_qa.py`)
+- 타이틀 60자·설명 40~160자·H1 1개·canonical·img alt·핵심 키워드·본문 최소 800자 + **3-gram Jaccard 유사도**(SIM_WARN 0.55 / SIM_FAIL 0.70).
+- 유사도는 **`<main>` 안쪽에서 `<aside>`를 뺀 본문**으로만 잰다(헤더·푸터·CTA 같은 공통 보일러플레이트는 어느 사이트나 같으므로 중복 판정 대상 아님). 그래서 `base.html`에 `<main id="main">` 래퍼가 있다 — **제거하지 말 것**.
+- 비교 전 엔티티 이름을 지운다(이름만 바꾼 복제를 잡기 위함). 기준값: 손으로 따로 쓴 고정 페이지끼리는 3~11%.
+
+### 캐러셀 (2026-09-28)
+- 매크로 `partials/carousel.html` — `{% from "partials/carousel.html" import carousel %}` 후 `{% call carousel('id', label='…', per=3, autoplay=6500) %}<div class="carou-item">…{% endcall %}`.
+- **scroll-snap이 실제 이동을 담당하고 JS(site.js 하단)는 화살표·점·자동재생만** 붙인다 → JS가 죽어도 스와이프로 볼 수 있고, 슬라이드는 복제·숨김 없이 전부 DOM에 남아 SEO 영향 없음.
+- 자동재생은 호버·포커스·탭 비활성·`prefers-reduced-motion`에서 멈추고, 사용자가 한 번이라도 조작하면 완전 중단.
+- 현재 사용처: 메인 "상황별 안내"(per=4, 자동재생 없음), 메인 "진행 사례"(per=3, 6.5초). 카드 CSS는 `.scard` / `.ccard`.
+- 모바일(≤960)은 한 장 82% + 다음 장 살짝 보임, 화살표 숨김·점만 표시.
 
 ### 확정 사항 (2026-09-14)
 - **상담 전화 1644-6755로 통일** (SITE_DEFAULTS phone/phone_link). **카카오톡 상담은 전면 제거** — 버튼·링크·문구·seed 데이터 모두 삭제, kakao_url 키도 없음. 다시 넣지 말 것.

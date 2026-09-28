@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "partials/carousel.html" import carousel %}
 
 {% macro ico(name) -%}
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -223,14 +224,17 @@
   </div>
   {% if cases %}
   <div class="sec-head reveal" style="margin-top:56px"><h2>상황별 안내</h2><p>채무가 생긴 원인에 따라 준비할 것이 다릅니다.</p></div>
-  <div class="area-grid stagger" style="grid-template-columns:repeat(2,1fr)">
-    <div><h3>생활·사업 채무</h3><ul>
-      {% for c in cases[:4] %}<li><a href="{{ url_for('ko.page', name=c.slug_ko) }}">{{ c.name }}</a></li>{% endfor %}
-    </ul></div>
-    <div><h3>보증·투자·기타</h3><ul>
-      {% for c in cases[4:] %}<li><a href="{{ url_for('ko.page', name=c.slug_ko) }}">{{ c.name }}</a></li>{% endfor %}
-    </ul></div>
-  </div>
+  {% call carousel('cases-type', label='상황별 안내', per=4) %}
+    {% for c in cases %}
+    <div class="carou-item">
+      <a class="scard" href="{{ url_for('ko.page', name=c.slug_ko) }}">
+        <span class="n">{{ '%02d'|format(loop.index) }}</span>
+        <strong>{{ c.name }}</strong>
+        <span class="go">개인회생 안내 보기</span>
+      </a>
+    </div>
+    {% endfor %}
+  {% endcall %}
   {% endif %}
 </div></section>
 {% endif %}
@@ -238,21 +242,23 @@
 {% if posts %}
 <section class="sec alt"><div class="wrap">
   <div class="sec-head reveal"><span class="label">진행 사례</span><h2><span class="thin">결과가 궁금하다면,</span> 진행 사례부터</h2><p>의뢰인 동의를 받아 사실 위주로 기록합니다. 특정 결과를 보장하지 않습니다.</p></div>
-  <div class="blog-grid stagger">
+  {% call carousel('cases', label='진행 사례', per=3, autoplay=6500) %}
     {% for p in posts %}
-    <article class="bcard">
-      <a class="thumb" href="{{ url_for('board.case_view', slug=p.slug) }}">
-        {% if p.thumb_path %}<img src="{{ p.thumb_path }}" alt="{{ p.thumb_alt or p.title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover">{% else %}<div class="ph"></div>{% endif %}
-      </a>
-      <div>
-        <p class="cat">진행 사례</p>
-        <h3><a href="{{ url_for('board.case_view', slug=p.slug) }}">{{ p.title }}</a></h3>
-        <p class="ex">{{ p.excerpt }}</p>
-        <p class="date">{{ p.published_at.strftime('%Y.%m.%d') }}</p>
-      </div>
-    </article>
+    <div class="carou-item">
+      <article class="ccard">
+        <a class="thumb" href="{{ url_for('board.case_view', slug=p.slug) }}">
+          {% if p.thumb_path %}<img src="{{ p.thumb_path }}" alt="{{ p.thumb_alt or p.title }}" loading="lazy">{% else %}<span class="ph"></span>{% endif %}
+        </a>
+        <div class="bd">
+          <p class="cat">진행 사례</p>
+          <h3><a href="{{ url_for('board.case_view', slug=p.slug) }}">{{ p.title }}</a></h3>
+          <p class="ex">{{ p.excerpt }}</p>
+          <p class="date">{{ p.published_at.strftime('%Y.%m.%d') }}</p>
+        </div>
+      </article>
+    </div>
     {% endfor %}
-  </div>
+  {% endcall %}
   <p class="more"><a href="{{ url_for('board.case_list') }}">사례 전체 보기</a></p>
 </div></section>
 {% endif %}

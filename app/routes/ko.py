@@ -15,8 +15,9 @@ bp = Blueprint("ko", __name__)
 BLOCK_KEYS = ("rehab_core", "after_apply", "why_us")
 
 
-def _blocks(variant):
-    return {k: get_block(k, variant) for k in BLOCK_KEYS}
+def _blocks(seed):
+    """seed(엔티티 이름)로 블록을 해시 선택 — 키당 6종이면 216가지 본문 조합."""
+    return {k: get_block(k, seed) for k in BLOCK_KEYS}
 
 
 @bp.route("/지역별-개인회생/")
@@ -60,13 +61,23 @@ def page(name):
 
 
 def _render_gu(gu):
-    faqs = pick_faqs("gu", "A", 3, gu=gu.name)
-    return render_template("area/gu.html", gu=gu, faqs=faqs)
+    faqs = pick_faqs("gu", gu.name, 3, gu=gu.name)
+    # 구는 4개뿐이라 해시로는 섹션이 우연히 겹친다 → 순번으로 라틴 방진 배분
+    order = [g.id for g in Gu.query.order_by(Gu.sort).all()]
+    rank = order.index(gu.id) if gu.id in order else 0
+    return render_template(
+        "area/gu.html",
+        gu=gu,
+        faqs=faqs,
+        seed=gu.name,
+        blocks=_blocks(gu.name),
+        lf_rank=rank,
+    )
 
 
 def _render_dong(dong):
     gu = dong.gu
-    v = dong.variant_set
+    v = dong.name
     concerns = pick_faqs("dong", v, 4, kind="concern", dong=dong.name, gu=gu.name)
     faqs = pick_faqs("dong", v, 5, dong=dong.name, gu=gu.name)
     adjacent = (
@@ -89,11 +100,12 @@ def _render_dong(dong):
         faqs=faqs,
         adjacent=adjacent,
         cross_jobs=cross_jobs,
+        seed=v,
     )
 
 
 def _render_job(job):
-    v = job.variant_set
+    v = job.name
     concerns = pick_faqs("job", v, 4, kind="concern", job=job.name)
     faqs = pick_faqs("job", v, 5, job=job.name)
     related = (
@@ -116,11 +128,12 @@ def _render_job(job):
         concerns=concerns,
         faqs=faqs,
         related=related,
+        seed=v,
     )
 
 
 def _render_case(case):
-    v = case.variant_set
+    v = case.name
     faqs = pick_faqs("case", v, 4, name=case.name)
     related = (
         CaseType.query.filter(CaseType.id != case.id)
@@ -129,5 +142,10 @@ def _render_case(case):
         .all()
     )
     return render_template(
-        "casetype/detail.html", case=case, blocks=_blocks(v), faqs=faqs, related=related
+        "casetype/detail.html",
+        case=case,
+        blocks=_blocks(v),
+        faqs=faqs,
+        related=related,
+        seed=v,
     )

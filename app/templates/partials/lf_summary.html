@@ -1,0 +1,14 @@
+{# 상단 핵심 요약 박스 (경쟁사 "핵심 확인사항" 구조) — AEO/LLM 인용 대상.
+   호출: {% with kw=..., seed=... %}{% include "partials/lf_summary.html" %}{% endwith %} #}
+<div class="lf-sum">
+  <h2>{{ kw }} 핵심 요약</h2>
+  <p>{{ vtext(seed, 'lf_summary', kw=kw) | safe }}</p>
+  <ul class="lf-kv">
+    <li><b>변제 기간</b><span>원칙 3년 · 최장 5년(사정에 따라 2년까지 단축)</span></li>
+    <li><b>채무 한도</b><span>무담보 10억 원 · 담보 15억 원 이하</span></li>
+    <li><b>추심 중단</b><span>접수 후 1~2주 금지명령</span></li>
+    <li><b>개시결정</b><span>신청 후 평균 3~6개월</span></li>
+    <li><b>관할 법원</b><span>수원회생법원</span></li>
+    <li><b>비면책 채권</b><span>세금 · 벌금 · 양육비</span></li>
+  </ul>
+</div>

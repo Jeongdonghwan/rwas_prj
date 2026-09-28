@@ -427,3 +427,119 @@ function initQuiz() {
   start();
 }
 
+
+
+/* ── 캐러셀 ──────────────────────────────────────────────────
+   scroll-snap이 실제 이동을 담당하고 JS는 화살표·점·자동재생만 붙인다.
+   슬라이드는 DOM에 그대로 있으므로 JS가 죽어도 스와이프로 볼 수 있다. */
+document.querySelectorAll('[data-carousel]').forEach(function (root) {
+  var track = root.querySelector('[data-carou-track]');
+  var prev = root.querySelector('[data-carou-prev]');
+  var next = root.querySelector('[data-carou-next]');
+  var dotBox = root.querySelector('[data-carou-dots]');
+  if (!track) return;
+  var items = Array.prototype.slice.call(track.children);
+  if (items.length < 2) { root.classList.add('single'); return; }
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function step() {
+    // 아이템 1개 폭 + gap
+    var a = items[0].getBoundingClientRect();
+    var b = items[1] ? items[1].getBoundingClientRect() : a;
+    var d = Math.round(b.left - a.left);
+    return d > 0 ? d : Math.round(a.width);
+  }
+  function perView() {
+    return Math.max(1, Math.round(track.clientWidth / step()));
+  }
+  function pageCount() {
+    return Math.max(1, items.length - perView() + 1);
+  }
+  function current() {
+    return Math.round(track.scrollLeft / step());
+  }
+  function go(i, smooth) {
+    var max = items.length - perView();
+    if (i < 0) i = max;           // 처음에서 이전 → 끝으로
+    if (i > max) i = 0;           // 끝에서 다음 → 처음으로
+    track.scrollTo({ left: i * step(), behavior: (smooth && !reduce) ? 'smooth' : 'auto' });
+  }
+
+  var dots = [];
+  function buildDots() {
+    if (!dotBox) return;
+    dotBox.innerHTML = '';
+    dots = [];
+    var n = pageCount();
+    if (n < 2) { dotBox.hidden = true; return; }
+    dotBox.hidden = false;
+    for (var i = 0; i < n; i++) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'carou-dot';
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-label', (i + 1) + '번째 항목으로 이동');
+      b.addEventListener('click', (function (idx) {
+        return function () { stop(); go(idx, true); };
+      })(i));
+      dotBox.appendChild(b);
+      dots.push(b);
+    }
+  }
+  function sync() {
+    var i = current();
+    var max = items.length - perView();
+    dots.forEach(function (d, k) {
+      var on = k === Math.min(i, dots.length - 1);
+      d.classList.toggle('on', on);
+      d.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    if (prev) prev.disabled = false;
+    if (next) next.disabled = false;
+    root.classList.toggle('at-start', i <= 0);
+    root.classList.toggle('at-end', i >= max);
+  }
+
+  if (prev) prev.addEventListener('click', function () { stop(); go(current() - 1, true); });
+  if (next) next.addEventListener('click', function () { stop(); go(current() + 1, true); });
+
+  var raf;
+  track.addEventListener('scroll', function () {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(sync);
+  }, { passive: true });
+
+  track.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); stop(); go(current() + 1, true); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); stop(); go(current() - 1, true); }
+  });
+
+  // 자동재생 — 호버·포커스·탭 비활성·모션 최소화 설정에서 멈춘다
+  var delay = parseInt(root.getAttribute('data-autoplay') || '0', 10);
+  var timer = null;
+  function play() {
+    if (!delay || reduce || timer) return;
+    timer = setInterval(function () { go(current() + 1, true); }, delay);
+  }
+  function pause() { if (timer) { clearInterval(timer); timer = null; } }
+  function stop() { pause(); delay = 0; }   // 사용자가 직접 조작하면 이후 자동재생 중단
+  root.addEventListener('mouseenter', pause);
+  root.addEventListener('mouseleave', play);
+  root.addEventListener('focusin', pause);
+  root.addEventListener('focusout', play);
+  document.addEventListener('visibilitychange', function () {
+    document.hidden ? pause() : play();
+  });
+  track.addEventListener('pointerdown', stop, { once: true });
+
+  var rt;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () { buildDots(); sync(); }, 150);
+  });
+
+  buildDots();
+  sync();
+  play();
+});

@@ -1,0 +1,29 @@
+{# 재사용 캐러셀 매크로.
+
+   사용:
+     {% from "partials/carousel.html" import carousel %}
+     {% call carousel('cases', label='진행 사례', per=3, autoplay=6000) %}
+       <div class="carou-item">…</div>
+       …
+     {% endcall %}
+
+   · 슬라이드는 전부 DOM에 남는다(복제·숨김 없음) → SEO·스크린리더 영향 없음
+   · CSS scroll-snap이 기본 동작, JS는 화살표·점·자동재생만 담당 → JS 없이도 스와이프 가능
+   · per = 데스크톱에서 한 화면에 보일 개수 (모바일은 CSS에서 1~1.2개로 조정)
+#}
+{% macro carousel(cid, label='', per=3, autoplay=0) %}
+<div class="carou" data-carousel data-autoplay="{{ autoplay }}"
+     style="--per:{{ per }}"
+     role="group" aria-roledescription="carousel"{% if label %} aria-label="{{ label }}"{% endif %}>
+  <div class="carou-track" id="carou-{{ cid }}" data-carou-track tabindex="0">
+    {{ caller() }}
+  </div>
+  <button class="carou-btn prev" type="button" data-carou-prev aria-label="이전 항목" aria-controls="carou-{{ cid }}">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button class="carou-btn next" type="button" data-carou-next aria-label="다음 항목" aria-controls="carou-{{ cid }}">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div class="carou-dots" data-carou-dots role="tablist" aria-label="{{ label or '슬라이드' }} 이동"></div>
+</div>
+{% endmacro %}

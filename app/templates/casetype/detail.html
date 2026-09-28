@@ -10,26 +10,45 @@
   <div class="page-head">
     <p class="cat">상황별 안내</p>
     <h1>{{ case.name }} 개인회생 안내</h1>
+    <p class="lead">{{ vtext(seed, 'case_lead', name=case.name) }}</p>
   </div>
 </div>
 
 <section class="sec"><div class="wrap detail">
   <div>
+    {% with kw = case.name ~ ' 개인회생' %}{% include "partials/lf_summary.html" %}{% endwith %}
+
     <div class="prose">
       <h2>{{ case.name }}, 정리할 수 있습니다</h2>
       <p>{{ case.intro }}</p>
+    </div>
 
-      <h2>개인회생은 어떤 제도인가</h2>
+    <div class="sec-head" style="margin-top:56px"><h2>{{ case.name }} 채무를 정리할 때 확인할 것</h2></div>
+    <ul class="points" style="margin-bottom:64px">
+      <li><h3>면책 대상인지</h3><p>{{ vtext(seed, 'case_dischargeable', name=case.name) }}</p></li>
+      <li><h3>채무 구성 확인</h3><p>{{ vtext(seed, 'case_composition', name=case.name) }}</p></li>
+      <li><h3>관할 법원</h3><p>수원·용인·화성 등 경기 남부에 주소지가 있으면 수원회생법원에 신청합니다. 법원마다 실무 기준이 달라 변제계획안 작성 단계에서부터 반영합니다.</p></li>
+      <li><h3>예상 기간</h3><p>{{ vtext(seed, 'dong_period') }}</p></li>
+      <li><h3>비용</h3><p>{{ vtext(seed, 'cost_note') }}</p></li>
+    </ul>
+
+    <div class="prose">
+      <h2>{{ vtext(seed, 'h_rehab_core') }}</h2>
       {{ blocks.rehab_core | safe }}
 
-      <h2>신청 후 흐름</h2>
+      <h2>{{ vtext(seed, 'h_after_apply') }}</h2>
       {{ blocks.after_apply | safe }}
 
-      <h2>{{ site.firm_name }}이 다르게 하는 점</h2>
+      <h2>{{ vtext(seed, 'h_why_us', firm=site.firm_name) }}</h2>
       {{ blocks.why_us | safe }}
     </div>
 
-    <div class="sec-head" style="margin-top:64px"><h2>{{ case.name }} 자주 묻는 질문</h2></div>
+    {% with kw = case.name ~ ' 개인회생' %}
+      {% include "partials/longform.html" %}
+      {% include "partials/lf_table.html" %}
+    {% endwith %}
+
+    <div class="sec-head" style="margin-top:64px"><h2>{{ vtext(seed, 'h_faq', name=case.name) }}</h2></div>
     <dl class="qa">
       {% for f in faqs %}<dt>{{ f.q }}</dt><dd>{{ f.a }}</dd>{% endfor %}
     </dl>
@@ -57,4 +76,4 @@
 </div></section>
 {% endblock %}
 
-{% block cta %}{% with cta_title = case.name ~ " 문제, 오늘 상담으로 방향부터 잡으세요." %}{% include "_cta.html" %}{% endwith %}{% endblock %}
+{% block cta %}{% with cta_title = vtext(seed, 'cta_line', name=case.name) %}{% include "_cta.html" %}{% endwith %}{% endblock %}

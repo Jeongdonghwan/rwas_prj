@@ -1,0 +1,11 @@
+{# 롱폼 본문 — 키워드가 들어간 번호 소제목 10개.
+   호출: {% with kw='매탄동 개인회생', seed=dong.name %}{% include "partials/longform.html" %}{% endwith %}
+   섹션 문장·소제목은 seed 해시로 회전(app/variants_longform.py). #}
+{# lf_rank: 페이지 수가 변형 수 이하인 유형(구)에서만 넘긴다 — content.vtext 설명 참고 #}
+{% set _rank = lf_rank|default(None, true) %}
+<div class="prose lf">
+  {% for key in lf_sections %}
+  <h2 class="lf-h"><span class="lf-n">{{ "%02d"|format(loop.index) }}</span>{{ vtext(seed, 'h_' ~ key, rank=_rank, kw=kw) }}</h2>
+  <p>{{ vtext(seed, key, rank=_rank, kw=kw) | safe }}</p>
+  {% endfor %}
+</div>

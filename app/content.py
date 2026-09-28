@@ -1,18 +1,49 @@
-"""variant 블록 선택·FAQ 회전·템플릿 변수 치환 헬퍼."""
+"""블록·FAQ·문장 회전 헬퍼.
+
+중복 콘텐츠 방지 전략: variant_set(A/B/C) 3값 회전 대신 **엔티티 이름을 시드로 한
+FNV-1a 해시**로 블록·FAQ·문장을 고르게 분산시킨다. 블록이 키당 6종이면
+본문 조합은 6×6×6 = 216가지, FAQ는 결정적 셔플로 순서·구성까지 달라진다.
+같은 페이지는 항상 같은 결과(멱등) — 크롤러가 보는 내용이 요청마다 바뀌지 않는다.
+"""
+
+import hashlib
 
 from jinja2 import Template
 
 from app.models import ContentBlock, Faq
+from app.variants import POOLS
 
-VARIANT_OFFSET = {"A": 0, "B": 1, "C": 2}
 
+def stable_hash(s):
+    """실행 간 고정 해시. 파이썬 hash()는 PYTHONHASHSEED 때문에 쓸 수 없다.
 
-def get_block(block_key, variant):
-    row = (
-        ContentBlock.query.filter_by(block_key=block_key, variant=variant).first()
-        or ContentBlock.query.filter_by(block_key=block_key, variant="A").first()
+    **FNV-1a를 쓰지 않는 이유**: 하위 비트 확산이 약해 `% n`(n이 작을 때)이
+    편향된다. 키 접미사가 'lf_sec1'/'lf_sec5'/'lf_sec9'처럼 끝 문자만 다르면
+    (0x31·0x35·0x39는 모두 4로 나눈 나머지가 1) 세 키가 같은 변형을 골라
+    두 페이지가 10개 섹션을 전부 공유하는 일이 실제로 발생했다.
+    blake2b는 avalanche가 보장되므로 `% n`이 균등하다.
+    """
+    return int.from_bytes(
+        hashlib.blake2b(str(s).encode("utf-8"), digest_size=8).digest(), "big"
     )
-    return row.body_html if row else ""
+
+
+def pick(seed, key, options):
+    """seed+key 해시로 options에서 하나 선택 (결정적)."""
+    if not options:
+        return None
+    return options[stable_hash(f"{seed}::{key}") % len(options)]
+
+
+def get_block(block_key, seed):
+    rows = (
+        ContentBlock.query.filter_by(block_key=block_key)
+        .order_by(ContentBlock.variant)
+        .all()
+    )
+    if not rows:
+        return ""
+    return pick(seed, block_key, rows).body_html
 
 
 def render_tpl(text, **vars):
@@ -21,19 +52,44 @@ def render_tpl(text, **vars):
     return Template(text).render(**vars)
 
 
-def pick_faqs(scope, variant, count, kind="qa", **vars):
-    """scope 풀에서 variant 오프셋으로 회전해 count개 선택, 변수 치환."""
-    pool = (
-        Faq.query.filter_by(scope=scope, kind=kind).order_by(Faq.sort).all()
-    )
+def vtext(seed, key, rank=None, **vars):
+    """POOLS[key] 문장 풀에서 하나 골라 변수 치환. 템플릿에서 직접 호출.
+
+    rank를 주면 해시 대신 `(hash(key) + rank) % n`으로 고른다. 페이지 수가
+    변형 수 이하인 유형(구 4개 × 변형 4개)에서 라틴 방진이 되어 **서로 다른
+    페이지가 한 섹션도 겹치지 않는다**. 페이지가 더 많은 유형(동 31개)에
+    쓰면 rank가 같은 페이지끼리 전부 겹치므로 그쪽은 rank 없이 해시를 쓴다.
+    """
+    pool = POOLS.get(key, [])
+    if not pool:
+        return ""
+    t = pool[(stable_hash(key) + rank) % len(pool)] if rank is not None \
+        else pick(seed, key, pool)
+    return render_tpl(t, **vars)
+
+
+def vlist(seed, key, count, **vars):
+    """POOLS[key]를 결정적 셔플해 count개 반환 (리스트 항목 회전용)."""
+    pool = POOLS.get(key, [])
     if not pool:
         return []
-    offset = VARIANT_OFFSET.get(variant, 0) % len(pool)
-    rotated = pool[offset:] + pool[:offset]
+    ordered = sorted(pool, key=lambda t: stable_hash(f"{seed}::{key}::{t[:24]}"))
+    return [render_tpl(t, **vars) for t in ordered[:count]]
+
+
+def pick_faqs(scope, seed, count, kind="qa", **vars):
+    """scope 풀을 seed로 결정적 셔플해 count개 선택, 변수 치환.
+
+    회전(offset)이 아니라 셔플이라 페이지별로 질문 구성 자체가 달라진다.
+    """
+    pool = Faq.query.filter_by(scope=scope, kind=kind).order_by(Faq.sort).all()
+    if not pool:
+        return []
+    ordered = sorted(pool, key=lambda f: stable_hash(f"{seed}::{kind}::{f.id}"))
     return [
         {
             "q": render_tpl(f.question_tpl, **vars),
             "a": render_tpl(f.answer_tpl, **vars),
         }
-        for f in rotated[:count]
+        for f in ordered[:count]
     ]

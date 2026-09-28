@@ -639,3 +639,128 @@ body.nav-open .gnb a{padding:15px 4px;border-bottom:1px solid var(--line-2);bord
 
 /* 스크롤 진행바 */
 #progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--green-bright);z-index:100;pointer-events:none}
+
+
+/* ── 롱폼 SEO 섹션 (동·구·직업·상황 페이지) ───────────────────── */
+/* 핵심 요약 박스 — 페이지 상단, 발췌/AI 인용 대상 */
+.lf-sum{background:var(--mint);border:1px solid var(--mint-2);border-radius:var(--r);
+  padding:26px 28px;margin-bottom:48px}
+.lf-sum h2{font-size:18px;margin:0 0 12px;color:var(--green)}
+.lf-sum p{margin:0;font-size:15px;line-height:1.85;color:var(--ink)}
+.lf-sum .lf-kv{list-style:none;margin:18px 0 0;padding:0;display:grid;
+  grid-template-columns:1fr 1fr;gap:8px 24px}
+.lf-sum .lf-kv li{display:grid;grid-template-columns:96px 1fr;gap:10px;
+  font-size:13.5px;padding:7px 0;border-top:1px solid var(--mint-2)}
+.lf-sum .lf-kv b{color:var(--green-2);font-weight:700}
+.lf-sum .lf-kv span{color:var(--ink-2)}
+
+/* 번호 소제목 10단계 */
+.prose.lf{margin-top:56px}
+.prose.lf .lf-h{display:flex;align-items:baseline;gap:12px;margin:44px 0 14px;
+  font-size:21px;line-height:1.45}
+.prose.lf .lf-h:first-child{margin-top:0}
+.prose.lf .lf-n{flex:0 0 auto;font-size:13px;font-weight:800;letter-spacing:.06em;
+  color:var(--green-bright);padding-top:3px}
+.prose.lf p{font-size:15.5px;line-height:1.9;color:var(--ink-2);margin:0}
+.prose.lf p b{color:var(--ink);font-weight:700}
+
+/* 제도 비교표 */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.lf-tbl{width:100%;min-width:620px;border-collapse:collapse;font-size:14px;
+  background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.lf-tbl thead th{background:var(--green);color:#fff;font-weight:700;font-size:13.5px;
+  padding:13px 14px;text-align:left;white-space:nowrap}
+.lf-tbl tbody th{background:var(--mint);color:var(--green);font-weight:700;
+  text-align:left;padding:13px 14px;white-space:nowrap;width:96px}
+.lf-tbl td{padding:13px 14px;border-top:1px solid var(--line);color:var(--ink-2);
+  line-height:1.65;vertical-align:top}
+.lf-tbl tbody tr:first-child th,.lf-tbl tbody tr:first-child td{border-top:none}
+p.note{font-size:13px;color:var(--ink-3);line-height:1.75;margin:14px 0 0}
+
+@media (max-width:960px){
+  .lf-sum{padding:22px 18px;margin-bottom:36px}
+  .lf-sum .lf-kv{grid-template-columns:1fr;gap:0}
+  .lf-sum .lf-kv li{grid-template-columns:88px 1fr}
+  .prose.lf .lf-h{font-size:18px;margin:34px 0 12px;gap:9px}
+  .prose.lf p{font-size:15px;line-height:1.85}
+  .lf-tbl{font-size:13px}
+}
+
+
+/* ── 캐러셀 ──────────────────────────────────────────────────
+   --per: 한 화면에 보일 아이템 개수 (템플릿 인라인 스타일로 전달) */
+.carou{position:relative}
+.carou-track{display:grid;grid-auto-flow:column;
+  grid-auto-columns:calc((100% - (var(--per) - 1) * 20px) / var(--per));
+  gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  padding:4px 2px 8px}
+.carou-track::-webkit-scrollbar{display:none}
+.carou-track:focus-visible{outline:2px solid var(--green-bright);outline-offset:4px;border-radius:var(--r)}
+.carou-item{scroll-snap-align:start;min-width:0}
+.carou-item>*{height:100%}
+
+.carou-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+  width:44px;height:44px;border-radius:50%;border:1px solid var(--line);
+  background:#fff;color:var(--green);display:grid;place-items:center;cursor:pointer;
+  box-shadow:0 6px 20px rgba(20,20,25,.12);transition:background .15s,color .15s,opacity .2s}
+.carou-btn:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.carou-btn.prev{left:-14px}
+.carou-btn.next{right:-14px}
+.carou.single .carou-btn,.carou.single .carou-dots{display:none}
+/* 끝에 닿으면 흐리게 (순환 이동은 계속 가능) */
+.carou.at-start .carou-btn.prev,.carou.at-end .carou-btn.next{opacity:.45}
+
+.carou-dots{display:flex;justify-content:center;gap:8px;margin-top:22px}
+.carou-dot{width:8px;height:8px;padding:0;border:none;border-radius:50%;
+  background:var(--mint-2);cursor:pointer;transition:width .2s,background .2s}
+.carou-dot.on{width:26px;border-radius:5px;background:var(--green)}
+
+@media (max-width:1180px){
+  .carou-btn.prev{left:2px}
+  .carou-btn.next{right:2px}
+}
+@media (max-width:960px){
+  .carou-track{grid-auto-columns:82%;gap:14px}
+  .carou-btn{display:none}
+  .carou-dots{margin-top:16px}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .carou-track{scroll-behavior:auto}
+}
+
+
+/* 캐러셀 카드 — 진행 사례 */
+.ccard{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);
+  border-radius:var(--r);overflow:hidden;height:100%;transition:box-shadow .2s,transform .2s}
+.ccard:hover{box-shadow:0 14px 34px rgba(20,20,25,.10);transform:translateY(-3px)}
+.ccard .thumb{display:block;aspect-ratio:16/10;background:var(--mint);overflow:hidden}
+.ccard .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
+.ccard:hover .thumb img{transform:scale(1.04)}
+.ccard .thumb .ph{display:block;width:100%;height:100%;
+  background:linear-gradient(135deg,var(--mint),var(--mint-2))}
+.ccard .bd{padding:20px 22px 22px;display:flex;flex-direction:column;flex:1 1 auto}
+.ccard .cat{font-size:11.5px;font-weight:700;letter-spacing:.1em;color:var(--green-bright);margin:0 0 8px}
+.ccard h3{font-size:16.5px;line-height:1.5;margin:0 0 10px}
+.ccard h3 a{color:var(--ink)}
+.ccard h3 a:hover{color:var(--green-2)}
+.ccard .ex{font-size:13.5px;line-height:1.7;color:var(--ink-2);margin:0 0 14px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ccard .date{font-size:12px;color:var(--ink-3);margin:auto 0 0}
+
+/* 캐러셀 카드 — 상황별 */
+.scard{display:flex;flex-direction:column;gap:10px;height:100%;
+  padding:24px 22px;background:#fff;border:1px solid var(--line);border-radius:var(--r);
+  transition:border-color .2s,box-shadow .2s,transform .2s}
+.scard:hover{border-color:var(--green-2);box-shadow:0 12px 28px rgba(20,20,25,.09);transform:translateY(-3px)}
+.scard .n{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--green-bright)}
+.scard strong{font-size:17px;font-weight:700;color:var(--ink);line-height:1.45}
+.scard .go{margin-top:auto;font-size:12.5px;color:var(--ink-3)}
+.scard:hover .go{color:var(--green-2)}
+
+@media (max-width:960px){
+  .ccard .bd{padding:18px}
+  .ccard h3{font-size:16px}
+  .scard{padding:20px 18px}
+}

@@ -10,24 +10,26 @@
   <div class="page-head">
     <p class="cat">{{ gu.name }}{% if dong.name_legal and dong.name_legal != dong.name %} · 행정동 {{ dong.name_legal }}{% endif %}</p>
     <h1>{{ dong.name }} 개인회생 안내</h1>
-    <p class="lead">{{ dong.name }}에 사시거나 {{ dong.name }}에서 일하시는 분이 개인회생을 알아볼 때 필요한 것을 정리했습니다. 첫 상담은 전화로도 가능합니다.</p>
+    <p class="lead">{{ vtext(seed, 'dong_lead', dong=dong.name, gu=gu.name) }}</p>
   </div>
 </div>
 
 <section class="sec"><div class="wrap detail">
   <div>
-    <div class="sec-head"><h2>{{ dong.name }}에서 상담 오시는 분들이 자주 묻는 것</h2></div>
+    {% with kw = dong.name ~ ' 개인회생' %}{% include "partials/lf_summary.html" %}{% endwith %}
+
+    <div class="sec-head"><h2>{{ vtext(seed, 'h_concerns', name=dong.name) }}</h2></div>
     <ul class="checks" style="columns:1;margin-bottom:64px">
       {% for c in concerns %}<li>{{ c.q }}</li>{% endfor %}
     </ul>
 
     <div class="sec-head"><h2>{{ dong.name }} 거주자 체크 포인트</h2></div>
     <ul class="points" style="margin-bottom:64px">
-      <li><h3>관할 법원</h3><p>{{ dong.name }} 주소지 채무자는 수원회생법원(수원지방법원 회생 전담)에 신청합니다. 사무소는 법원 인근이라 서류 접수와 보정 대응이 빠릅니다.</p></li>
+      <li><h3>관할 법원</h3><p>{{ vtext(seed, 'dong_court', dong=dong.name, gu=gu.name) }}</p></li>
       <li><h3>오시는 길</h3><p>{{ dong.transit_note }}</p></li>
-      <li><h3>준비서류</h3><p>부채증명서(각 금융사), 최근 1년 소득증빙, 주민등록등본, 임대차계약서가 기본입니다. 상담 후 본인 상황에 맞는 체크리스트를 드립니다.</p></li>
-      <li><h3>예상 기간</h3><p>서류 준비 2–3주, 신청 후 금지명령까지 1–2주, 개시결정까지 평균 3~6개월입니다. 이후 변제계획 인가 절차가 이어집니다.</p></li>
-      <li><h3>비용</h3><p>변호사 보수는 상담 시 서면 안내드리며 분할 납부가 가능합니다. 법원 예납금은 채권자 수에 따른 실비입니다.</p></li>
+      <li><h3>준비서류</h3><p>{{ vtext(seed, 'dong_docs', dong=dong.name) }}</p></li>
+      <li><h3>예상 기간</h3><p>{{ vtext(seed, 'dong_period') }}</p></li>
+      <li><h3>비용</h3><p>{{ vtext(seed, 'cost_note') }}</p></li>
     </ul>
 
     <div class="prose">
@@ -35,24 +37,29 @@
       <p>{{ dong.feature_note }}</p>
 
       <h2>{{ dong.name }}에서 사무소까지 오시는 길</h2>
-      <p>{{ dong.transit_note }} 방문이 어려우시면 첫 상담은 전화로 진행하고, 서류 정리 단계에 한 번 방문하시면 됩니다.</p>
+      <p>{{ dong.transit_note }} {{ vtext(seed, 'dong_visit_tail') }}</p>
 
-      <h2>개인회생은 어떤 제도인가</h2>
+      <h2>{{ vtext(seed, 'h_rehab_core') }}</h2>
       {{ blocks.rehab_core | safe }}
 
-      <h2>신청 후 흐름</h2>
+      <h2>{{ vtext(seed, 'h_after_apply') }}</h2>
       {{ blocks.after_apply | safe }}
 
-      <h2>{{ site.firm_name }}이 다르게 하는 점</h2>
+      <h2>{{ vtext(seed, 'h_why_us', firm=site.firm_name) }}</h2>
       {{ blocks.why_us | safe }}
     </div>
 
-    <div class="sec-head" style="margin-top:64px"><h2>{{ dong.name }} 개인회생 자주 묻는 질문</h2></div>
+    {% with kw = dong.name ~ ' 개인회생' %}
+      {% include "partials/longform.html" %}
+      {% include "partials/lf_table.html" %}
+    {% endwith %}
+
+    <div class="sec-head" style="margin-top:64px"><h2>{{ vtext(seed, 'h_faq', name=dong.name) }}</h2></div>
     <dl class="qa">
       {% for f in faqs %}<dt>{{ f.q }}</dt><dd>{{ f.a }}</dd>{% endfor %}
     </dl>
 
-    <div class="sec-head" style="margin-top:64px"><h2>함께 보면 좋은 페이지</h2></div>
+    <div class="sec-head" style="margin-top:64px"><h2>{{ vtext(seed, 'h_links') }}</h2></div>
     <div class="linklist">
       {% for a in adjacent %}<a href="{{ url_for('ko.page', name=a.name) }}">{{ a.name }} 개인회생</a>{% endfor %}
       <a href="{{ url_for('ko.page', name=gu.name) }}">{{ gu.name }} 개인회생 안내</a>
@@ -77,4 +84,4 @@
 </div></section>
 {% endblock %}
 
-{% block cta %}{% with cta_title = dong.name ~ "에서 전화 한 통이면 예상 변제금부터 계산해드립니다." %}{% include "_cta.html" %}{% endwith %}{% endblock %}
+{% block cta %}{% with cta_title = vtext(seed, 'cta_line', name=dong.name) %}{% include "_cta.html" %}{% endwith %}{% endblock %}
