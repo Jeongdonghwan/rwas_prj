@@ -86,6 +86,10 @@ class Keyword(db.Model):
     correction_terms = db.Column(db.String(200))         # ";" 구분
     is_public = db.Column(db.Boolean, default=True, index=True)
     source_no = db.Column(db.Integer)
+    # 같은 (분류, 제도, 지역) 그룹 안에서의 순번. app/variant_codes.VECTORS를
+    # 이 값으로 골라 섹션 조합을 배정한다 → 같은 그룹 두 페이지가 공유하는
+    # 섹션이 최대 3/6개로 제한된다. 해시로 독립 선택하면 우연히 5~6개가 겹친다.
+    variant_idx = db.Column(db.Integer, default=0)
 
 
 class ContentBlock(db.Model):

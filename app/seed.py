@@ -149,10 +149,18 @@ def seed_keywords_command(public):
     db.session.query(Keyword).delete()
     db.session.commit()
 
+    # (분류, 제도, 지역) 그룹별 순번 — 섹션 조합 배정에 쓴다
+    from collections import defaultdict
+    counter = defaultdict(int)
+
     rows = []
     with open(path, encoding="utf-8") as f:
         for r in csv.DictReader(f):
+            key = (r["category"], r["scheme"], r["region"])
+            idx = counter[key]
+            counter[key] += 1
             rows.append({
+                "variant_idx": idx,
                 "slug_ko": r["slug_ko"],
                 "keyword": r["keyword"],
                 "scheme": r["scheme"],

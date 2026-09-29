@@ -775,3 +775,19 @@ p.note{font-size:13px;color:var(--ink-3);line-height:1.75;margin:14px 0 0}
   .ccard h3{font-size:16px}
   .scard{padding:20px 18px}
 }
+
+
+/* ── 서브키워드 페이지 교정 문단 ───────────────────────────────
+   제도를 치환하면서 말이 안 되게 된 키워드(예: "개인파산 변제금")에
+   본문 최상단으로 들어간다. 오해를 먼저 바로잡고 본문으로 넘어가는 자리라
+   경고가 아니라 "짚고 간다"는 톤으로 보이게 한다. */
+.kw-fix{background:var(--mint);border:1px solid var(--mint-2);
+  border-left:3px solid var(--green-2);border-radius:var(--r);
+  padding:22px 24px;margin-bottom:32px}
+.kw-fix p{font-size:15px;line-height:1.85;color:var(--ink);margin:0}
+.kw-fix p b{color:var(--green)}
+.kw-fix .kw-fix-cta{margin-top:10px;font-size:13.5px;color:var(--ink-2)}
+@media (max-width:960px){
+  .kw-fix{padding:18px 16px;margin-bottom:26px}
+  .kw-fix p{font-size:14.5px}
+}

@@ -19,9 +19,15 @@ from app.content import pick, render_tpl, stable_hash
 from app.keyword_rules import SCHEMES, correction_terms
 from app.keyword_sections import SECTIONS
 from app.scheme_facts import SCHEME_FACTS, correction_html
+from app.variant_codes import VECTORS
 
 # 분류가 아직 정의되지 않았을 때 쓰는 기본 섹션 세트
 FALLBACK_CATEGORY = "상황형"
+
+# 제도·지역별 벡터 오프셋. 96개 벡터와 서로소인 간격(19·7)을 써서
+# 제도가 다르면 반드시 다른 벡터가 배정되게 한다.
+SCHEME_OFFSET = {code: i * 19 for i, code in enumerate(SCHEMES)}
+REGION_OFFSET = 7
 
 
 def _cat(category):
@@ -48,13 +54,25 @@ def build(kw):
     seed = kw.slug_ko
     cat = _cat(kw.category)
 
+    # 섹션 조합은 해시가 아니라 배정 코드로 고른다. 해시로 독립 선택하면
+    # 같은 그룹에서 5~6개 섹션이 우연히 겹치는 쌍이 생긴다(app/variant_codes.py).
+    #
+    # variant_idx는 (분류, 제도, 지역) 그룹 안의 순번이라, 같은 키워드의 제도별
+    # 페이지는 순번이 같다. 그대로 쓰면 제도만 다른 5페이지가 같은 섹션을 쓴다
+    # (실측: 제도 간 유사도 73%까지 올라갔다). 그래서 제도·지역만큼 벡터를 어긋낸다.
+    # 오프셋은 그룹 전체에 똑같이 적용되므로 그룹 내 거리는 그대로 유지된다.
+    offset = SCHEME_OFFSET.get(kw.scheme, 0) + (REGION_OFFSET if kw.region else 0)
+    vec = VECTORS[((kw.variant_idx or 0) + offset) % len(VECTORS)]
     sections = []
     for i, sec in enumerate(cat["sections"]):
-        key = "%s::%d" % (sec.get("key", i), i)
-        sections.append({
-            "head": render_tpl(pick(seed, "h::" + key, sec["heads"]), **v),
-            "body": render_tpl(pick(seed, "b::" + key, sec["bodies"]), **v),
-        })
+        bodies = sec["bodies"]
+        heads = sec["heads"]
+        b = bodies[vec[i] % len(bodies)] if i < len(vec) else \
+            pick(seed, "b::%d" % i, bodies)
+        # 소제목은 본문과 다른 축으로 돌려 같은 조합이라도 제목이 겹치지 않게
+        h = heads[(vec[i] + (kw.variant_idx or 0)) % len(heads)] if i < len(vec) else \
+            pick(seed, "h::%d" % i, heads)
+        sections.append({"head": render_tpl(h, **v), "body": render_tpl(b, **v)})
 
     # FAQ는 순서를 섞어 페이지마다 구성이 달라지게 한다
     pool = cat.get("faqs") or []

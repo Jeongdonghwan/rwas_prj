@@ -36,7 +36,11 @@
       {% endfor %}
     </div>
 
+    {# 비교표는 전 페이지에 같은 600자가 들어가 중복 덩어리가 된다.
+       제도를 견주는 것이 주제인 분류에만 넣는다. #}
+    {% if k.category in ('제도비교', '신용회복') %}
     {% with kw = k.keyword %}{% include "partials/lf_table.html" %}{% endwith %}
+    {% endif %}
 
     {% if page.faqs %}
     <div class="sec-head" style="margin-top:64px"><h2>{{ k.keyword }} 자주 묻는 질문</h2></div>

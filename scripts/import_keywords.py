@@ -83,10 +83,16 @@ def main():
     base = load(xlsx)
     print("원본 키워드 %d개 로드" % len(base))
 
-    out, seen, dup = [], set(), 0
+    out, seen, dup, skipped = [], set(), 0, 0
     for scheme, region in COMBOS:
         for r in base:
             kw = to_scheme(r["keyword"], scheme)
+            # 원본에 이미 대상 제도명이 들어 있으면 치환이 겹친다.
+            # 예) "개인회생 개인파산 차이" → "개인파산 개인파산 차이"
+            # 원본(개인회생) 페이지가 같은 주제를 이미 다루므로 건너뛴다.
+            if any(kw.count(n) > 1 for n in SCHEMES.values()):
+                skipped += 1
+                continue
             if region:
                 kw = "%s %s" % (region, kw)
             slug = slugify(kw)
@@ -113,7 +119,7 @@ def main():
         w.writerows(out)
 
     print("생성: %s" % OUT)
-    print("총 %d행 (슬러그 중복 제외 %d건)" % (len(out), dup))
+    print("총 %d행 (슬러그 중복 %d건, 제도명 중복으로 제외 %d건)" % (len(out), dup, skipped))
     print()
     by = Counter((o["scheme"], o["region"]) for o in out)
     for (s, rg), n in by.items():
