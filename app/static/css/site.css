@@ -795,6 +795,9 @@ p.note{font-size:13px;color:var(--ink-3);line-height:1.75;margin:14px 0 0}
 
 /* ── 상담 접수 완료 모달 ─────────────────────────────────────── */
 body.modal-open{overflow:hidden}
+/* hidden 속성이 display를 이기도록 먼저 선언한다. 이게 없으면 display:grid가
+   hidden을 덮어써서 전 페이지에 어두운 오버레이가 깔린다(실제로 겪음). */
+.done-modal[hidden]{display:none}
 .done-modal{position:fixed;inset:0;z-index:200;display:grid;place-items:center;
   padding:20px;background:rgba(20,16,18,.55);backdrop-filter:blur(3px);
   animation:doneFade .18s ease-out}
@@ -817,4 +820,48 @@ body.modal-open{overflow:hidden}
   .done-card{padding:30px 22px 24px;border-radius:16px}
   .done-card h3{font-size:18px}
   .done-acts .btn{width:100%}
+}
+
+
+/* ── 디자인 보강 (2026-09-29, ansan.seoyullaw.com 참고) ─────────
+   색상·레이아웃 틀은 그대로 두고 두 가지 디테일만 가져왔다.
+   ① 섹션 키커를 대시+텍스트에서 알약 배지로
+   ② 정보 행(라벨/값)을 왼쪽 액센트 바 + 세로 배치로 */
+
+/* ① 키커 알약 배지 — 기존 .label::before 대시를 점으로 바꾸고 테두리를 두른다 */
+.sec-head .label{
+  padding:7px 14px 7px 12px;border:1px solid var(--mint-2);border-radius:999px;
+  background:var(--mint);letter-spacing:-.01em;font-size:12.5px}
+.sec-head .label::before{
+  width:6px;height:6px;border-radius:50%;background:var(--green-bright)}
+/* 다크 섹션 위에서는 배경을 반투명으로 */
+.sec.dark .sec-head .label,.hero .label{
+  background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.22);color:#fff}
+.sec.dark .sec-head .label::before,.hero .label::before{background:var(--green-bright)}
+
+/* ② 정보 행 — 왼쪽 액센트 바 + 라벨 위 / 값 아래 */
+.lf-sum .lf-kv li{
+  display:block;padding:0 0 0 12px;border-top:none;position:relative;
+  min-height:38px}
+.lf-sum .lf-kv li::before{
+  content:"";position:absolute;left:0;top:3px;bottom:3px;width:2px;
+  border-radius:2px;background:var(--green-bright);opacity:.55}
+.lf-sum .lf-kv b{
+  display:block;font-size:11.5px;font-weight:700;letter-spacing:.02em;
+  color:var(--green-2);margin-bottom:3px}
+.lf-sum .lf-kv span{display:block;font-size:13.5px;line-height:1.55;color:var(--ink)}
+
+/* 사이드바 '바로 확인'도 같은 문법으로 통일 */
+.aside .kv li{
+  display:block;padding:0 0 0 11px;border-bottom:none;position:relative;min-height:36px}
+.aside .kv li::before{
+  content:"";position:absolute;left:0;top:2px;bottom:2px;width:2px;
+  border-radius:2px;background:var(--green-bright);opacity:.5}
+.aside .kv b{
+  display:block;font-size:11px;font-weight:700;letter-spacing:.02em;
+  color:var(--green-2);margin-bottom:2px}
+.aside .kv span{display:block;font-size:13px;line-height:1.5;color:var(--ink)}
+
+@media (max-width:960px){
+  .lf-sum .lf-kv li{min-height:0;padding-bottom:4px}
 }
