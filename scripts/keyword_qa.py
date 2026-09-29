@@ -23,7 +23,7 @@ import hashlib
 import random
 import re
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 for _s in (sys.stdout, sys.stderr):
@@ -96,8 +96,8 @@ def main():
     print("검사 대상: %d 페이지" % len(rows))
 
     sigs, lengths, errors = {}, {}, []
-    exact_pairs = []          # 정확도 대조용으로 일부만 원본 집합을 남긴다
-    keep_sets = {}
+    keep_sets = {}            # MinHash 정확도 대조용으로 일부만 원본 집합을 남긴다
+    titles, descs = Counter(), Counter()
 
     for i, k in enumerate(rows, 1):
         if i % 1000 == 0:
@@ -106,7 +106,13 @@ def main():
         if r.status_code != 200:
             errors.append("%s: HTTP %d" % (k.slug_ko, r.status_code))
             continue
-        body = text_of(r.get_data(as_text=True), main_only=True)
+        html = r.get_data(as_text=True)
+        # 타이틀·설명 중복은 대량 페이지에서 가장 흔한 사고다. 렌더하는 김에 같이 센다.
+        mt = re.search(r"<title>(.*?)</title>", html, re.S)
+        md = re.search(r'<meta name="description" content="(.*?)">', html, re.S)
+        titles[mt.group(1).strip() if mt else ""] += 1
+        descs[md.group(1).strip() if md else ""] += 1
+        body = text_of(html, main_only=True)
         lengths[k.id] = len(body.replace(" ", ""))
         gs = grams(strip_name(body, k.keyword))
         sigs[k.id] = signature(gs)
@@ -182,7 +188,31 @@ def main():
             print("  ⚠ %d쌍이 %d%% 이상 — 제도별 서술 각도를 더 벌려야 한다"
                   % (len(over), CROSS_WARN * 100))
 
-    # ── 3) 분량 ────────────────────────────────────────────────────
+    # ── 3) 타이틀·설명 ─────────────────────────────────────────────
+    dup_t = [(t, n) for t, n in titles.items() if n > 1]
+    dup_d = [(d, n) for d, n in descs.items() if n > 1]
+    long_t = [t for t in titles if len(t) > 60]
+    bad_d = [d for d in descs if not (40 <= len(d) <= 160)]
+    print("\n=== 타이틀 · 메타 설명 ===")
+    print("타이틀 고유 %d / 설명 고유 %d" % (len(titles), len(descs)))
+    if dup_t:
+        print("  ⚠ 중복 타이틀 %d종" % len(dup_t))
+        for t, n in dup_t[:5]:
+            print("     %dx %s" % (n, t[:60]))
+        errors.append("중복 타이틀 %d종" % len(dup_t))
+    if dup_d:
+        print("  ⚠ 중복 설명 %d종" % len(dup_d))
+        errors.append("중복 설명 %d종" % len(dup_d))
+    if long_t:
+        print("  ⚠ 60자 초과 타이틀 %d건" % len(long_t))
+        errors.append("60자 초과 타이틀 %d건" % len(long_t))
+    if bad_d:
+        print("  ⚠ 40~160자를 벗어난 설명 %d건" % len(bad_d))
+        errors.append("설명 길이 위반 %d건" % len(bad_d))
+    if not (dup_t or dup_d or long_t or bad_d):
+        print("  중복 0건 · 길이 위반 0건")
+
+    # ── 4) 분량 ────────────────────────────────────────────────────
     if lengths:
         vals = sorted(lengths.values())
         thin = [i for i, v in lengths.items() if v < 1500]
