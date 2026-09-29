@@ -18,7 +18,7 @@ from flask import (
 from PIL import Image, ImageOps
 
 from app import db
-from app.models import Inquiry, Post
+from app.models import Inquiry, Keyword, Post
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -63,6 +63,8 @@ def dashboard():
         "today": Inquiry.query.filter(Inquiry.created_at >= today_start).count(),
         "new": Inquiry.query.filter_by(status="new").count(),
         "posts": Post.query.filter_by(is_public=True).count(),
+        "keywords": Keyword.query.filter_by(is_public=True).count(),
+        "keywords_hidden": Keyword.query.filter_by(is_public=False).count(),
     }
     recent = Inquiry.query.order_by(Inquiry.created_at.desc()).limit(8).all()
     posts = Post.query.order_by(Post.published_at.desc()).limit(5).all()

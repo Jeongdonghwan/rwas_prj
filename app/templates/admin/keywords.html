@@ -4,7 +4,7 @@
 {% block content %}
 <div class="phead">
   <h1>키워드 페이지</h1>
-  <p>총 {{ total }}건 · 공개 {{ public }}건</p>
+  <p>총 {{ "{:,}".format(total) }}건 · 공개 {{ "{:,}".format(public) }}건</p>
   <div class="act">
     <a class="btn line" href="{{ url_for('keyword.hub') }}" target="_blank" rel="noopener">모아보기 ↗</a>
   </div>
@@ -23,13 +23,14 @@
           <span class="sub"><a href="{{ url_for('keyword.scheme_hub', scheme=r.scheme) }}" target="_blank" rel="noopener">/모아보기/{{ r.scheme }}/</a></span>
         </td>
         <td class="muted nowrap">{{ r.region or '-' }}</td>
-        <td class="num">{{ r.total }}</td>
+        <td><span class="kwnum">{{ "{:,}".format(r.total) }}</span></td>
         <td>
           {% if r.public == r.total %}<span class="bd on">전체 공개</span>
           {% elif r.public == 0 %}<span class="bd off">비공개</span>
-          {% else %}<span class="bd contacted">{{ r.public }}건 공개</span>{% endif %}
+          {% else %}<span class="bd contacted">{{ "{:,}".format(r.public) }}건 공개</span>{% endif %}
+          <span class="kwbar {{ '' if r.public else 'off' }}"><i style="width:{{ (r.public / r.total * 100) | round }}%"></i></span>
         </td>
-        <td class="hide-sm muted">{{ r.fix }}</td>
+        <td class="hide-sm muted">{{ "{:,}".format(r.fix) }}건</td>
         <td>
           <div class="ract">
             <form method="post" action="{{ url_for('admin.keywords_toggle') }}"

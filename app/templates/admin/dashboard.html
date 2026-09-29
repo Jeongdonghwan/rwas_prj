@@ -10,11 +10,35 @@
   </div>
 </div>
 
+{% macro aico(d) -%}
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ d|safe }}</svg>
+{%- endmacro %}
 <div class="stats">
-  <div class="stat hl"><p class="lb">오늘 접수</p><p class="nm">{{ s.today }}<small>건</small></p></div>
-  <div class="stat"><p class="lb">미처리(신규)</p><p class="nm">{{ s.new }}<small>건</small></p></div>
-  <div class="stat"><p class="lb">전체 접수</p><p class="nm">{{ s.total }}<small>건</small></p></div>
-  <div class="stat"><p class="lb">공개 사례</p><p class="nm">{{ s.posts }}<small>건</small></p></div>
+  <div class="stat hl">
+    <span class="ico">{{ aico('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>') }}</span>
+    <div class="bd2"><p class="lb">오늘 접수</p><p class="nm">{{ s.today }}<small>건</small></p>
+      <span class="sub">{{ today }}</span></div>
+  </div>
+  <div class="stat">
+    <span class="ico">{{ aico('<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>') }}</span>
+    <div class="bd2"><p class="lb">미처리(신규)</p><p class="nm">{{ s.new }}<small>건</small></p>
+      <span class="sub">{% if s.new %}연락이 필요합니다{% else %}모두 처리됨{% endif %}</span></div>
+  </div>
+  <div class="stat">
+    <span class="ico">{{ aico('<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>') }}</span>
+    <div class="bd2"><p class="lb">전체 접수</p><p class="nm">{{ "{:,}".format(s.total) }}<small>건</small></p>
+      <span class="sub">누적</span></div>
+  </div>
+  <div class="stat">
+    <span class="ico">{{ aico('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>') }}</span>
+    <div class="bd2"><p class="lb">공개 사례</p><p class="nm">{{ s.posts }}<small>건</small></p>
+      <span class="sub">게시판 노출 중</span></div>
+  </div>
+  <div class="stat">
+    <span class="ico">{{ aico('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>') }}</span>
+    <div class="bd2"><p class="lb">키워드 페이지</p><p class="nm">{{ "{:,}".format(s.keywords) }}<small>건</small></p>
+      <span class="sub">{% if s.keywords_hidden %}{{ "{:,}".format(s.keywords_hidden) }}건 비공개{% else %}전체 공개 중{% endif %}</span></div>
+  </div>
 </div>
 
 <div class="card">

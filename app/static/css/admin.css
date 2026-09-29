@@ -222,3 +222,48 @@ tr.editing .ract{opacity:1}
   .phead h1{font-size:20px}
   .tbl th,.tbl td{padding:11px 12px;font-size:13.5px}
 }
+
+
+/* ── 화면 정리 (2026-09-29) ─────────────────────────────────────
+   공개 사이트와 같은 문법을 쓴다: 알약 키커, 왼쪽 액센트 바, 아이콘 칩.
+   정보 밀도를 올리고 시각적 위계를 준다. */
+
+/* 통계 카드 — 아이콘 칩 + 부제, 강조 카드는 배경까지 틴트 */
+.stats{grid-template-columns:repeat(5,1fr)}
+.stat{display:flex;gap:14px;align-items:flex-start;padding:18px 18px 16px}
+.stat .ico{flex:0 0 auto;display:grid;place-items:center;width:38px;height:38px;
+  border-radius:11px;background:var(--gray-soft);color:var(--ink-3)}
+.stat .ico svg{width:19px;height:19px}
+.stat .bd2{min-width:0}
+.stat .lb{margin-bottom:4px}
+.stat .nm{font-size:25px}
+.stat .sub{display:block;font-size:11.5px;color:var(--ink-4);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat.hl{background:var(--wine-soft);border-color:#efdde1}
+.stat.hl .ico{background:#fff;color:var(--wine)}
+.stat.hl .lb{color:var(--wine-2)}
+
+/* 카드 제목 앞 액센트 바 — 공개 사이트 키커와 같은 문법 */
+.card .ct h2{display:flex;align-items:center;gap:9px}
+.card .ct h2::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--wine-3)}
+
+/* 테이블 밀도 */
+.tbl th{padding:11px 16px}
+.tbl td{padding:12px 16px}
+.tbl .num{font-variant-numeric:tabular-nums}
+
+/* 키워드 세트 행 — 수치를 읽기 쉽게 */
+.kwnum{font-variant-numeric:tabular-nums;font-weight:700;font-size:15px}
+.kwbar{display:block;height:3px;border-radius:2px;background:var(--gray-soft);
+  margin-top:6px;overflow:hidden;max-width:120px}
+.kwbar i{display:block;height:100%;background:var(--ok);border-radius:2px}
+.kwbar.off i{background:var(--ink-4)}
+
+@media (max-width:1200px){ .stats{grid-template-columns:repeat(3,1fr)} }
+@media (max-width:900px){ .stats{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:600px){
+  .stat{padding:14px}
+  .stat .ico{width:32px;height:32px;border-radius:9px}
+  .stat .nm{font-size:21px}
+  .stat .sub{display:none}
+}
