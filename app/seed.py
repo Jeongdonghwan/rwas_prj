@@ -186,3 +186,44 @@ def seed_keywords_command(public):
         click.echo("   %-11s %5d" % (scheme, n))
     click.echo("   교정 문단 필요: %d행"
                % Keyword.query.filter_by(needs_correction=True).count())
+
+
+@click.command("sms-check")
+@click.option("--to", default=None, help="이 번호로 테스트 문자를 보낸다(생략하면 잔여건수만 조회)")
+@with_appcontext
+def sms_check_command(to):
+    """문자 설정 점검 — 잔여 건수 조회, 선택적으로 테스트 발송.
+
+        flask sms-check                    잔여 건수만
+        flask sms-check --to 01012345678   테스트 문자까지
+
+    발신 서버 IP가 알리고에 등록되지 않았으면 여기서 거절 응답이 나온다.
+    ALIGO_TEST_MODE=Y면 실제 발송 없이 응답만 받는다(과금 없음).
+    """
+    import os
+
+    from app import sms
+    from app.config import SITE_DEFAULTS
+
+    click.echo("설정 상태")
+    click.echo("  아이디    : %s" % (os.environ.get("ALIGO_USER_ID") or "(없음)"))
+    key = os.environ.get("ALIGO_API_KEY") or ""
+    click.echo("  API 키    : %s" % (key[:4] + "…" + key[-4:] if len(key) > 8 else "(없음)"))
+    click.echo("  발신번호  : %s" % (os.environ.get("ALIGO_SENDER") or "(없음)"))
+    click.echo("  테스트모드: %s" % (os.environ.get("ALIGO_TEST_MODE") or "(꺼짐)"))
+    if not sms.is_configured():
+        raise click.ClickException("ALIGO_* 환경변수가 비어 있습니다(.env 확인)")
+
+    click.echo("\n잔여 건수 조회")
+    r = sms.remain()
+    click.echo("  %s" % r.get("response") if r.get("ok") else "  실패: %s" % r)
+
+    if to:
+        msg = sms.applicant_message("홍길동", SITE_DEFAULTS["firm_name"],
+                                    SITE_DEFAULTS["phone"])
+        click.echo("\n테스트 발송 → %s" % to)
+        click.echo("  본문(%d바이트, %s):" % (sms._byte_len(msg), sms._msg_type(msg)))
+        for line in msg.splitlines():
+            click.echo("    %s" % line)
+        out = sms.send(to, msg, title="상담 신청 접수")
+        click.echo("  결과: %s" % out)

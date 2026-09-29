@@ -4,4 +4,5 @@ Flask-Compress>=1.14
 PyMySQL>=1.1
 python-dotenv>=1.0
 Pillow>=10.0
+requests>=2.31   # 알리고 문자 API
 gunicorn>=23.0; sys_platform != "win32"

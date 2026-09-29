@@ -1,7 +1,9 @@
+import os
 import re
 
 from flask import (
     Blueprint,
+    current_app,
     flash,
     jsonify,
     redirect,
@@ -11,7 +13,8 @@ from flask import (
     url_for,
 )
 
-from app import db
+from app import db, sms
+from app.config import SITE_DEFAULTS
 from app.models import Inquiry
 
 bp = Blueprint("contact", __name__)
@@ -22,6 +25,29 @@ PHONE_RE = re.compile(r"^[0-9\-\s]{9,20}$")
 @bp.route("/contact/")
 def contact():
     return render_template("contact.html")
+
+
+def _notify(name, phone, debt_range, area_text):
+    """접수 확인 문자(신청자) + 새 접수 알림(사무소).
+
+    두 발송 모두 실패해도 접수에는 영향이 없다(app/sms.py 참고).
+    """
+    site = SITE_DEFAULTS
+    try:
+        sms.send_async(
+            phone,
+            sms.applicant_message(name, site["firm_name"], site["phone"]),
+            title="상담 신청 접수",
+        )
+        admin_to = os.environ.get("ALIGO_ADMIN_PHONE", "").strip()
+        if admin_to:
+            sms.send_async(
+                admin_to,
+                sms.admin_message(name, phone, debt_range, area_text),
+                title="상담 접수 알림",
+            )
+    except Exception:            # 문자 때문에 접수 응답이 깨지는 일은 없어야 한다
+        current_app.logger.exception("문자 발송 준비 중 오류")
 
 
 def _wants_json():
@@ -70,6 +96,10 @@ def submit():
         )
     )
     db.session.commit()
+
+    # 문자는 접수가 **저장된 뒤에** 백그라운드로 보낸다.
+    # 문자 발송이 실패해도 접수는 이미 남아 있어야 하고, 응답도 지연되면 안 된다.
+    _notify(name, phone, debt_range, area_text)
 
     if _wants_json():
         return jsonify({"ok": True, "name": name})
