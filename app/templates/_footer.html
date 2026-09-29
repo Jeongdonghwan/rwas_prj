@@ -5,6 +5,9 @@
     대표변호사 {{ site.ceo }} · 광고책임변호사 {{ site.ad_lawyer }} · 사업자등록번호 {{ site.biz_no }}<br>
     {{ site.address }} · 이메일 {{ site.email }}<br>
     <div class="links">
+      {# 서브키워드 페이지로 들어가는 유일한 입구. 지우면 12,000페이지가 고아가 된다 #}
+      <a href="{{ url_for('keyword.hub') }}">제도별 안내 모아보기</a>
+      <a href="{{ url_for('ko.area_hub') }}">지역별 안내</a>
       <a href="{{ url_for('main.privacy') }}">개인정보처리방침</a>
       <a href="{{ url_for('main.email_policy') }}">이메일무단수집거부</a>
     </div>

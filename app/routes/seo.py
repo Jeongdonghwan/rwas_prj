@@ -9,10 +9,15 @@ from email.utils import format_datetime
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-from flask import Blueprint, Response, url_for
+from flask import Blueprint, Response, abort, url_for
 
 from app.config import SITE_DEFAULTS
-from app.models import CaseType, Dong, Gu, Job, Post
+from app.keyword_rules import SCHEMES
+from app.models import CaseType, Dong, Gu, Job, Keyword, Post
+
+# 서브키워드 사이트맵은 제도별로 나눈다. 색인 문제가 어느 세트에서 났는지
+# 추적하려면 나눠야 하고, 문제가 생기면 세트 단위로 내릴 수 있다.
+KW_PER_FILE = 5000
 
 bp = Blueprint("seo", __name__)
 
@@ -145,11 +150,28 @@ def sitemap_index():
         "board": (latest_post.updated_at or latest_post.published_at)
                  if latest_post else template_mtime("board"),
     }
-    items = "\n".join(
+    names = ["pages", "area", "job", "case", "board"]
+    parts = [
         "  <sitemap>\n    <loc>%s/sitemap-%s.xml</loc>\n    <lastmod>%s</lastmod>\n  </sitemap>"
         % (base(), n, lastmods[n].strftime("%Y-%m-%d"))
-        for n in ["pages", "area", "job", "case", "board"]
-    )
+        for n in names
+    ]
+
+    # 서브키워드 — 제도별, 5,000개 넘으면 페이지 분할
+    kw_mt = content_mtime("app/keyword_sections", "app/scheme_facts.py",
+                          "app/keyword_render.py", "app/templates/keyword",
+                          "seed/keyword.csv")
+    for scheme in SCHEMES:
+        n = Keyword.query.filter_by(scheme=scheme, is_public=True).count()
+        if not n:
+            continue
+        for p in range(1, (n + KW_PER_FILE - 1) // KW_PER_FILE + 1):
+            parts.append(
+                "  <sitemap>\n    <loc>%s/sitemap-kw-%s-%d.xml</loc>\n"
+                "    <lastmod>%s</lastmod>\n  </sitemap>"
+                % (base(), scheme, p, kw_mt.strftime("%Y-%m-%d"))
+            )
+    items = "\n".join(parts)
     return xml_response(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -281,3 +303,47 @@ def rss():
         + "  </channel>\n</rss>\n"
     )
     return xml_response(body, "application/rss+xml; charset=utf-8")
+
+
+@bp.route("/sitemap-kw-<scheme>-<int:page>.xml")
+def sitemap_keyword(scheme, page):
+    """서브키워드 사이트맵 — 제도별 분할. 비공개(is_public=False)는 넣지 않는다."""
+    if scheme not in SCHEMES or page < 1:
+        abort(404)
+    mt = content_mtime("app/keyword_sections", "app/scheme_facts.py",
+                       "app/keyword_render.py", "app/templates/keyword",
+                       "seed/keyword.csv")
+    rows = (
+        Keyword.query.filter_by(scheme=scheme, is_public=True)
+        .order_by(Keyword.id)
+        .offset((page - 1) * KW_PER_FILE)
+        .limit(KW_PER_FILE)
+        .all()
+    )
+    if not rows:
+        abort(404)
+
+    entries = []
+    if page == 1:
+        # 허브는 첫 파일에만 넣는다 — 크롤러가 여기부터 내려가게
+        entries.append(url_entry(abs_url("keyword.hub"), mt, "weekly", "0.8"))
+        entries.append(
+            url_entry(abs_url("keyword.scheme_hub", scheme=scheme), mt, "weekly", "0.8")
+        )
+        cats = (
+            Keyword.query.with_entities(Keyword.category)
+            .filter_by(scheme=scheme, is_public=True)
+            .distinct()
+            .all()
+        )
+        for (cat,) in cats:
+            entries.append(url_entry(
+                abs_url("keyword.category_hub", scheme=scheme, category=cat),
+                mt, "weekly", "0.7",
+            ))
+
+    entries += [
+        url_entry(abs_url("keyword.page", slug=k.slug_ko), mt, "monthly", "0.6")
+        for k in rows
+    ]
+    return xml_response(urlset(entries))

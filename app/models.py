@@ -64,6 +64,30 @@ class CaseType(db.Model):
     sort = db.Column(db.Integer, default=0)
 
 
+class Keyword(db.Model):
+    """서브키워드 랜딩 페이지 (12,000행). seed/keyword.csv에서 적재.
+
+    전체 설계는 keyword-pages-plan.md 참고.
+    - scheme: rehab / bankruptcy / credit / workout / adjust (app/keyword_rules.SCHEMES)
+    - needs_correction: 제도 치환으로 사실과 어긋나는 키워드 → 본문 최상단에 교정 문단
+    - is_public: 세트 단위 롤백용. 대량 발행 후 색인 문제가 나면 여기부터 내린다.
+    """
+
+    __tablename__ = "keyword"
+
+    id = db.Column(db.Integer, primary_key=True)
+    slug_ko = db.Column(db.String(200), unique=True, nullable=False, index=True)
+    keyword = db.Column(db.String(200), nullable=False)
+    scheme = db.Column(db.String(20), nullable=False, index=True)
+    region = db.Column(db.String(20), default="")       # "" 또는 "수원"
+    category = db.Column(db.String(40), index=True)      # 분류 25종
+    intent = db.Column(db.String(60))                    # 검색의도 30종
+    needs_correction = db.Column(db.Boolean, default=False)
+    correction_terms = db.Column(db.String(200))         # ";" 구분
+    is_public = db.Column(db.Boolean, default=True, index=True)
+    source_no = db.Column(db.Integer)
+
+
 class ContentBlock(db.Model):
     __tablename__ = "content_block"
 

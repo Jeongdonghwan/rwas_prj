@@ -7,7 +7,7 @@ import click
 from flask.cli import with_appcontext
 
 from app import db
-from app.models import CaseType, ContentBlock, Dong, Faq, Gu, Job, Post
+from app.models import CaseType, ContentBlock, Dong, Faq, Gu, Job, Keyword, Post
 
 SEED_DIR = Path(__file__).resolve().parent.parent / "seed"
 
@@ -128,3 +128,53 @@ def seed_command():
         f"job={Job.query.count()} case_type={CaseType.query.count()} "
         f"faq={Faq.query.count()} content_block={ContentBlock.query.count()}"
     )
+
+
+@click.command("seed-keywords")
+@click.option("--public/--draft", default=True,
+              help="적재 시 공개 여부. --draft로 넣고 나중에 세트별로 공개할 수 있다.")
+@with_appcontext
+def seed_keywords_command(public):
+    """seed/keyword.csv(12,000행)를 keyword 테이블에 적재. 전체 삭제 후 재삽입.
+
+    본 시드와 분리한 이유: 행이 많아 매번 돌리면 느리고,
+    `flask seed`는 지역·직업 데이터만 다루기 때문이다.
+    """
+    path = SEED_DIR / "keyword.csv"
+    if not path.exists():
+        raise click.ClickException(
+            "seed/keyword.csv가 없습니다. 먼저 python scripts/import_keywords.py 를 실행하세요."
+        )
+
+    db.session.query(Keyword).delete()
+    db.session.commit()
+
+    rows = []
+    with open(path, encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            rows.append({
+                "slug_ko": r["slug_ko"],
+                "keyword": r["keyword"],
+                "scheme": r["scheme"],
+                "region": r["region"],
+                "category": r["category"],
+                "intent": r["intent"],
+                "needs_correction": r["needs_correction"] == "1",
+                "correction_terms": r["correction_terms"] or None,
+                "is_public": public,
+                "source_no": int(r["source_no"]) if r["source_no"] else None,
+            })
+
+    # 12,000행이라 ORM 개별 add는 느리다 → 청크 단위 bulk insert
+    CHUNK = 2000
+    for i in range(0, len(rows), CHUNK):
+        db.session.bulk_insert_mappings(Keyword, rows[i:i + CHUNK])
+        db.session.commit()
+
+    total = Keyword.query.count()
+    click.echo("keyword 적재 완료: %d행 (공개=%s)" % (total, public))
+    for scheme in ("rehab", "bankruptcy", "credit", "workout", "adjust"):
+        n = Keyword.query.filter_by(scheme=scheme).count()
+        click.echo("   %-11s %5d" % (scheme, n))
+    click.echo("   교정 문단 필요: %d행"
+               % Keyword.query.filter_by(needs_correction=True).count())

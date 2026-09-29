@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% set k = page.kw %}
+{% block title %}{{ k.keyword }} | 수원개인회생 법률사무소 레이{% endblock %}
+{% block meta_keywords %}{{ k.keyword }}, {{ k.keyword }} 상담, {{ page.scheme_name }} {{ k.category }}, {{ site.keywords }}{% endblock %}
+{% block meta_desc %}{{ k.keyword }} 안내. {{ page.intro }}. 수원개인회생 법률사무소 레이에서 이재열 변호사가 직접 상담합니다. {{ site.phone }}{% endblock %}
+{% block head %}{% include "partials/faq_jsonld.html" %}{% endblock %}
+
+{% block content %}
+{% with crumbs=[(page.scheme_name ~ ' 안내', None), (k.category, None), (k.keyword, None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+
+<div class="wrap">
+  <div class="page-head">
+    <p class="cat">{{ page.scheme_name }} · {{ k.category }}{% if k.region %} · {{ k.region }}{% endif %}</p>
+    <h1>{{ k.keyword }}</h1>
+    <p class="lead">{{ page.intro }}에 대해, {{ k.category }} 관점에서 정리했습니다.</p>
+  </div>
+</div>
+
+<section class="sec"><div class="wrap detail">
+  <div>
+    {# 제도 치환으로 성립하지 않는 키워드는 먼저 바로잡고 들어간다 #}
+    {{ page.correction | safe }}
+
+    <div class="lf-sum">
+      <h2>{{ k.keyword }} 핵심 요약</h2>
+      <p>{{ page.summary | safe }}</p>
+      <ul class="lf-kv">
+        {% for label, value in page.kv %}<li><b>{{ label }}</b><span>{{ value }}</span></li>{% endfor %}
+      </ul>
+    </div>
+
+    <div class="prose lf">
+      {% for s in page.sections %}
+      <h2 class="lf-h"><span class="lf-n">{{ "%02d"|format(loop.index) }}</span>{{ s.head }}</h2>
+      {{ s.body | safe }}
+      {% endfor %}
+    </div>
+
+    {% with kw = k.keyword %}{% include "partials/lf_table.html" %}{% endwith %}
+
+    {% if page.faqs %}
+    <div class="sec-head" style="margin-top:64px"><h2>{{ k.keyword }} 자주 묻는 질문</h2></div>
+    <dl class="qa">
+      {% for f in page.faqs %}<dt>{{ f.q }}</dt><dd>{{ f.a }}</dd>{% endfor %}
+    </dl>
+    {% endif %}
+
+    {% if others %}
+    <div class="sec-head" style="margin-top:64px"><h2>다른 제도로 보기</h2></div>
+    <div class="linklist">
+      {% for o in others %}<a href="{{ url_for('keyword.page', slug=o.slug_ko) }}">{{ o.keyword }}</a>{% endfor %}
+    </div>
+    {% endif %}
+
+    {% if same_cat %}
+    <div class="sec-head" style="margin-top:48px"><h2>{{ k.category }} 관련해서 함께 보는 내용</h2></div>
+    <div class="linklist">
+      {% for o in same_cat %}<a href="{{ url_for('keyword.page', slug=o.slug_ko) }}">{{ o.keyword }}</a>{% endfor %}
+      <a href="{{ url_for('main.service_rehab') }}">개인회생 안내</a>
+      <a href="{{ url_for('main.service_cost') }}">비용 안내</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <aside class="side">
+    <div class="aside">
+      <h3>바로 확인</h3>
+      <ul class="kv">
+        {% for label, value in page.kv[:4] %}<li><b>{{ label }}</b><span>{{ value }}</span></li>{% endfor %}
+      </ul>
+      <a class="btn red wide" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>
+      <a class="btn wide" href="{{ url_for('contact.contact') }}#form">상담 신청</a>
+    </div>
+  </aside>
+</div></section>
+{% endblock %}
+
+{% block cta %}{% with cta_title = k.keyword ~ ", 전화 한 통이면 방향부터 확인할 수 있습니다." %}{% include "_cta.html" %}{% endwith %}{% endblock %}

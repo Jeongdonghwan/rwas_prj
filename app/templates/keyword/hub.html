@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}채무조정 제도별 모아보기 | 수원개인회생 법률사무소 레이{% endblock %}
+{% block meta_desc %}개인회생·개인파산·신용회복·워크아웃·채무조정을 주제별로 정리했습니다. 수원개인회생 법률사무소 레이.{% endblock %}
+
+{% block content %}
+{% with crumbs=[('모아보기', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+<div class="wrap">
+  <div class="page-head">
+    <p class="cat">모아보기</p>
+    <h1>제도별 · 주제별 안내</h1>
+    <p class="lead">찾으시는 제도를 고르면 주제별로 정리된 안내를 볼 수 있습니다.</p>
+  </div>
+</div>
+
+<section class="sec"><div class="wrap">
+  <div class="cards stagger">
+    {% for s in schemes %}
+    <div class="card">
+      <h3><a href="{{ url_for('keyword.scheme_hub', scheme=s.code) }}">{{ s.name }}</a></h3>
+      <p>{{ s.intro }}</p>
+      <p class="muted" style="margin-top:10px;font-size:13px;color:var(--ink-3)">{{ s.count }}개 주제</p>
+    </div>
+    {% endfor %}
+  </div>
+</div></section>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "admin/_base.html" %}
+{% block title %}키워드 페이지{% endblock %}
+
+{% block content %}
+<div class="phead">
+  <h1>키워드 페이지</h1>
+  <p>총 {{ total }}건 · 공개 {{ public }}건</p>
+  <div class="act">
+    <a class="btn line" href="{{ url_for('keyword.hub') }}" target="_blank" rel="noopener">모아보기 ↗</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="tblwrap">
+  <table class="tbl">
+    <thead>
+      <tr><th>제도</th><th>지역</th><th>전체</th><th>공개</th><th class="hide-sm">교정 문단</th><th style="width:200px"></th></tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td class="strong nowrap">{{ r.name }}
+          <span class="sub"><a href="{{ url_for('keyword.scheme_hub', scheme=r.scheme) }}" target="_blank" rel="noopener">/모아보기/{{ r.scheme }}/</a></span>
+        </td>
+        <td class="muted nowrap">{{ r.region or '-' }}</td>
+        <td class="num">{{ r.total }}</td>
+        <td>
+          {% if r.public == r.total %}<span class="bd on">전체 공개</span>
+          {% elif r.public == 0 %}<span class="bd off">비공개</span>
+          {% else %}<span class="bd contacted">{{ r.public }}건 공개</span>{% endif %}
+        </td>
+        <td class="hide-sm muted">{{ r.fix }}</td>
+        <td>
+          <div class="ract">
+            <form method="post" action="{{ url_for('admin.keywords_toggle') }}"
+                  onsubmit="return confirm('{{ r.name }}{% if r.region %} ({{ r.region }}){% endif %} {{ r.total }}건을 {% if r.public %}모두 내릴까요? 해당 페이지가 404가 되고 사이트맵에서도 빠집니다.{% else %}모두 공개할까요?{% endif %}')">
+              <input type="hidden" name="scheme" value="{{ r.scheme }}">
+              <input type="hidden" name="region" value="{{ r.region }}">
+              <input type="hidden" name="publish" value="{{ 0 if r.public else 1 }}">
+              <button class="btn sm {{ 'danger' if r.public else 'line' }}" type="submit">
+                {{ '세트 내리기' if r.public else '세트 공개' }}
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="note">
+  <b>이 화면의 용도</b> 키워드 페이지 12,000건을 한 번에 발행했기 때문에,
+  색인률이 떨어지거나 기존 페이지 노출이 줄면 <b>세트 단위로 즉시 내릴 수 있어야</b> 합니다.
+  내리면 해당 페이지는 404가 되고 사이트맵에서도 빠집니다.
+  발행 후 2주간은 서치콘솔·서치어드바이저 색인률을 주 단위로 확인하고,
+  문제가 보이면 제도 파생 세트(개인파산·신용회복·워크아웃·채무조정)부터 내리는 것을 권합니다.
+  내용 자체를 바꾸려면 <code>seed/keyword.csv</code>를 다시 만들고
+  <code>flask seed-keywords</code>를 실행합니다.
+</div>
+{% endblock %}

@@ -94,9 +94,16 @@ def create_app():
     app.register_blueprint(board_bp)
     app.register_blueprint(seo_bp)
 
-    from app.seed import seed_command
+    # 서브키워드 블루프린트는 /<slug>/ 라는 가장 넓은 패턴을 쓴다.
+    # 고정 페이지·기존 한글 URL이 먼저 잡혀야 하므로 반드시 마지막에 등록한다.
+    from app.routes.keyword import bp as keyword_bp
+
+    app.register_blueprint(keyword_bp)
+
+    from app.seed import seed_command, seed_keywords_command
 
     app.cli.add_command(seed_command)
+    app.cli.add_command(seed_keywords_command)
 
     with app.app_context():
         from app import models  # noqa: F401

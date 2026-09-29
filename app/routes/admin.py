@@ -302,3 +302,51 @@ def upload():
     except Exception:
         return jsonify({"error": "invalid image"}), 400
     return jsonify({"url": url})
+
+
+# ── 서브키워드 세트 관리 ────────────────────────────────────────────
+# 12,000페이지를 한 번에 발행하기로 했으므로, 문제가 생겼을 때 세트 단위로
+# 즉시 내릴 수 있어야 한다. is_public=False면 페이지는 404, 사이트맵에서도 빠진다.
+
+@bp.route("/keywords")
+@requires_auth
+def keywords():
+    from app.keyword_rules import SCHEMES
+    from app.models import Keyword
+
+    rows = []
+    for code, name in SCHEMES.items():
+        for region in ("", "수원"):
+            q = Keyword.query.filter_by(scheme=code, region=region)
+            total = q.count()
+            if not total:
+                continue
+            rows.append({
+                "scheme": code,
+                "name": name,
+                "region": region,
+                "total": total,
+                "public": q.filter_by(is_public=True).count(),
+                "fix": q.filter_by(needs_correction=True).count(),
+            })
+    return render_template(
+        "admin/keywords.html", nav="kw", rows=rows,
+        total=sum(r["total"] for r in rows),
+        public=sum(r["public"] for r in rows),
+    )
+
+
+@bp.route("/keywords/toggle", methods=["POST"])
+@requires_auth
+def keywords_toggle():
+    from app.models import Keyword
+
+    scheme = request.form.get("scheme")
+    region = request.form.get("region", "")
+    publish = request.form.get("publish") == "1"
+    q = Keyword.query.filter_by(scheme=scheme, region=region)
+    n = q.update({Keyword.is_public: publish}, synchronize_session=False)
+    db.session.commit()
+    current_app.logger.info("keyword set %s/%s → public=%s (%d행)",
+                            scheme, region or "-", publish, n)
+    return redirect(url_for("admin.keywords"))
