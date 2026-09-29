@@ -791,3 +791,30 @@ p.note{font-size:13px;color:var(--ink-3);line-height:1.75;margin:14px 0 0}
   .kw-fix{padding:18px 16px;margin-bottom:26px}
   .kw-fix p{font-size:14.5px}
 }
+
+
+/* ── 상담 접수 완료 모달 ─────────────────────────────────────── */
+body.modal-open{overflow:hidden}
+.done-modal{position:fixed;inset:0;z-index:200;display:grid;place-items:center;
+  padding:20px;background:rgba(20,16,18,.55);backdrop-filter:blur(3px);
+  animation:doneFade .18s ease-out}
+.done-card{background:#fff;border-radius:20px;max-width:420px;width:100%;
+  padding:38px 32px 30px;text-align:center;box-shadow:0 24px 60px rgba(20,16,18,.28);
+  animation:doneUp .22s cubic-bezier(.2,.8,.3,1)}
+.done-ico{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 18px;
+  border-radius:50%;background:var(--mint);color:var(--green)}
+.done-card h3{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px;color:var(--ink)}
+.done-msg{font-size:15px;line-height:1.7;color:var(--ink);margin-bottom:6px}
+.done-sub{font-size:13.5px;line-height:1.7;color:var(--ink-3);margin-bottom:22px}
+.done-acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.done-acts .btn{min-width:130px}
+@keyframes doneFade{from{opacity:0}to{opacity:1}}
+@keyframes doneUp{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .done-modal,.done-card{animation:none}
+}
+@media (max-width:600px){
+  .done-card{padding:30px 22px 24px;border-radius:16px}
+  .done-card h3{font-size:18px}
+  .done-acts .btn{width:100%}
+}

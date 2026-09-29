@@ -543,3 +543,66 @@ document.querySelectorAll('[data-carousel]').forEach(function (root) {
   sync();
   play();
 });
+
+
+/* ── 상담 신청: 같은 자리에서 완료 모달 ────────────────────────
+   fetch로 보내고 성공하면 모달을 띄운다. JS가 없거나 fetch가 실패하면
+   form.submit()으로 기존 동작(POST → /inquiry/done/)에 맡긴다. */
+document.querySelectorAll('form[data-consult]').forEach(function (form) {
+  var modal = document.getElementById('consult-done');
+  if (!modal) return;
+  var btn = form.querySelector('button[type=submit]');
+  var lastFocus = null;
+
+  function open(name) {
+    var msg = modal.querySelector('[data-done-msg]');
+    if (msg) {
+      msg.textContent = name
+        ? name + '님, 접수되었습니다. 담당자가 연락드리겠습니다.'
+        : '접수 내용을 확인한 뒤 담당자가 연락드립니다.';
+    }
+    lastFocus = document.activeElement;
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+    var close = modal.querySelector('[data-done-close]');
+    if (close) close.focus();
+  }
+  function close() {
+    modal.hidden = true;
+    document.body.classList.remove('modal-open');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal || e.target.closest('[data-done-close]')) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !modal.hidden) close();
+  });
+
+  form.addEventListener('submit', function (e) {
+    if (!window.fetch || !form.checkValidity()) return;   // 기본 동작에 맡김
+    e.preventDefault();
+    varorigLabel = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = '접수 중…'; }
+
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'X-Requested-With': 'fetch' }
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (res.ok && res.d.ok) {
+          form.reset();
+          open(res.d.name);
+        } else {
+          alert(res.d.error || '접수에 실패했습니다. 전화로 연락 주시면 바로 도와드리겠습니다.');
+        }
+      })
+      .catch(function () { form.submit(); })   // 네트워크 문제면 일반 제출로
+      .then(function () {
+        if (btn) { btn.disabled = false; btn.textContent =origLabel; }
+      });
+  });
+});

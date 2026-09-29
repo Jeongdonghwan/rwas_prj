@@ -1,6 +1,15 @@
 import re
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from app import db
 from app.models import Inquiry
@@ -15,6 +24,11 @@ def contact():
     return render_template("contact.html")
 
 
+def _wants_json():
+    """site.js가 fetch로 보낼 때만 JSON을 준다. JS가 없으면 기존 방식으로 동작."""
+    return request.headers.get("X-Requested-With") == "fetch"
+
+
 @bp.route("/inquiry", methods=["POST"])
 def submit():
     name = (request.form.get("name") or "").strip()[:50]
@@ -27,11 +41,15 @@ def submit():
 
     back = source_path if source_path.startswith("/") else url_for("main.index")
 
+    error = None
     if not name or not PHONE_RE.match(phone):
-        flash("이름과 연락처를 확인해주세요.", "error")
-        return redirect(back + "#form")
-    if not agree:
-        flash("개인정보 수집·이용 동의가 필요합니다.", "error")
+        error = "이름과 연락처를 확인해주세요."
+    elif not agree:
+        error = "개인정보 수집·이용 동의가 필요합니다."
+    if error:
+        if _wants_json():
+            return jsonify({"ok": False, "error": error}), 400
+        flash(error, "error")
         return redirect(back + "#form")
 
     utm = {
@@ -53,4 +71,18 @@ def submit():
     )
     db.session.commit()
 
+    if _wants_json():
+        return jsonify({"ok": True, "name": name})
+
+    # JS가 없을 때는 POST-Redirect-GET. POST 응답을 그대로 렌더하면
+    # 새로고침 시 브라우저가 재제출을 묻고 URL도 /inquiry로 남는다.
+    session["inquiry_name"] = name
+    return redirect(url_for("contact.done"))
+
+
+@bp.route("/inquiry/done/")
+def done():
+    name = session.pop("inquiry_name", None)
+    if not name:
+        return redirect(url_for("main.index"))
     return render_template("inquiry_done.html", name=name)

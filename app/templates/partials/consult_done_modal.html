@@ -1,0 +1,19 @@
+{# 상담 접수 완료 모달 — base.html에서 전역으로 한 번만 포함한다.
+   폼이 페이지마다 다르게 생겼어도(메인은 가로형, contact는 세로형) 모달은 공용이다.
+   site.js가 form[data-consult] 제출 성공 시 연다.
+   JS가 없으면 폼이 그냥 POST되어 /inquiry/done/ 페이지로 이동한다(둘 다 동작). #}
+<div class="done-modal" id="consult-done" hidden role="dialog" aria-modal="true" aria-labelledby="cd-title">
+  <div class="done-card">
+    <span class="done-ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor"
+           stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    </span>
+    <h3 id="cd-title">상담 신청이 완료되었습니다</h3>
+    <p class="done-msg" data-done-msg>접수 내용을 확인한 뒤 담당자가 연락드립니다.</p>
+    <p class="done-sub">영업시간 기준 30분 안에 연락드립니다. 급하시면 지금 전화 주셔도 됩니다.</p>
+    <div class="done-acts">
+      <a class="btn red" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>
+      <button class="btn line" type="button" data-done-close>확인</button>
+    </div>
+  </div>
+</div>
