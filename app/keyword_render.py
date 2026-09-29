@@ -15,6 +15,8 @@
 4,096조합이므로 조합이 충분히 남는다.
 """
 
+from itertools import combinations
+
 from app.content import pick, render_tpl, stable_hash
 from app.keyword_rules import SCHEMES, correction_terms
 from app.keyword_sections import SECTIONS
@@ -28,6 +30,10 @@ FALLBACK_CATEGORY = "상황형"
 # 제도가 다르면 반드시 다른 벡터가 배정되게 한다.
 SCHEME_OFFSET = {code: i * 19 for i, code in enumerate(SCHEMES)}
 REGION_OFFSET = 7
+
+# FAQ 풀에서 실제로 보여줄 개수. 풀(5개)을 다 쓰면 같은 분류가 전부 같은 FAQ를
+# 갖게 되므로 부분집합을 쓴다. C(5,3)=10가지 조합이 순번으로 배정된다.
+FAQ_TAKE = 3
 
 
 def _cat(category):
@@ -74,13 +80,20 @@ def build(kw):
             pick(seed, "h::%d" % i, heads)
         sections.append({"head": render_tpl(h, **v), "body": render_tpl(b, **v)})
 
-    # FAQ는 순서를 섞어 페이지마다 구성이 달라지게 한다
+    # FAQ는 **부분집합**을 골라야 한다. 풀 5개에서 5개를 다 쓰면 같은 분류의 모든
+    # 페이지가 같은 FAQ를 갖고, 순서를 섞어도 3-gram 집합은 그대로라 유사도가 안 내려간다.
+    # (실측: FAQ가 공통 그램의 37%를 차지했다.) 조합을 순번으로 배정해 겹침을 줄인다.
     pool = cat.get("faqs") or []
-    ordered = sorted(pool, key=lambda f: stable_hash("%s::faq::%s" % (seed, f["q"][:30])))
-    faqs = [
-        {"q": render_tpl(f["q"], **v), "a": render_tpl(f["a"], **v)}
-        for f in ordered[:5]
-    ]
+    faqs = []
+    if pool:
+        take = min(FAQ_TAKE, len(pool))
+        combos = list(combinations(range(len(pool)), take))
+        idx = combos[((kw.variant_idx or 0) + offset) % len(combos)]
+        chosen = [pool[i] for i in idx]
+        # 고른 뒤 순서만 해시로 섞는다(보이는 순서를 페이지마다 다르게)
+        chosen.sort(key=lambda f: stable_hash("%s::faq::%s" % (seed, f["q"][:30])))
+        faqs = [{"q": render_tpl(f["q"], **v), "a": render_tpl(f["a"], **v)}
+                for f in chosen]
 
     terms = correction_terms(_base_keyword(kw), kw.scheme) if kw.needs_correction else []
 
