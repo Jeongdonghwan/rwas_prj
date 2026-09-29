@@ -76,8 +76,10 @@ class Keyword(db.Model):
     __tablename__ = "keyword"
 
     id = db.Column(db.Integer, primary_key=True)
-    slug_ko = db.Column(db.String(200), unique=True, nullable=False, index=True)
-    keyword = db.Column(db.String(200), nullable=False)
+    # slug_ko 실측 최대 28자(71바이트). VARCHAR(200)이면 utf8mb4 유니크 인덱스가
+    # 800바이트가 되어 구형 InnoDB의 767바이트 한계에 걸릴 수 있다 → 120으로 제한.
+    slug_ko = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    keyword = db.Column(db.String(160), nullable=False)
     scheme = db.Column(db.String(20), nullable=False, index=True)
     region = db.Column(db.String(20), default="")       # "" 또는 "수원"
     category = db.Column(db.String(40), index=True)      # 분류 25종
