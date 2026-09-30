@@ -201,9 +201,17 @@ def sms_check_command(to):
     ALIGO_TEST_MODE=Y면 실제 발송 없이 응답만 받는다(과금 없음).
     """
     import os
+    import sys
 
     from app import sms
     from app.config import SITE_DEFAULTS
+
+    # 윈도우 콘솔이 cp949라 ✓ 같은 문자에서 터진다
+    for _s in (sys.stdout, sys.stderr):
+        try:
+            _s.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
 
     click.echo("설정 상태")
     click.echo("  아이디    : %s" % (os.environ.get("ALIGO_USER_ID") or "(없음)"))
