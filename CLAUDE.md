@@ -189,6 +189,28 @@ xlsx나 치환 규칙이 바뀌면 **두 단계를 다 다시 돌려야 한다.*
   운영에서 `keyword` 테이블을 드롭하고 다시 시드해야 한다(로컬에서 `variant_idx` 추가 때 겪음).
 - 11,952행 적재는 청크 bulk insert라 수 초면 끝난다.
 
+### 모션 정리 (2026-09-30, gopung 참고)
+`C:\side_Prj\gopung` 의 동적 요소만 참고했다(색상·레이아웃은 손대지 않음).
+그쪽은 GSAP·AOS 같은 라이브러리를 전혀 안 쓰고 순수 CSS + IntersectionObserver만 쓴다.
+
+- **easing 토큰 `--ease:cubic-bezier(.16,1,.3,1)`** (expo-out). 하드코딩돼 있던 17곳을 전부 이걸로 통일.
+  움직임의 인상이 사실상 이 한 줄에서 나온다. **새 transition에도 반드시 `var(--ease)`를 쓸 것.**
+- **duration 층위 토큰** `--t-fast .2s`(색) / `--t-move .35s`(이동) / `--t-slow .6s`(이미지) / `--t-reveal .8s`(리빌).
+  섞어 쓰면 사이트가 산만해진다.
+- **2단 리빌 `.deep`** — 카드가 올라온 뒤 그 안의 아이콘→제목→본문이 0.07초 간격으로 이어진다.
+  메인 "진행 방식" 3카드에 적용. reduced-motion에서는 `!important`로 즉시 표시.
+- **히어로 SCROLL 드립** — 트랙에 `overflow:hidden`을 주고 이동 거리를 트랙 높이의 2배로 잡아
+  마스크·JS 없이 "통과"를 만든다. 마크업은 `<i class="drip">`.
+
+**FAQ 아코디언 — 실제로 있던 버그를 고쳤다**
+- 예전엔 `.qa dd`의 기본값이 `max-height:0`이라 **JS가 죽으면 답변이 영영 안 보였다.**
+  이제 CSS 기본은 펼침이고, JS가 `dl`에 `.js-acc`를 붙인 뒤에야 접힌다.
+- 접을 때 **padding까지 0으로 내려야 한다.** `box-sizing:border-box`여도 박스는 padding+border보다
+  작아지지 않아, padding을 남기면 `max-height:0`인데도 35px가 남는다(실측으로 확인).
+- `max-height:600px`는 현재 가장 긴 답변(183자 ≈ 160px)의 3배 여유다. 답변을 크게 늘리면 이 값도 올릴 것.
+- **`scrollHeight`로 실측해 넣는 방식은 쓰지 않는다.** 시도했다가 되돌렸다 — padding이 트랜지션 중이면
+  높이가 모자라게 측정되고, 헤드리스에서 검증도 어려웠다. 고정값이 단순하고 안전하다.
+
 ### 상담 접수 문자 알림 (2026-09-30)
 - **알리고(Aligo) API** — `app/sms.py`. 신청자에게 접수 확인, `ALIGO_ADMIN_PHONE`을 넣으면 사무소에도 알림.
 - **설정은 전부 `.env`** (`ALIGO_USER_ID` / `ALIGO_API_KEY` / `ALIGO_SENDER` / `ALIGO_TEST_MODE` / `ALIGO_ADMIN_PHONE`).

@@ -90,21 +90,29 @@
 
   // FAQ 아코디언 (.qa 중 .static 제외; 콘텐츠는 DOM에 항상 존재)
   document.querySelectorAll('dl.qa:not(.static)').forEach(function (dl) {
-    var dts = dl.querySelectorAll('dt');
-    dts.forEach(function (dt, i) {
+    // .js-acc를 붙여야 CSS가 접기 시작한다. 여기까지 못 오면 답변이
+    // 펼쳐진 채로 남아 내용이 보인다(CSS 기본값이 열림).
+    dl.classList.add('js-acc');
+    dl.querySelectorAll('dt').forEach(function (dt, i) {
       var dd = dt.nextElementSibling;
       if (!dd || dd.tagName !== 'DD') return;
       dt.setAttribute('role', 'button');
       dt.setAttribute('tabindex', '0');
+      dt.setAttribute('aria-expanded', 'false');
       function toggle() {
         var open = dt.classList.toggle('open');
         dd.classList.toggle('open', open);
+        dt.setAttribute('aria-expanded', open ? 'true' : 'false');
       }
       dt.addEventListener('click', toggle);
       dt.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
       });
-      if (i === 0) { dt.classList.add('open'); dd.classList.add('open'); }
+      if (i === 0) {
+        dt.classList.add('open');
+        dd.classList.add('open');
+        dt.setAttribute('aria-expanded', 'true');
+      }
     });
   });
 
