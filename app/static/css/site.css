@@ -523,20 +523,20 @@ p{margin:0}
 .lawyer-photo .shot{position:relative;border-radius:22px;overflow:hidden;
   box-shadow:0 26px 60px rgba(30,22,24,.20);display:block}
 .lawyer-photo img{width:100%;display:block;transition:transform var(--t-slow) var(--ease)}
-/* 하단 그라데이션 — 이름표가 읽히게만 하고 사진은 가리지 않는다 */
-.lawyer-photo .shot::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;
-  background:linear-gradient(0deg,rgba(14,12,13,.80) 0%,rgba(14,12,13,.42) 40%,transparent 100%)}
-.lawyer-photo .tag{position:absolute;left:24px;right:24px;bottom:22px;z-index:2;color:#fff;
-  padding-left:13px}
-.lawyer-photo .tag::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;
-  border-radius:2px;background:var(--green-bright)}
-.lawyer-photo .tag b{display:block;font-size:18px;font-weight:800;letter-spacing:-.02em}
-.lawyer-photo .tag span{font-size:12px;color:rgba(255,255,255,.76);letter-spacing:.05em}
+/* 이름표는 **흰 카드**다. 어두운 그라데이션을 깔아봤더니 사진 하단이
+   밝은 회색이라 얼룩처럼 보였다. 밝은 사진에는 밝은 칩이 깔끔하다. */
+.lawyer-photo .tag{position:absolute;left:20px;bottom:20px;z-index:2;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(6px);
+  border-radius:12px;padding:11px 18px 11px 15px;
+  box-shadow:0 10px 28px rgba(30,22,24,.18);
+  border-left:3px solid var(--green-bright)}
+.lawyer-photo .tag b{display:block;font-size:16.5px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.lawyer-photo .tag span{font-size:11.5px;color:var(--ink-3);letter-spacing:.05em}
 .lawyer-photo:hover::before{transform:translate(-6px,6px)}
 .lawyer-photo:hover img{transform:scale(1.025)}
 @media (max-width:960px){
   .lawyer-photo::before{left:12px;right:-12px;top:16px;bottom:-12px}
-  .lawyer-photo .tag{left:18px;right:18px;bottom:18px}
+  .lawyer-photo .tag{left:16px;bottom:16px;padding:9px 15px 9px 13px}
 }
 .lawyer-bio h2{margin-bottom:6px}
 .lawyer-bio .en{font-size:13px;letter-spacing:.1em;color:var(--ink-3);font-weight:700;margin-bottom:24px;text-transform:uppercase}
