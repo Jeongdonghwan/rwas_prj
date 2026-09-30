@@ -614,3 +614,91 @@ document.querySelectorAll('form[data-consult]').forEach(function (form) {
       });
   });
 });
+
+
+/* ── 히어로 배경 슬라이드 ────────────────────────────────────────
+   느린 크로스페이드(1.6s) + 켄번즈 줌. 자동 전환 6초.
+   슬라이드는 전부 DOM에 있고 opacity만 바뀐다(레이아웃 변화 없음).
+   스크롤로 히어로를 지나가면 멈춘다 — 안 보이는 화면에서 타이머를 돌릴 이유가 없다. */
+(function () {
+  var box = document.querySelector('[data-hero-slides]');
+  if (!box) return;
+  var slides = box.querySelectorAll('.slide');
+  var dotBox = document.querySelector('[data-hero-dots]');
+  if (slides.length < 2) { if (dotBox) dotBox.hidden = true; return; }
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var idx = 0, timer = null, DELAY = 6000;
+  var dots = [];
+
+  function show(i) {
+    idx = (i + slides.length) % slides.length;
+    slides.forEach(function (s, k) {
+      var on = k === idx;
+      s.classList.toggle('on', on);
+      // 켄번즈를 매번 처음부터 돌리려면 애니메이션을 리셋해야 한다
+      if (on) {
+        var img = s.querySelector('img');
+        if (img && !reduced) { img.style.animation = 'none'; img.offsetHeight; img.style.animation = ''; }
+      }
+    });
+    dots.forEach(function (d, k) {
+      d.classList.toggle('on', k === idx);
+      d.setAttribute('aria-selected', k === idx ? 'true' : 'false');
+    });
+  }
+  function next() { show(idx + 1); }
+  function play() { if (!timer && !reduced) timer = setInterval(next, DELAY); }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+  if (dotBox) {
+    slides.forEach(function (_, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-label', (i + 1) + '번째 배경');
+      if (i === 0) { b.classList.add('on'); b.setAttribute('aria-selected', 'true'); }
+      b.addEventListener('click', function () { stop(); show(i); play(); });
+      dotBox.appendChild(b);
+      dots.push(b);
+    });
+  }
+
+  // 히어로가 화면에서 벗어나면 정지, 돌아오면 재개
+  var hero = box.closest('.hero');
+  if (hero && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) {
+      es[0].isIntersecting ? play() : stop();
+    }, { threshold: 0.15 }).observe(hero);
+  } else {
+    play();
+  }
+  document.addEventListener('visibilitychange', function () {
+    document.hidden ? stop() : play();
+  });
+})();
+
+/* ── 히어로 스크롤 이탈 ──────────────────────────────────────────
+   아래로 내리면 히어로 글자가 천천히 멀어지며 사라진다.
+   transform/opacity만 건드리고 rAF로 스로틀해 리플로우가 없다. */
+(function () {
+  var hero = document.querySelector('.hero');
+  if (!hero) return;
+  var copy = hero.querySelector('.hero-copy');
+  if (!copy || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var ticking = false;
+  function update() {
+    var h = hero.offsetHeight || 1;
+    var p = Math.min(Math.max(window.scrollY / h, 0), 1);
+    copy.style.transform = 'translate3d(0,' + (p * 72).toFixed(1) + 'px,0)';
+    copy.style.opacity = String(1 - Math.min(p * 1.35, 1));
+    ticking = false;
+  }
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  }, { passive: true });
+  update();
+})();
