@@ -189,8 +189,10 @@
 
 <section class="sec alt lawyer-sec"><div class="wrap">
   <div class="lawyer-photo reveal">
-    <img src="{{ url_for('static', filename='img/lawyer-card.webp') }}" alt="이재열 대표변호사" width="380" height="475" loading="lazy">
-    <div class="tag"><b>이재열 변호사</b><span>{{ lawyer.name_en }} · LEI LAW OFFICE</span></div>
+    <span class="shot">
+      <img src="{{ url_for('static', filename='img/lawyer-card.webp') }}" alt="이재열 대표변호사" width="380" height="475" loading="lazy">
+      <span class="tag"><b>이재열 변호사</b><span>{{ lawyer.name_en }} · LEI LAW OFFICE</span></span>
+    </span>
   </div>
   <div class="lawyer-bio reveal d1">
     <div class="sec-head" style="margin-bottom:20px"><span class="label">대표변호사</span><h2><span class="thin">사건을 맡기면,</span> 변호사가 직접 합니다</h2><p>상담·서류·법원 대응까지 이재열 변호사가 처음부터 끝까지 진행합니다.</p></div>
