@@ -226,4 +226,12 @@ def sms_check_command(to):
         for line in msg.splitlines():
             click.echo("    %s" % line)
         out = sms.send(to, msg, title="상담 신청 접수")
-        click.echo("  결과: %s" % out)
+        click.echo("  결과: %s" % out.get("response", out))
+        if out.get("ok"):
+            click.echo("  ✓ 발송 요청 성공"
+                       + ("  (테스트모드라 실제로는 가지 않습니다)"
+                          if os.environ.get("ALIGO_TEST_MODE", "").upper() == "Y" else ""))
+        else:
+            hint = sms.error_hint((out.get("response") or {}).get("result_code"))
+            if hint:
+                click.echo("  → %s" % hint)

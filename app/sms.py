@@ -39,6 +39,24 @@ REMAIN_URL = "https://apis.aligo.in/remain/"
 SMS_BYTE_LIMIT = 90
 TIMEOUT = 10
 
+# 알리고 오류 코드 → 무엇을 해야 하는지. 로그만 보고 조치할 수 있게 적어 둔다.
+# (실제로 -101 → -103 순서로 겪었다)
+ERROR_HINTS = {
+    -101: "발송 서버 IP가 알리고에 등록되지 않았습니다. 알리고 > 설정 > IP 등록에서 서버 IP를 추가하세요.",
+    -102: "아이디 또는 API 키가 맞지 않습니다. .env의 ALIGO_USER_ID / ALIGO_API_KEY를 확인하세요.",
+    -103: "발신번호가 등록·승인되지 않았습니다. 알리고 > 발신번호 관리에서 사전등록(통신서비스 이용증명원 등)을 마쳐야 합니다.",
+    -104: "잔여 건수가 부족합니다. 알리고에서 충전하세요.",
+    -111: "수신번호 형식이 잘못되었습니다.",
+    -201: "문자 내용이 비어 있거나 형식이 잘못되었습니다.",
+}
+
+
+def error_hint(code):
+    try:
+        return ERROR_HINTS.get(int(code), "")
+    except (TypeError, ValueError):
+        return ""
+
 
 def _conf():
     return {
@@ -116,9 +134,11 @@ def send(receiver, msg, title=None):
         log.info("문자 발송 성공 to=%s type=%s msg_id=%s",
                  to[-4:].rjust(len(to), "*"), data["msg_type"], out.get("msg_id"))
     else:
-        # IP 미등록·잔액 부족 등은 여기로 온다. 접수는 이미 저장된 상태다.
-        log.error("문자 발송 거절 code=%s message=%s", out.get("result_code"),
-                  out.get("message"))
+        # IP 미등록·발신번호 미승인·잔액 부족 등이 여기로 온다.
+        # 접수는 이미 저장된 상태이므로 로그만 남기고 넘어간다.
+        hint = error_hint(out.get("result_code"))
+        log.error("문자 발송 거절 code=%s message=%s%s", out.get("result_code"),
+                  out.get("message"), (" → " + hint) if hint else "")
     return {"ok": ok, "reason": "sent" if ok else "rejected", "response": out}
 
 
@@ -144,7 +164,8 @@ def remain():
             data={"key": c["api_key"], "userid": c["user_id"]},
             timeout=TIMEOUT,
         )
-        return {"ok": True, "response": r.json()}
+        out = r.json()
+        return {"ok": True, "response": out, "hint": error_hint(out.get("result_code"))}
     except Exception as exc:
         return {"ok": False, "reason": "request_failed", "error": str(exc)}
 
