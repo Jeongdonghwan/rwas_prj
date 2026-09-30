@@ -176,17 +176,23 @@ def remain():
 # 거래관계에 따른 안내 문자다. **광고 문구를 넣지 말 것** —
 # 광고성 정보가 되면 (광고) 표기와 수신거부 안내 의무가 생긴다(정보통신망법).
 
-def applicant_message(name, firm, phone):
+def applicant_message(name, firm, phone=None):
     """신청자에게 보내는 접수 확인.
 
-    **90바이트(SMS) 안에 들어가도록 맞춰 둔 문안이다.** 3글자 이름 기준 87바이트.
-    한 줄만 더 붙여도 LMS로 넘어가 요금이 3배가 된다. 문구를 고칠 때는
-    `flask sms-check`로 바이트 수를 확인할 것(이름이 길면 자동으로 LMS로 나간다).
+    **본문에 전화번호를 넣지 않는다.** 문자는 발신번호(010-9631-6616)로 나가는데
+    본문에 다른 번호(대표번호 1644-6755)를 적으면 받는 사람이 헷갈린다.
+    번호를 빼면 회신·발신번호 통화가 그대로 발신번호로 연결된다.
+
+    **90바이트(SMS) 안에 들어가도록 맞춰 둔 문안이다.** 한 줄만 더 붙여도
+    LMS로 넘어가 요금이 3배가 된다. 문구를 고치면 `flask sms-check`로
+    바이트 수를 확인할 것(이름이 길면 자동으로 LMS로 나간다).
+
+    phone 인자는 호출부 호환을 위해 남겨두었고 본문에는 쓰지 않는다.
     """
     return (
         "[{firm}] {name}님, 상담 신청이 접수되었습니다.\n"
-        "30분 내 연락드립니다. {phone}"
-    ).format(firm=firm, name=name, phone=phone)
+        "30분 내 담당자가 연락드립니다."
+    ).format(firm=firm, name=name)
 
 
 def admin_message(name, phone, debt, area):
