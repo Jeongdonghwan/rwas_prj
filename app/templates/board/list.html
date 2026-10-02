@@ -25,7 +25,7 @@
         <p class="cat">진행 사례</p>
         <h3><a href="{{ url_for('board.case_view', slug=p.slug) }}">{{ p.title }}</a></h3>
         <p class="ex">{{ p.excerpt }}</p>
-        <p class="date">{{ p.published_at.strftime('%Y.%m.%d') }}</p>
+        <p class="date">{{ p.published_at|kst('%Y.%m.%d') }}</p>
       </div>
     </article>
     {% endfor %}

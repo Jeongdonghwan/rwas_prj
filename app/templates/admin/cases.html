@@ -28,7 +28,7 @@
           <a class="ln" href="{{ url_for('admin.case_edit', post_id=p.id) }}">{{ p.title }}</a>
           <span class="sub">/사례/{{ p.slug }}/</span>
         </td>
-        <td class="hide-sm num nowrap">{{ p.published_at.strftime('%Y-%m-%d') }}</td>
+        <td class="hide-sm num nowrap">{{ p.published_at|kst('%Y-%m-%d') }}</td>
         <td><span class="bd {{ 'on' if p.is_public else 'off' }}">{{ '공개' if p.is_public else '비공개' }}</span></td>
         <td class="hide-sm muted">{{ p.view_count or 0 }}</td>
         <td>

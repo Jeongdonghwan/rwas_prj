@@ -1,4 +1,4 @@
-from datetime import timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import quote
 
@@ -7,6 +7,31 @@ from flask_compress import Compress
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+
+# ── 시각 ────────────────────────────────────────────────────────────
+# DB에는 전부 UTC로 쌓는다(models.now_utc). 서버 로컬 시각을 섞으면 정렬과
+# 비교가 9시간씩 어긋나므로, **저장은 UTC·표시는 KST**로 분리한다.
+# 운영 서버의 타임존 설정에 기대지 않으려고 오프셋을 직접 둔다.
+KST = timezone(timedelta(hours=9))
+
+
+def to_kst(dt):
+    """naive는 UTC로 간주하고 KST로 바꾼다. 과거 데이터가 naive라서 필요하다."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(KST)
+
+
+def kst_day_start_utc(days_ago=0):
+    """한국 날짜 기준 그날 0시를 UTC naive로 돌려준다.
+
+    DB의 created_at과 직접 비교하려면 tz를 떼야 한다 — SQLite는 naive로 저장한다.
+    """
+    day = (datetime.now(KST) - timedelta(days=days_ago)).date()
+    start = datetime.combine(day, datetime.min.time(), tzinfo=KST)
+    return start.astimezone(timezone.utc).replace(tzinfo=None)
 
 
 def create_app():
@@ -77,13 +102,11 @@ def create_app():
     app.jinja_env.globals["lf_sections"] = SECTION_KEYS
     app.jinja_env.filters["josa"] = josa
 
-    # DB에는 UTC(naive 포함)로 쌓이는데 어드민은 한국 시각으로 봐야 한다.
-    def _kst(dt, fmt="%Y-%m-%d %H:%M"):
-        if not dt:
-            return "-"
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        return dt.astimezone(timezone(timedelta(hours=9))).strftime(fmt)
+    # DB에는 UTC로 쌓이니 화면에 찍을 땐 전부 이 필터를 거친다.
+    # 템플릿에서 .strftime()을 직접 부르면 9시간 이른 시각이 나온다.
+    def _kst(dt, fmt="%Y-%m-%d %H:%M", empty="-"):
+        dt = to_kst(dt)
+        return dt.strftime(fmt) if dt else empty
 
     app.jinja_env.filters["kst"] = _kst
 

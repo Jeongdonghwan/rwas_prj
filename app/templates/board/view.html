@@ -13,8 +13,8 @@
   "headline": {{ post.title | tojson }},
   "description": {{ (post.excerpt or '') | tojson }},
   "image": "{% if post.thumb_path %}{{ site.base_url }}{{ post.thumb_path }}{% else %}{{ site.base_url }}{{ url_for('static', filename='img/og.jpg') }}{% endif %}",
-  "datePublished": "{{ post.published_at.strftime('%Y-%m-%d') }}",
-  "dateModified": "{{ (post.updated_at or post.published_at).strftime('%Y-%m-%d') }}",
+  "datePublished": "{{ post.published_at|kst('%Y-%m-%d') }}",
+  "dateModified": "{{ (post.updated_at or post.published_at)|kst('%Y-%m-%d') }}",
   "author": { "@type": "Organization", "name": {{ site.firm_name | tojson }} },
   "publisher": {
     "@type": "Organization",
@@ -35,7 +35,7 @@
     <div class="post-head">
       <p class="cat">진행 사례</p>
       <h1>{{ post.title }}</h1>
-      <p class="meta"><span>{{ post.published_at.strftime('%Y.%m.%d') }}</span><span>{{ site.firm_name }}</span><span>조회 {{ post.view_count or 0 }}</span></p>
+      <p class="meta"><span>{{ post.published_at|kst('%Y.%m.%d') }}</span><span>{{ site.firm_name }}</span><span>조회 {{ post.view_count or 0 }}</span></p>
     </div>
 
     {% if post.thumb_path %}

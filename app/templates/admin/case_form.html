@@ -27,7 +27,7 @@
     </div>
     <div>
       <label>발행일</label>
-      <input type="date" name="published_at" value="{{ post.published_at.strftime('%Y-%m-%d') if post and post.published_at else '' }}">
+      <input type="date" name="published_at" value="{{ post.published_at|kst('%Y-%m-%d', '') if post else '' }}">
     </div>
   </div>
 

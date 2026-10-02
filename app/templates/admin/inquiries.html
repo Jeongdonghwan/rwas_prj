@@ -39,9 +39,9 @@
       {% for r in rows %}
       {# 읽기 모드가 기본. 편집 버튼을 눌러야 폼이 열린다 (admin.js) #}
       <tr data-row="{{ r.id }}">
-        <td class="hide-sm num nowrap">{{ r.created_at.strftime('%Y-%m-%d') }} {{ r.created_at.strftime('%H:%M') }}</td>
+        <td class="hide-sm num nowrap">{{ r.created_at|kst('%Y-%m-%d') }} {{ r.created_at|kst('%H:%M') }}</td>
         {# 좁은 화면에선 접수일시 열이 숨으므로 이름 아래에 날짜를 보여준다 #}
-        <td class="strong nowrap">{{ r.name }}<span class="sub only-sm">{{ r.created_at.strftime('%m-%d %H:%M') }}</span></td>
+        <td class="strong nowrap">{{ r.name }}<span class="sub only-sm">{{ r.created_at|kst('%m-%d %H:%M') }}</span></td>
         <td class="nowrap"><a class="tel" href="tel:{{ r.phone }}">{{ r.phone }}</a></td>
         <td class="hide-sm muted nowrap">{{ r.debt_range or '-' }}</td>
         <td class="hide-sm muted nowrap">{{ r.area_text or '-' }}</td>

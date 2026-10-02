@@ -2,7 +2,7 @@ import os
 import re
 import uuid
 import time
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timezone
 from functools import wraps
 from pathlib import Path
 
@@ -20,7 +20,7 @@ from flask import (
 )
 from PIL import Image, ImageOps
 
-from app import db
+from app import KST, db, kst_day_start_utc, to_kst
 from app.models import AdminUser, Inquiry, Keyword, Post
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -157,7 +157,9 @@ def home():
 @bp.route("/dashboard")
 @requires_auth
 def dashboard():
-    today_start = datetime.combine(date.today(), datetime.min.time())
+    # created_at은 UTC로 쌓이므로 서버 로컬 자정으로 자르면 "오늘 접수" 건수가
+    # 9시간 어긋난다. 한국 날짜의 0시를 UTC로 환산해서 비교한다.
+    today_start = kst_day_start_utc()
     stats = {
         "total": Inquiry.query.count(),
         "today": Inquiry.query.filter(Inquiry.created_at >= today_start).count(),
@@ -175,7 +177,7 @@ def dashboard():
         recent=recent,
         posts=posts,
         status_label=STATUS_LABEL,
-        today=date.today().strftime("%Y년 %m월 %d일"),
+        today=datetime.now(KST).strftime("%Y년 %m월 %d일"),
     )
 
 
@@ -234,12 +236,12 @@ def inquiries_csv():
     lines = ["접수일시,이름,연락처,채무액,지역,유입페이지,상태,메모"]
     for r in rows:
         lines.append(",".join([
-            cell(r.created_at.strftime("%Y-%m-%d %H:%M")),
+            cell(to_kst(r.created_at).strftime("%Y-%m-%d %H:%M")),
             cell(r.name), cell(r.phone), cell(r.debt_range), cell(r.area_text),
             cell(r.source_path), cell(STATUS_LABEL.get(r.status, r.status)), cell(r.memo),
         ]))
     body = "\ufeff" + "\n".join(lines)  # 엑셀 한글 대응 BOM
-    fname = "inquiries_%s.csv" % date.today().strftime("%Y%m%d")
+    fname = "inquiries_%s.csv" % datetime.now(KST).strftime("%Y%m%d")
     return Response(
         body,
         mimetype="text/csv; charset=utf-8",
@@ -292,7 +294,7 @@ def unique_slug(title, post_id=None):
 
 
 def upload_dir():
-    now = datetime.now()
+    now = datetime.now(KST)  # 업로드 폴더도 한국 날짜 기준
     rel = Path("uploads") / f"{now:%Y}" / f"{now:%m}"
     absdir = Path(current_app.static_folder) / rel
     absdir.mkdir(parents=True, exist_ok=True)
