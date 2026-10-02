@@ -1,0 +1,99 @@
+{% extends "admin/_base.html" %}
+{% block title %}계정 관리{% endblock %}
+
+{% block content %}
+<div class="phead">
+  <h1>계정 관리</h1>
+  <p>{{ me.username }}(으)로 로그인됨</p>
+</div>
+
+{% with msgs = get_flashed_messages(with_categories=true) %}
+  {% for cat, m in msgs %}<p class="{{ 'alert' if cat == 'error' else 'okmsg' }}">{{ m }}</p>{% endfor %}
+{% endwith %}
+
+{% if me.must_change %}
+<p class="alert"><b>초기 비밀번호를 쓰고 있습니다.</b>
+  다른 화면으로 가려면 먼저 비밀번호를 바꿔야 합니다. 공개된 주소라 반드시 변경해 주세요.</p>
+{% endif %}
+
+<div class="card">
+  <div class="ct"><h2>내 비밀번호 변경</h2></div>
+  <form class="form" method="post" action="{{ url_for('admin.password') }}" style="padding:22px 24px 26px">
+    {% if not me.must_change %}
+    <label style="margin-top:0">현재 비밀번호</label>
+    <input type="password" name="current" autocomplete="current-password" required>
+    {% endif %}
+    <div class="row2">
+      <div>
+        <label {% if me.must_change %}style="margin-top:0"{% endif %}>새 비밀번호 <span class="hint">8자 이상</span></label>
+        <input type="password" name="new" autocomplete="new-password" minlength="8" required>
+      </div>
+      <div>
+        <label {% if me.must_change %}style="margin-top:0"{% endif %}>새 비밀번호 확인</label>
+        <input type="password" name="again" autocomplete="new-password" minlength="8" required>
+      </div>
+    </div>
+    <div class="actions"><button class="btn" type="submit">비밀번호 변경</button></div>
+  </form>
+</div>
+
+<div class="card">
+  <div class="ct"><h2>계정 목록</h2></div>
+  <div class="tblwrap">
+  <table class="tbl">
+    <thead><tr><th>아이디</th><th>이름</th><th>상태</th><th class="hide-sm">마지막 로그인</th><th style="width:170px"></th></tr></thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td class="strong nowrap">{{ u.username }}{% if u.id == me.id %} <span class="bd contacted">나</span>{% endif %}</td>
+        <td class="muted nowrap">{{ u.name or '-' }}</td>
+        <td>
+          {% if not u.is_active %}<span class="bd off">중지</span>
+          {% elif u.must_change %}<span class="bd contacted">비번 변경 필요</span>
+          {% else %}<span class="bd on">사용 중</span>{% endif %}
+        </td>
+        <td class="hide-sm num nowrap">{{ u.last_login_at|kst }}</td>
+        <td>
+          <div class="ract">
+            {% if u.id != me.id %}
+            <form method="post" action="{{ url_for('admin.account_toggle', user_id=u.id) }}">
+              <button class="btn sm line" type="submit">{{ '중지' if u.is_active else '사용' }}</button>
+            </form>
+            <form method="post" action="{{ url_for('admin.account_delete', user_id=u.id) }}"
+                  onsubmit="return confirm('{{ u.username }} 계정을 삭제할까요? 되돌릴 수 없습니다.')">
+              <button class="btn sm danger" type="submit">삭제</button>
+            </form>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="ct"><h2>계정 추가</h2></div>
+  <form class="form" method="post" action="{{ url_for('admin.account_add') }}" style="padding:22px 24px 26px">
+    <div class="row2">
+      <div>
+        <label style="margin-top:0">아이디 <span class="hint">영문·숫자·_.- 3~50자</span></label>
+        <input type="text" name="username" pattern="[A-Za-z0-9_.\-]{3,50}" required>
+      </div>
+      <div>
+        <label style="margin-top:0">이름 <span class="hint">표시용</span></label>
+        <input type="text" name="name" maxlength="50">
+      </div>
+    </div>
+    <label>비밀번호 <span class="hint">8자 이상 · 첫 로그인 때 본인이 바꾸게 됩니다</span></label>
+    <input type="password" name="password" autocomplete="new-password" minlength="8" required>
+    <div class="actions"><button class="btn line" type="submit">계정 추가</button></div>
+  </form>
+</div>
+
+<div class="note">
+  <b>비밀번호를 잊었을 때</b> 서버에서 아래를 실행하면 임시 비밀번호로 되돌릴 수 있습니다.
+  <code>FLASK_APP=run.py flask admin-reset &lt;아이디&gt;</code>
+</div>
+{% endblock %}

@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -14,6 +15,20 @@ class Config:
     )
     SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
     JSON_AS_ASCII = False
+
+    # 어드민 세션 쿠키. Secure는 https에서만 켠다 — 로컬 http 개발에서 켜면
+    # 브라우저가 쿠키를 저장하지 않아 로그인이 무한 반복된다.
+    SESSION_COOKIE_NAME = "lei_adm"
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "") not in (
+        "",
+        "0",
+        "false",
+        "False",
+    )
+    # "로그인 상태 유지"를 켠 세션의 수명
+    PERMANENT_SESSION_LIFETIME = timedelta(days=14)
 
 
 # 사이트 기본값 (사업자등록증 기준). 이메일·도메인은 확정 시 교체.

@@ -64,6 +64,39 @@ class CaseType(db.Model):
     sort = db.Column(db.Integer, default=0)
 
 
+class AdminUser(db.Model):
+    """어드민 계정.
+
+    예전에는 HTTP Basic + 환경변수 한 쌍이었다. 로그아웃이 안 되고,
+    비밀번호를 바꾸려면 서버 .env를 고치고 재시작해야 했으며, 계정이 하나뿐이었다.
+
+    비밀번호는 **평문으로 저장하지 않는다** — werkzeug scrypt 해시만 둔다.
+    첫 기동 시 계정이 하나도 없으면 ADMIN_USER/ADMIN_PASSWORD(기본 admin/admin)로
+    하나를 만든다. 그 상태는 어드민 화면에 경고로 표시된다.
+    """
+
+    __tablename__ = "admin_user"
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(50))
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    must_change = db.Column(db.Boolean, default=False, nullable=False)
+    last_login_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=now_utc)
+
+    def set_password(self, raw):
+        from werkzeug.security import generate_password_hash
+
+        self.password_hash = generate_password_hash(raw)
+
+    def check_password(self, raw):
+        from werkzeug.security import check_password_hash
+
+        return check_password_hash(self.password_hash, raw or "")
+
+
 class Keyword(db.Model):
     """서브키워드 랜딩 페이지 (12,000행). seed/keyword.csv에서 적재.
 

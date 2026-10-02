@@ -1,3 +1,4 @@
+from datetime import timedelta, timezone
 from pathlib import Path
 from urllib.parse import quote
 
@@ -76,6 +77,16 @@ def create_app():
     app.jinja_env.globals["lf_sections"] = SECTION_KEYS
     app.jinja_env.filters["josa"] = josa
 
+    # DB에는 UTC(naive 포함)로 쌓이는데 어드민은 한국 시각으로 봐야 한다.
+    def _kst(dt, fmt="%Y-%m-%d %H:%M"):
+        if not dt:
+            return "-"
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone(timedelta(hours=9))).strftime(fmt)
+
+    app.jinja_env.filters["kst"] = _kst
+
     from app.routes.main import bp as main_bp
     from app.routes.contact import bp as contact_bp
     from app.routes.admin import bp as admin_bp
@@ -100,11 +111,13 @@ def create_app():
 
     app.register_blueprint(keyword_bp)
 
-    from app.seed import seed_command, seed_keywords_command, sms_check_command
+    from app.seed import (admin_reset_command, seed_command,
+                          seed_keywords_command, sms_check_command)
 
     app.cli.add_command(seed_command)
     app.cli.add_command(seed_keywords_command)
     app.cli.add_command(sms_check_command)
+    app.cli.add_command(admin_reset_command)
 
     with app.app_context():
         from app import models  # noqa: F401

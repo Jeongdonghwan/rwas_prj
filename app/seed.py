@@ -243,3 +243,35 @@ def sms_check_command(to):
             hint = sms.error_hint((out.get("response") or {}).get("result_code"))
             if hint:
                 click.echo("  → %s" % hint)
+
+
+@click.command("admin-reset")
+@click.argument("username")
+@click.option("--password", default=None, help="지정하지 않으면 임시 비밀번호를 만들어 출력한다")
+@with_appcontext
+def admin_reset_command(username, password):
+    """어드민 비밀번호 재설정 — 비밀번호를 잊었을 때 서버에서 쓴다.
+
+        flask admin-reset admin
+        flask admin-reset admin --password 새비밀번호
+
+    재설정하면 다음 로그인 때 본인이 다시 바꾸도록 must_change가 선다.
+    """
+    import secrets
+
+    from app.models import AdminUser
+
+    u = AdminUser.query.filter_by(username=username).first()
+    if not u:
+        names = [x.username for x in AdminUser.query.all()]
+        raise click.ClickException(
+            "'%s' 계정이 없습니다. 현재 계정: %s" % (username, ", ".join(names) or "(없음)")
+        )
+    pw = password or secrets.token_urlsafe(9)
+    u.set_password(pw)
+    u.must_change = True
+    u.is_active = True
+    db.session.commit()
+    click.echo("'%s' 비밀번호를 재설정했습니다." % username)
+    click.echo("  임시 비밀번호: %s" % pw)
+    click.echo("  로그인 후 바로 변경하게 됩니다.")

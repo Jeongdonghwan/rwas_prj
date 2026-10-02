@@ -23,10 +23,14 @@
     <a href="{{ url_for('admin.inquiries') }}" {% if nav == 'inq' %}class="on"{% endif %}>상담 접수</a>
     <a href="{{ url_for('admin.cases') }}" {% if nav == 'case' %}class="on"{% endif %}>진행 사례</a>
     <a href="{{ url_for('admin.keywords') }}" {% if nav == 'kw' %}class="on"{% endif %}>키워드 페이지</a>
+    <a href="{{ url_for('admin.account') }}" {% if nav == 'acct' %}class="on"{% endif %}>계정</a>
   </nav>
   <div class="right">
-    <span class="tag">관리자</span>
+    {% if me %}<span class="tag">{{ me.username }}</span>{% else %}<span class="tag">관리자</span>{% endif %}
     <a href="{{ url_for('main.index') }}" target="_blank" rel="noopener">사이트 보기 ↗</a>
+    <form method="post" action="{{ url_for('admin.logout') }}" style="display:inline">
+      <button class="linkbtn" type="submit">로그아웃</button>
+    </form>
   </div>
 </div></header>
 

@@ -173,7 +173,7 @@ tr.editing .ract{opacity:1}
 /* ── 폼 (글쓰기) ──────────────────────────────────────────── */
 .form label{display:block;font-size:13.5px;font-weight:700;margin:20px 0 7px}
 .form label .hint{font-weight:500;color:var(--ink-3);font-size:12.5px;margin-left:6px}
-.form input[type=text],.form input[type=date],.form input[type=file]{
+.form input[type=text],.form input[type=date],.form input[type=file],.form input[type=password]{
   width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-s);background:#fff}
 .form input:focus{outline:none;border-color:var(--wine-3);box-shadow:0 0 0 3px var(--wine-soft)}
 .form .row2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
@@ -267,3 +267,39 @@ tr.editing .ract{opacity:1}
   .stat .nm{font-size:21px}
   .stat .sub{display:none}
 }
+
+
+/* ── 로그인 화면 ────────────────────────────────────────────────── */
+.login-body{background:var(--paper);display:grid;place-items:center;min-height:100vh;padding:20px}
+.login-wrap{width:100%;max-width:400px}
+.login-card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:34px 32px 28px;box-shadow:0 10px 40px rgba(26,22,24,.08)}
+.login-logo{display:flex;align-items:center;gap:9px;margin-bottom:22px}
+.login-logo img{display:block}
+.login-logo b{font-size:15px;font-weight:800;color:#8a6a34;line-height:1.15}
+.login-logo b small{display:block;font-size:8.5px;letter-spacing:.2em;color:#b99a63;font-weight:600}
+.login-card h1{font-size:20px;font-weight:800;letter-spacing:-.025em;margin-bottom:20px}
+.login-card label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}
+.login-card input[type=text],.login-card input[type=password],.login-card input:not([type]){
+  width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-s);background:#fff}
+.login-card input:focus{outline:none;border-color:var(--wine-3);box-shadow:0 0 0 3px var(--wine-soft)}
+.login-keep{display:flex!important;align-items:center;gap:7px;font-weight:600;
+  font-size:13px;color:var(--ink-2);margin:16px 0 18px}
+.login-keep input{width:15px;height:15px;accent-color:var(--wine)}
+.btn.wide{width:100%}
+.login-err{background:var(--danger-soft);color:var(--danger);border:1px solid var(--danger-line);
+  border-radius:var(--r-s);padding:11px 14px;font-size:13.5px;margin-bottom:4px}
+.login-foot{margin-top:18px;text-align:center;font-size:13px}
+.login-foot a{color:var(--ink-3)}
+.login-foot a:hover{color:var(--ink)}
+
+/* 헤더 로그아웃 — 링크처럼 보이는 버튼 */
+.linkbtn{background:none;border:0;cursor:pointer;font-size:13.5px;color:var(--ink-3);
+  padding:7px 10px;border-radius:var(--r-s);font-family:inherit}
+.linkbtn:hover{background:var(--gray-soft);color:var(--ink)}
+
+/* 성공 메시지 */
+.okmsg{background:var(--ok-soft);color:var(--ok);border:1px solid #cfe7da;
+  border-radius:var(--r-s);padding:12px 15px;font-size:14px;margin-bottom:16px}
+.note code{background:var(--gray-soft);border-radius:5px;padding:2px 7px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
