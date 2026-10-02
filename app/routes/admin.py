@@ -23,7 +23,12 @@ from PIL import Image, ImageOps
 from app import KST, db, kst_day_start_utc, to_kst
 from app.models import AdminUser, Inquiry, Keyword, Post
 
-bp = Blueprint("admin", __name__, url_prefix="/admin")
+# 어드민 주소. `/admin`은 누구나 찍어보는 자리라 봇의 로그인 시도가 끊이지 않는다.
+# .env의 ADMIN_PATH로 바꿀 수 있다 — 바꾸면 재시작만 하면 되고 코드는 안 건드린다.
+# **주소를 숨기는 건 자물쇠가 아니라 가림막이다.** 실제 방어는 로그인·해시·시도 제한이다.
+ADMIN_PATH = "/" + (os.environ.get("ADMIN_PATH") or "leilaw").strip("/")
+
+bp = Blueprint("admin", __name__, url_prefix=ADMIN_PATH)
 
 STATUSES = ("new", "contacted", "done", "spam")
 STATUS_LABEL = {"new": "신규", "contacted": "연락함", "done": "완료", "spam": "스팸"}
@@ -71,7 +76,7 @@ def requires_auth(f):
         if not user:
             session.pop("admin_id", None)
             # full_path는 쿼리가 없어도 끝에 "?"를 붙인다 → 그대로 두면
-            # 로그인 후 "/admin/keywords?"로 돌아가 쿼리 파싱이 어색해진다.
+            # 로그인 후 "…/keywords?"로 돌아가 쿼리 파싱이 어색해진다.
             nxt = request.full_path.rstrip("?") if request.method == "GET" else None
             return redirect(url_for("admin.login", next=nxt))
         # 초기 비밀번호를 쓰는 동안에는 변경 화면 밖으로 못 나간다

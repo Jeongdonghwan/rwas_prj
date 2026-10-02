@@ -103,10 +103,13 @@ def urlset(entries):
 
 @bp.route("/robots.txt")
 def robots():
+    # 어드민 주소는 **일부러 적지 않는다.** robots.txt는 누구나 읽는 공개 파일이라
+    # Disallow에 적는 순간 "여기가 관리자 주소다"라고 알려주는 꼴이다(스캐너가
+    # 가장 먼저 보는 파일이기도 하다). 색인 차단은 어드민 페이지의
+    # `<meta name="robots" content="noindex,nofollow">`와 로그인 리다이렉트로 충분하다.
     body = "\n".join([
         "User-agent: *",
         "Allow: /",
-        "Disallow: /admin/",
         "Disallow: /inquiry",
         "Disallow: /static/uploads/tmp/",
         "Disallow: /*?utm_",
@@ -114,13 +117,11 @@ def robots():
         "# 네이버 검색로봇",
         "User-agent: Yeti",
         "Allow: /",
-        "Disallow: /admin/",
         "Disallow: /inquiry",
         "",
         "# 다음 검색로봇",
         "User-agent: Daum",
         "Allow: /",
-        "Disallow: /admin/",
         "Disallow: /inquiry",
         "",
         "Sitemap: %s/sitemap.xml" % base(),
