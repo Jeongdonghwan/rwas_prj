@@ -16,7 +16,7 @@ python run.py            # http://127.0.0.1:5000 (SQLite: instance/dev.db 자동
   Disallow에 쓰는 순간 관리자 주소를 알려주는 꼴이다. 색인 차단은 페이지의 noindex 메타가 한다.
   **세션 로그인 + DB 계정**(`AdminUser`). 계정이 하나도 없을 때만
   `ADMIN_USER`/`ADMIN_PASSWORD`(기본 admin/admin)로 최초 계정을 만들고, 기본 비밀번호면
-  `must_change`가 서서 로그인 직후 변경을 강제한다. 그 뒤 추가·중지·삭제·비번 변경은 `/admin/account`.
+  `must_change`가 서서 로그인 직후 변경을 강제한다. 그 뒤 추가·중지·삭제·비번 변경은 `/leilaw/account`.
   비밀번호 분실 시 서버에서 `FLASK_APP=run.py flask admin-reset <아이디>` → 임시 비번 출력.
   운영 .env에 `SESSION_COOKIE_SECURE=1` 필요(https 전용 쿠키).
 - 배포는 `/deploy` 스킬 사용 (Cafe24 멀티사이트 서버).
