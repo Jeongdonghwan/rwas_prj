@@ -111,6 +111,12 @@ def main():
             if any(kw.count(n) > 1 for n in SCHEMES.values()):
                 skipped += 1
                 continue
+            # 법원명을 못 박는 사이트(전국 단위)에서는 특정 법원을 지목한 키워드를
+            # 버린다. "제주특별자치도 도산 수원회생법원 접수 안내" 같은 페이지가
+            # 생기는 걸 막는다. 관할이 실제로 그 법원인 사이트는 그대로 둔다.
+            if REGION.get("court_mode") == "generic" and "회생법원" in kw:
+                skipped += 1
+                continue
             if region:
                 kw = "%s %s" % (region, kw)
             slug = slugify(kw)
