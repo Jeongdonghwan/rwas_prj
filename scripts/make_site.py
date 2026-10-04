@@ -100,8 +100,11 @@ def write_seeds(dst, gu_rows, dong_rows):
             "variant_set": "ABC"[i % 3],
             "sort": i,
         })
+    # 도산레이는 지역 축이 시도 1단이라 동이 없다 — 헤더만 있는 CSV를 쓴다
+    fields = ["gu_slug", "slug", "name", "name_legal", "transit_note",
+              "feature_note", "adjacent_slugs", "variant_set", "sort"]
     with open(seed / "dong.csv", "w", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
         w.writerows(rows)
     return len(gu_rows), len(rows)

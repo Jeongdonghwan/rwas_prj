@@ -73,6 +73,7 @@ SITE_DEFAULTS = {
     # 관할 법원 — 지역에 따라 달라진다
     "court": REGION["court"],
     "court_mode": REGION["court_mode"],
+    "area_mode": REGION["area_mode"],
     "court_long": REGION["court_long"],
     "court_district": REGION["court_district"],
     # ── 사무소 위치 — 지역 사이트가 몇 개든 사무소는 광교 한 곳이다 ──

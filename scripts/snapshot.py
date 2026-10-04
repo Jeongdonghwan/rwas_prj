@@ -77,10 +77,15 @@ def build(out_path, sample=SAMPLE):
             continue
         body = r.get_data()
         full = hashlib.blake2b(body, digest_size=16).hexdigest()
-        core = full
+        # HTML은 공백을 접어서 비교한다. 템플릿에 {% if %}를 넣으면 빈 줄이
+        # 생기는데 그것까지 FAIL로 잡으면 게이트가 매번 울려 쓸모가 없어진다.
+        # 글자가 바뀌면 여전히 잡힌다.
+        core = hashlib.blake2b(
+            b" ".join(body.split()), digest_size=16
+        ).hexdigest()
         if p.endswith(".xml"):
             core = hashlib.blake2b(
-                TIME_FIELDS.sub(b"", body), digest_size=16
+                b" ".join(TIME_FIELDS.sub(b"", body).split()), digest_size=16
             ).hexdigest()
         shots[p] = [full, core]
 

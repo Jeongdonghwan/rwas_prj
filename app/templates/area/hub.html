@@ -17,9 +17,13 @@
   {% for gu in gus %}
   <div style="margin-bottom:48px">
     <h2 style="padding-bottom:12px;border-bottom:2px solid var(--navy);margin-bottom:16px"><a href="{{ url_for('ko.page', name=gu.name) }}">{{ gu.name }} 개인회생 안내</a></h2>
+    {% if gu.dongs %}
     <div class="linklist">
       {% for dong in gu.dongs %}<a href="{{ url_for('ko.page', name=dong.name) }}">{{ dong.name }} 개인회생</a>{% endfor %}
     </div>
+    {% else %}
+    <p style="color:var(--ink-2)">{{ gu.court_note }}</p>
+    {% endif %}
   </div>
   {% endfor %}
 

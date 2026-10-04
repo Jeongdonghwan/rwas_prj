@@ -26,7 +26,11 @@ for _s in (sys.stdout, sys.stderr):
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app import create_app  # noqa: E402
+from app import create_app
+from app.config import REGION
+
+# 핵심 키워드는 지역마다 다르다 — 하드코딩하면 다른 지역 사이트에서 전부 FAIL
+CORE_KW = REGION["name"] + "개인회생"  # noqa: E402
 from app.models import CaseType, Dong, Gu, Job, Post  # noqa: E402
 
 TITLE_MAX = 60
@@ -126,7 +130,7 @@ def main():
         no_alt = [i for i in imgs if "alt=" not in i]
         if no_alt:
             errors.append("%s: alt 없는 img %d개" % (label, len(no_alt)))
-        if "수원개인회생" not in title and "수원개인회생" not in desc:
+        if CORE_KW not in title and CORE_KW not in desc:
             errors.append("%s: 핵심 키워드 없음" % label)
         if len(body.replace(" ", "")) < BODY_MIN:
             warns.append("%s: 본문 %d자(권장 %d 이상)"
