@@ -62,11 +62,12 @@ def write_region(dst, region):
         "",
         "REGION = {",
     ]
-    for key in ("name", "name_full", "nearby", "area_served", "area_served_text",
-                "brand", "brand_seo", "keywords", "base_url",
-                "court_mode", "court", "area_mode",
-                "kw_schemes", "kw_prefix"):
-        lines.append("    %r: %r," % (key, region[key]))
+    # 키를 손으로 나열하면 REGION에 필드를 더할 때마다 여기가 빠져 KeyError가 난다.
+    # 데이터에 있는 것을 그대로 내보낸다(env로 덮는 두 개만 따로).
+    for key, val in region.items():
+        if key in ("site_salt", "site_offset"):
+            continue
+        lines.append("    %r: %r," % (key, val))
     lines += [
         "",
         "    # 사이트 구분자 — 같은 문장 풀을 쓰는 다른 지역 사이트와 겹치지 않게 한다.",
@@ -114,6 +115,12 @@ def main():
     args = ap.parse_args()
 
     mod = importlib.import_module("scripts.site_data.%s" % args.site)
+
+    # 원본(수원)이 가진 키가 빠지면 복사본이 KeyError로 죽는다 — 여기서 먼저 잡는다
+    from app.region import REGION as BASE
+    missing = sorted(set(BASE) - set(mod.REGION))
+    if missing:
+        sys.exit("site_data/%s.py에 빠진 키: %s" % (args.site, ", ".join(missing)))
     dst = Path(args.out) if args.out else ROOT.parent / ("%s_prj" % args.site)
 
     if dst.exists():

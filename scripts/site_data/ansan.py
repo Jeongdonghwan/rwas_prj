@@ -17,6 +17,7 @@ REGION = {
     "nearby": "시흥·군포·화성 등 경기 서남부",
     "area_served": ["안산시 상록구", "안산시 단원구"],
     "area_served_text": "안산·시흥·화성 등 경기 남부",
+    "area_long": "안산·시흥·수원·화성·군포 등 경기 남부",
 
     "brand": "안산개인회생파산 법률사무소 레이",
     "brand_seo": "안산개인회생 법률사무소 레이",
@@ -27,8 +28,11 @@ REGION = {
     ),
     "base_url": "https://ansanlei.com",
 
+    # 안산도 수원회생법원 관할이다(안산지원은 일반 민형사만 담당)
     "court_mode": "named",
     "court": "수원회생법원",
+    "court_long": "수원회생법원(수원지방법원 회생 전담)",
+    "court_district": "수원지방법원",
     "area_mode": "gu_dong",
 
     "kw_schemes": ["rehab", "bankruptcy", "credit", "workout", "adjust"],
