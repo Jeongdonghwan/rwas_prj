@@ -48,6 +48,11 @@ def pick(seed, key, options):
 
 
 def get_block(block_key, seed):
+    """seed/content_blocks/*.html 중 하나를 골라 돌려준다.
+
+    **render_tpl을 거쳐야 한다.** 블록 안에 지역 변수({{ court }} 등)를 넣자
+    치환되지 않고 화면에 그대로 찍혔다.
+    """
     rows = (
         ContentBlock.query.filter_by(block_key=block_key)
         .order_by(ContentBlock.variant)
@@ -55,7 +60,12 @@ def get_block(block_key, seed):
     )
     if not rows:
         return ""
-    return pick(seed, block_key, rows).body_html
+    html = pick(seed, block_key, rows).body_html
+    out = render_tpl(html)
+    # jinja from_string이 끝 개행을 먹어 원본과 바이트가 어긋난다
+    if html.endswith("\n") and not out.endswith("\n"):
+        out += "\n"
+    return out
 
 
 # 받침 유무로 갈리는 조사 쌍 — (받침 있음, 받침 없음)
