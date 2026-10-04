@@ -70,14 +70,23 @@ REGION = {
     # 지역 축 — "gu_dong"은 구→동 2단, "sido"는 전국 17개 시도 1단(도산레이)
     "area_mode": "gu_dong",
 
-    # 키워드 지역 접두사. 문자열 하나면 단일 지역, 리스트면 시도별로 다 만든다.
+    # 키워드로 펼칠 제도. 첫 번째가 대표 제도이고, 지역 접두 세트는 거기에만 붙는다.
+    # 도산레이는 ["dosan"] 하나만 쓴다.
+    "kw_schemes": ["rehab", "bankruptcy", "credit", "workout", "adjust"],
+    # 키워드 지역 접두사. 문자열 하나면 단일 지역,
+    # 리스트면 그 수만큼 세트가 더 생긴다(도산레이는 17개 시도).
     "kw_prefix": "수원",
 
     # 사이트 구분자 — multi-site-plan.md §3.
     # 같은 키워드라도 사이트마다 다른 섹션 조합·FAQ·문장이 나오게 하는 값이다.
     # **수원은 0/"" 고정** — 이미 색인된 사이트라 출력이 바뀌면 안 된다.
-    "site_salt": "",
-    "site_offset": 0,
+    #
+    # 환경변수로 덮어쓸 수 있는 이유는 scripts/cross_site_qa.py 때문이다.
+    # 그 도구는 같은 코드를 서로 다른 값으로 두 번 돌려 사이트 간 유사도를 잰다
+    # (REGION은 import 시점에 한 번 읽히므로 한 프로세스 안에서는 못 바꾼다).
+    # .env에 넣지 않는 한 기본값 그대로다.
+    "site_salt": os.environ.get("SITE_SALT", ""),
+    "site_offset": int(os.environ.get("SITE_OFFSET") or 0),
 }
 
 # 사이트 기본값 (사업자등록증 기준). 이메일·도메인은 확정 시 교체.

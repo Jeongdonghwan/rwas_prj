@@ -194,8 +194,18 @@ def applicant_message(name, firm=None, phone=None):
 
 
 def admin_message(name, phone, debt, area):
-    """사무소에 보내는 새 접수 알림."""
-    parts = ["[상담 접수] %s %s" % (name, phone)]
+    """사무소에 보내는 새 접수 알림.
+
+    지역 사이트가 여러 개이고 **알림 번호는 하나라서**, 머리말에 사이트를
+    적지 않으면 어느 사이트에서 온 문의인지 구분할 수 없다(multi-site-plan.md).
+    머리말은 "[수원 상담 접수]"처럼 지역명을 앞에 붙인다 — SMS 90바이트
+    안에 들어가도록 지역명만 쓰고 브랜드 전체는 넣지 않는다.
+    """
+    from app.config import REGION
+
+    region = REGION.get("name") or ""
+    head = "[%s 상담 접수]" % region if region else "[상담 접수]"
+    parts = ["%s %s %s" % (head, name, phone)]
     if debt:
         parts.append("채무 %s" % debt)
     if area:

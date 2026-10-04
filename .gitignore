@@ -5,3 +5,5 @@ instance/
 app/static/uploads/
 .venv/
 venv/
+
+.qa_tmp/

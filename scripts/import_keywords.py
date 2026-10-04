@@ -33,6 +33,7 @@ for _s in (sys.stdout, sys.stderr):
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from app.config import REGION  # noqa: E402
 from app.keyword_rules import (  # noqa: E402
     SCHEMES, correction_terms, needs_correction, to_scheme,
 )
@@ -41,15 +42,32 @@ DEFAULT_XLSX = (Path.home() / "Documents" / "카카오톡 받은 파일"
                 / "개인회생_서브키워드_2000개.xlsx")
 OUT = ROOT / "seed" / "keyword.csv"
 
-# (제도, 지역) 조합 — 지역은 개인회생에만 붙인다(사용자 결정)
-COMBOS = [
-    ("rehab", ""),
-    ("rehab", "수원"),
-    ("bankruptcy", ""),
-    ("credit", ""),
-    ("workout", ""),
-    ("adjust", ""),
-]
+
+def build_combos(cfg=REGION):
+    """(제도, 지역) 조합을 지역 설정에서 만든다.
+
+    지역 접두 세트는 **대표 제도(첫 번째)에만** 붙인다. 제도마다 다 붙이면
+    "수원 개인파산 …"처럼 검색량이 거의 없는 조합이 수천 개 생긴다.
+
+    수원  : 제도 5개 + 접두 1개  = 6세트 ≈ 12,000행
+    도산  : 제도 1개 + 접두 17개 = 18세트 ≈ 36,000행
+
+    순서는 접두 세트를 대표 제도 바로 뒤에 둔다 — 슬러그가 겹칠 때 먼저 온
+    쪽이 이기므로, 순서를 바꾸면 기존 keyword.csv와 결과가 달라진다.
+    """
+    schemes = list(cfg.get("kw_schemes") or ["rehab"])
+    prefixes = cfg.get("kw_prefix") or ""
+    if isinstance(prefixes, str):
+        prefixes = [prefixes] if prefixes else []
+    combos = []
+    for i, s in enumerate(schemes):
+        combos.append((s, ""))
+        if i == 0:
+            combos += [(s, p) for p in prefixes]
+    return combos
+
+
+COMBOS = build_combos()
 
 
 def slugify(text):
