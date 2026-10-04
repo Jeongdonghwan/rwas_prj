@@ -196,6 +196,57 @@ xlsx나 치환 규칙이 바뀌면 **두 단계를 다 다시 돌려야 한다.*
   운영에서 `keyword` 테이블을 드롭하고 다시 시드해야 한다(로컬에서 `variant_idx` 추가 때 겪음).
 - 11,952행 적재는 청크 bulk insert라 수 초면 끝난다.
 
+### 지역 사이트 5개 (2026-10-04)
+전체 계획은 **[multi-site-plan.md](multi-site-plan.md)**. 구조를 건드리기 전에 읽을 것.
+
+| 사이트 | 폴더 | salt / offset | 지역 축 | 키워드 |
+|---|---|---|---|---|
+| 수원(원본) | `raws_prj` | `""` / 0 | 구 4 · 동 31 | 11,952 |
+| 안산 | `../ansan_prj` | `ansan` / 31 | 구 2 · 동 16 | 11,952 |
+| 용인 | `../yongin_prj` | `yongin` / 53 | 구 3 · 동 30 | 11,952 |
+| 성남 | `../seongnam_prj` | `seongnam` / 71 | 구 3 · 동 30 | 11,952 |
+| 도산 | `../dosan_prj` | `dosan` / 89 | **시도 17** | 35,784 |
+
+**지역마다 다른 것은 `app/region.py`와 `seed/gu.csv`·`dong.csv`·`keyword.csv` 뿐이다.**
+나머지 코드는 전부 같다. 새로 만들거나 다시 만들 때:
+
+```bash
+python scripts/make_site.py ansan --force     # ../ansan_prj 생성
+cd ../ansan_prj && python scripts/import_keywords.py
+FLASK_APP=run.py flask seed && FLASK_APP=run.py flask seed-keywords
+```
+
+**꼭 알아야 할 것**
+
+1. **수원 출력은 바뀌면 안 된다**(이미 색인됨). `scripts/snapshot.py`로 전후를 찍어
+   비교할 것. HTML 공백과 사이트맵 `lastmod`는 무시하고 본문만 본다.
+   `git stash`로 기준을 뜨면 **DB에는 새 시드가 남아 있어 비교가 틀어진다** — 기준 커밋의
+   `app/`·`seed/`를 같이 체크아웃하고 `flask seed`를 다시 돌릴 것.
+2. **같은 문장 풀 34만 자를 5개 사이트가 공유한다.** 글을 새로 쓰는 대신 `site_offset`으로
+   섹션 조합을, `site_salt`로 문장·FAQ 선택을 어긋낸다. `VECTORS`가 서로 최소 3자리 다른
+   코드라 6개 섹션 중 3개 이상이 달라진다. 실측 사이트 간 유사도 평균 0.47~0.52 / 최대 0.70.
+   **`scripts/cross_site_qa.py`로 재고 기준(평균 0.60 / 최대 0.75)을 넘기지 말 것.**
+3. **`SCHEMES`에 제도를 끼울 때는 반드시 맨 뒤에.** `SCHEME_OFFSET`이 `enumerate` 순번이라
+   중간에 넣으면 기존 제도 오프셋이 전부 밀려 색인된 수원 페이지의 섹션 조합이 바뀐다.
+4. **구 개수가 문장 풀 변형 수(4)를 넘으면 `lf_rank`를 넘기지 않는다**(`routes/ko.py`).
+   도산레이가 시도 17개인데 그대로 넘겼더니 시도 페이지가 서로 93% 같아졌다. 지금은 해시로 돌려 64%.
+5. **문장 풀에도 지역명이 박혀 있었다.** 템플릿만 고치면 안 된다 — `variants.py`,
+   `variants_longform.py`, `keyword_sections/`, `seed/faq.csv`, `seed/content_blocks/`까지
+   `{{ region }}` `{{ court }}` `{{ court_long }}` `{{ court_district }}` `{{ area_long }}`로 바꿨다
+   (jinja 전역 등록은 `app/__init__.py`). **`scripts/region_leak.py`로 확인할 것.**
+   `get_block`도 `render_tpl`을 거친다 — 예전엔 raw HTML을 그대로 돌려줬다.
+6. **사무소 위치와 관할 법원은 다른 값이다.** 사무소는 어느 사이트든 광교 한 곳이라
+   `site.office_court`(항상 수원회생법원)이고, 관할은 `site.court`다. 섞으면 전국 사이트에서
+   "주소지 관할 법원 앞"이라는 말이 안 되는 문장이 나온다.
+
+**도산레이만 다른 점** — `area_mode="sido"`(구·동 2단이 아니라 시도 1단, 동 없음),
+`court_mode="generic"`(서울·부산·그 외로 관할이 갈려 법원명을 못 박는다. "사무소가 법원
+인근이라 빠르다"는 문장도 빠진다 — 광교는 서울·부산 법원 근처가 아니다),
+제도는 `dosan` 하나, 접두사는 시도 17개 + 접두 없음 = 18세트.
+`core_kw="도산"`(seo_qa용 — "도산개인회생"은 쓰이지 않는 조합).
+
+**배포**: 사이트마다 도메인·포트·DB·`.env`·systemd 유닛이 따로 필요하다. 아직 안 했다.
+
 ### 대표변호사 사진 보정·카드 재디자인 (2026-09-30)
 - **사진 보정은 `scripts/build_lawyer_photo.py`로 한다.** 원본(Downloads/CSY_5372/CSY_5372.JPG)에서
   다시 만들므로 화질 손실이 없다. 값을 바꾸고 다시 돌리면 3종(card/900/480)이 한 번에 갱신된다.
