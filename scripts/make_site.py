@@ -129,9 +129,18 @@ def main():
     if dst.exists():
         if not args.force:
             sys.exit("이미 있습니다: %s  (--force로 덮어쓰기)" % dst)
-        shutil.rmtree(dst)
+        # .git은 남긴다 — 생성한 프로젝트도 저장소라 통째로 지우면 이력이 날아간다.
+        # (복사 대상에서 .git을 빼 두었으므로 그대로 둬도 덮어쓰이지 않는다.)
+        for child in dst.iterdir():
+            if child.name == ".git":
+                continue
+            shutil.rmtree(child) if child.is_dir() else child.unlink()
+        dst.rmdir() if not any(dst.iterdir()) else None
 
-    shutil.copytree(ROOT, dst, ignore=_ignore)
+    if dst.exists():                       # .git만 남은 경우 — 그 위에 덮어쓴다
+        shutil.copytree(ROOT, dst, ignore=_ignore, dirs_exist_ok=True)
+    else:
+        shutil.copytree(ROOT, dst, ignore=_ignore)
     write_region(dst, mod.REGION)
     n_gu, n_dong = write_seeds(dst, mod.GU, mod.DONG)
 

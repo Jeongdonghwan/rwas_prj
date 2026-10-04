@@ -41,7 +41,8 @@ A~D단계 끝. 네 사이트 모두 생성·시드·QA 통과했다. **배포(E�
 
 1. 도메인 — `ansanlei.com` / `yonginlei.com` / `seongnamlei.com` / `dosanlei.com`
    (`app/region.py`의 `base_url` 기본값. 실제 도메인이 정해지면 교체)
-2. 포트 — 수원이 8038. 겹치지 않게 배정
+2. 포트 — **확정**: 수원 8038 / 안산 8040 / 용인 8041 / 성남 8042 / 도산 8043
+   (`app/region.py`의 `port`. 한 서버에 다 올라가므로 겹치면 안 된다)
 3. MariaDB 데이터베이스 생성 + `.env`의 `DATABASE_URL`
 4. `.env` — `SECRET_KEY`, `SESSION_COOKIE_SECURE=1`, `ADMIN_*`, `ALIGO_*`
 5. systemd 유닛 + nginx 서버 블록
