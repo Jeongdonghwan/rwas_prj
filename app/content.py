@@ -11,8 +11,14 @@ import hashlib
 from flask import current_app
 from jinja2 import Environment
 
+from app.config import REGION
 from app.models import ContentBlock, Faq
 from app.variants import POOLS
+
+# 사이트 소금 — multi-site-plan.md §3.
+# 지역 사이트들이 같은 문장 풀을 공유하므로, 해시 입력에 소금을 섞어
+# 사이트마다 다른 후보가 뽑히게 한다. **수원은 빈 문자열이라 기존과 동일하다.**
+SITE_SALT = REGION.get("site_salt", "")
 
 
 def stable_hash(s):
@@ -29,11 +35,16 @@ def stable_hash(s):
     )
 
 
+def _h(s):
+    """사이트 소금을 섞은 해시. 소금이 비면 stable_hash와 완전히 같다."""
+    return stable_hash(f"{SITE_SALT}::{s}" if SITE_SALT else s)
+
+
 def pick(seed, key, options):
     """seed+key 해시로 options에서 하나 선택 (결정적)."""
     if not options:
         return None
-    return options[stable_hash(f"{seed}::{key}") % len(options)]
+    return options[_h(f"{seed}::{key}") % len(options)]
 
 
 def get_block(block_key, seed):
@@ -103,7 +114,7 @@ def vtext(seed, key, rank=None, **vars):
     pool = POOLS.get(key, [])
     if not pool:
         return ""
-    t = pool[(stable_hash(key) + rank) % len(pool)] if rank is not None \
+    t = pool[(_h(key) + rank) % len(pool)] if rank is not None \
         else pick(seed, key, pool)
     return render_tpl(t, **vars)
 
@@ -113,7 +124,7 @@ def vlist(seed, key, count, **vars):
     pool = POOLS.get(key, [])
     if not pool:
         return []
-    ordered = sorted(pool, key=lambda t: stable_hash(f"{seed}::{key}::{t[:24]}"))
+    ordered = sorted(pool, key=lambda t: _h(f"{seed}::{key}::{t[:24]}"))
     return [render_tpl(t, **vars) for t in ordered[:count]]
 
 
@@ -125,7 +136,7 @@ def pick_faqs(scope, seed, count, kind="qa", **vars):
     pool = Faq.query.filter_by(scope=scope, kind=kind).order_by(Faq.sort).all()
     if not pool:
         return []
-    ordered = sorted(pool, key=lambda f: stable_hash(f"{seed}::{kind}::{f.id}"))
+    ordered = sorted(pool, key=lambda f: _h(f"{seed}::{kind}::{f.id}"))
     return [
         {
             "q": render_tpl(f.question_tpl, **vars),

@@ -31,10 +31,52 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(days=14)
 
 
+# ── 지역 설정 ───────────────────────────────────────────────────────
+# **다른 지역 사이트를 만들 때 바꾸는 곳은 여기와 seed/gu.csv·dong.csv뿐이다.**
+# 안산·용인·성남·도산 프로젝트는 이 저장소를 복사한 뒤 이 블록만 교체한다.
+# 전체 계획은 multi-site-plan.md.
+REGION = {
+    # 지역명 — 브랜드·타이틀·키워드·본문 전반에 들어간다
+    "name": "수원",
+
+    "brand": "수원개인회생파산 법률사무소 레이",
+    # 서브페이지 타이틀 접미사. 60자 상한이 있어 brand보다 짧게 유지할 것
+    "brand_seo": "수원개인회생 법률사무소 레이",
+    "keywords": (
+        "수원개인회생, 수원개인회생파산, 수원 개인회생, 수원 개인파산, "
+        "수원개인회생 변호사, 수원회생법원, 개인회생 신청자격, 개인회생 비용, "
+        "채무조정, 법률사무소 레이"
+    ),
+    "base_url": "https://suwonlei.com",
+
+    # 관할 법원 표기 방식
+    #   "named"   — 법원 이름을 그대로 쓴다. 사무소가 법원 인근이라는 문장도 쓴다.
+    #               수원·안산·용인·성남은 전부 수원회생법원 관할이고 광교 사무소가
+    #               실제로 그 법원 근처라 네 사이트 모두 이 모드다.
+    #   "generic" — 법원명 없이 "주소지 관할 법원"으로 쓰고, **법원 인근이라는
+    #               문장은 아예 뺀다.** 전국 단위(도산레이)용 — 광교 사무소는
+    #               서울·부산 법원 근처가 아니라서 그 문장이 허위가 된다.
+    "court_mode": "named",
+    "court": "수원회생법원",
+
+    # 지역 축 — "gu_dong"은 구→동 2단, "sido"는 전국 17개 시도 1단(도산레이)
+    "area_mode": "gu_dong",
+
+    # 키워드 지역 접두사. 문자열 하나면 단일 지역, 리스트면 시도별로 다 만든다.
+    "kw_prefix": "수원",
+
+    # 사이트 구분자 — multi-site-plan.md §3.
+    # 같은 키워드라도 사이트마다 다른 섹션 조합·FAQ·문장이 나오게 하는 값이다.
+    # **수원은 0/"" 고정** — 이미 색인된 사이트라 출력이 바뀌면 안 된다.
+    "site_salt": "",
+    "site_offset": 0,
+}
+
 # 사이트 기본값 (사업자등록증 기준). 이메일·도메인은 확정 시 교체.
+# 주소·전화·사업자번호는 **모든 지역 사이트가 공유한다**(사무소는 광교 한 곳).
 SITE_DEFAULTS = {
     "firm_name": "법률사무소 레이",
-    "brand": "수원개인회생파산 법률사무소 레이",
+    "brand": REGION["brand"],
     "brand_en": "LEI LAW OFFICE",
     "phone": "1644-6755",
     "phone_link": "16446755",
@@ -48,7 +90,7 @@ SITE_DEFAULTS = {
     "hours": "24시간 상담, 주말 예약제",
     "map_embed": "",
     # 도메인 (non-www, https). .env의 SITE_URL로 덮어쓸 수 있음
-    "base_url": os.environ.get("SITE_URL", "https://suwonlei.com").rstrip("/"),
+    "base_url": os.environ.get("SITE_URL", REGION["base_url"]).rstrip("/"),
     # 검색엔진 소유확인 메타값 (공개값이라 기본값으로 둠)
     "naver_site_verification": os.environ.get(
         "NAVER_SITE_VERIFICATION", "fc590fc0d8e14f3f16b0104f7193ebdf22d7554a"
@@ -57,13 +99,13 @@ SITE_DEFAULTS = {
         "GOOGLE_SITE_VERIFICATION", "WFdQhnriDQxtjgd2f72pkYIKvwzARsIzBX05OQKucgM"
     ),
     # 검색 노출용 짧은 브랜드 (서브페이지 타이틀 접미사)
-    "brand_seo": "수원개인회생 법률사무소 레이",
+    "brand_seo": REGION["brand_seo"],
     # 전 페이지 공통 키워드 (페이지별 키워드는 meta_keywords 블록으로 추가)
-    "keywords": (
-        "수원개인회생, 수원개인회생파산, 수원 개인회생, 수원 개인파산, "
-        "수원개인회생 변호사, 수원회생법원, 개인회생 신청자격, 개인회생 비용, "
-        "채무조정, 법률사무소 레이"
-    ),
+    "keywords": REGION["keywords"],
+    # 템플릿에서 지역명을 쓸 때 — 하드코딩 대신 {{ site.region }}
+    "region": REGION["name"],
+    "court": REGION["court"],
+    "court_mode": REGION["court_mode"],
 }
 
 # 대표변호사 약력 (about·메인 소개 섹션에서 사용)

@@ -17,6 +17,7 @@
 
 from itertools import combinations
 
+from app.config import REGION
 from app.content import pick, render_tpl, stable_hash
 from app.keyword_rules import SCHEMES, correction_terms
 from app.keyword_sections import SECTIONS
@@ -30,6 +31,29 @@ FALLBACK_CATEGORY = "상황형"
 # 제도가 다르면 반드시 다른 벡터가 배정되게 한다.
 SCHEME_OFFSET = {code: i * 19 for i, code in enumerate(SCHEMES)}
 REGION_OFFSET = 7
+
+# 사이트 오프셋 — multi-site-plan.md §3.
+# 지역 사이트들은 같은 문장 풀을 공유한다. 오프셋이 다르면 다른 벡터가 뽑히고,
+# VECTORS는 서로 최소 3자리가 다른 코드라 **6개 섹션 중 최소 3개가 달라진다.**
+# 수원은 0이라 기존 출력이 그대로 나온다.
+SITE_OFFSET = REGION.get("site_offset", 0)
+SITE_SALT = REGION.get("site_salt", "")
+
+
+def _region_offset(region):
+    """지역 축이 몇 갈래냐에 따라 오프셋을 다르게 준다.
+
+    수원형(gu_dong)은 지역 접두사가 붙었다/아니다 둘뿐이라 상수 하나면 됐다.
+    **도산레이는 지역 축이 17개 시도라 상수를 쓰면 17개가 전부 같은 오프셋을
+    받는다** — "서울특별시 개인회생 자격"과 "경기도 개인회생 자격"이 같은 섹션
+    조합을 쓰게 된다. 게다가 그 사이트는 제도가 하나라 SCHEME_OFFSET이 전부 0이라
+    분산을 지역 축이 혼자 떠맡는다. 그래서 시도마다 다른 값을 준다.
+    """
+    if not region:
+        return 0
+    if REGION.get("area_mode") == "sido":
+        return REGION_OFFSET * (1 + stable_hash("sido::%s" % region) % 13)
+    return REGION_OFFSET
 
 # FAQ 풀에서 실제로 보여줄 개수. 풀(5개)을 다 쓰면 같은 분류가 전부 같은 FAQ를
 # 갖게 되므로 부분집합을 쓴다. C(5,3)=10가지 조합이 순번으로 배정된다.
@@ -57,7 +81,9 @@ def build(kw):
     """Keyword 행 하나를 렌더링에 필요한 dict로 만든다."""
     facts = SCHEME_FACTS[kw.scheme]
     v = tpl_vars(kw)
-    seed = kw.slug_ko
+    # 시드에 사이트 소금을 섞는다 — stable_hash 기반 선택(문장 풀·FAQ 순서)이
+    # 사이트마다 달라진다. 수원은 소금이 ""이라 기존 시드 그대로다.
+    seed = (SITE_SALT + "::" + kw.slug_ko) if SITE_SALT else kw.slug_ko
     cat = _cat(kw.category)
 
     # 섹션 조합은 해시가 아니라 배정 코드로 고른다. 해시로 독립 선택하면
@@ -67,7 +93,9 @@ def build(kw):
     # 페이지는 순번이 같다. 그대로 쓰면 제도만 다른 5페이지가 같은 섹션을 쓴다
     # (실측: 제도 간 유사도 73%까지 올라갔다). 그래서 제도·지역만큼 벡터를 어긋낸다.
     # 오프셋은 그룹 전체에 똑같이 적용되므로 그룹 내 거리는 그대로 유지된다.
-    offset = SCHEME_OFFSET.get(kw.scheme, 0) + (REGION_OFFSET if kw.region else 0)
+    offset = (SCHEME_OFFSET.get(kw.scheme, 0)
+              + _region_offset(kw.region)
+              + SITE_OFFSET)
     vec = VECTORS[((kw.variant_idx or 0) + offset) % len(VECTORS)]
     sections = []
     for i, sec in enumerate(cat["sections"]):
