@@ -8,6 +8,10 @@
 from flask import Blueprint, abort, render_template
 
 from app.content import get_block, pick_faqs
+from app.variants import POOLS
+
+# 가장 작은 문장 풀의 크기. 구 개수가 이보다 많으면 rank 배분이 무의미해진다.
+VARIANT_COUNT = min(len(v) for v in POOLS.values())
 from app.models import CaseType, Dong, Gu, Job
 
 bp = Blueprint("ko", __name__)
@@ -62,9 +66,15 @@ def page(name):
 
 def _render_gu(gu):
     faqs = pick_faqs("gu", gu.name, 3, gu=gu.name)
-    # 구는 4개뿐이라 해시로는 섹션이 우연히 겹친다 → 순번으로 라틴 방진 배분
+    # 구가 몇 개 안 되면 해시로는 섹션이 우연히 겹친다 → 순번으로 라틴 방진 배분.
+    #
+    # **개수가 변형 수를 넘으면 rank를 쓰면 안 된다.** rank가 같은 페이지끼리
+    # 전부 같은 문장을 쓰게 된다. 도산레이는 시도가 17개인데 변형이 4종이라
+    # 그대로 넘겼더니 시도 페이지가 서로 93% 같아졌다(실측). 그 경우 해시로 돌린다.
     order = [g.id for g in Gu.query.order_by(Gu.sort).all()]
     rank = order.index(gu.id) if gu.id in order else 0
+    if len(order) > VARIANT_COUNT:
+        rank = None
     return render_template(
         "area/gu.html",
         gu=gu,

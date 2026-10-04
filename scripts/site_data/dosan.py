@@ -18,6 +18,8 @@
 REGION = {
     "name": "도산",
     "name_full": "전국",
+    # "도산개인회생"은 쓰이지 않는 조합이라 핵심 키워드를 따로 둔다(seo_qa)
+    "core_kw": "도산",
     "nearby": "전국 어디서나 비대면 상담",
     "area_served": ["대한민국 전역"],
     "area_served_text": "전국",

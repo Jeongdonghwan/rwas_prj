@@ -30,7 +30,9 @@ from app import create_app
 from app.config import REGION
 
 # 핵심 키워드는 지역마다 다르다 — 하드코딩하면 다른 지역 사이트에서 전부 FAIL
-CORE_KW = REGION["name"] + "개인회생"  # noqa: E402
+# 핵심 키워드는 지역마다 다르다. 도산레이처럼 "도산개인회생"이 실제로 안 쓰이는
+# 조합이면 REGION["core_kw"]로 따로 지정한다.
+CORE_KW = REGION.get("core_kw") or REGION["name"] + "개인회생"  # noqa: E402
 from app.models import CaseType, Dong, Gu, Job, Post  # noqa: E402
 
 TITLE_MAX = 60
