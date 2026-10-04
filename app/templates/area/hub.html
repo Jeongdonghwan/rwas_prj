@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% block title %}수원 지역별 개인회생 안내 | 수원개인회생 법률사무소 레이{% endblock %}
-{% block meta_keywords %}수원개인회생 지역, 장안구 개인회생, 권선구 개인회생, 팔달구 개인회생, 영통구 개인회생, {{ site.keywords }}{% endblock %}
-{% block meta_desc %}수원개인회생 지역별 안내. 장안구·권선구·팔달구·영통구 31개 동별로 관할 법원, 오시는 길, 자주 묻는 질문을 정리했습니다.{% endblock %}
+{% block title %}{{ site.region }} 지역별 개인회생 안내 | {{ site.brand_seo }}{% endblock %}
+{% block meta_keywords %}{{ site.region }}개인회생 지역, 장안구 개인회생, 권선구 개인회생, 팔달구 개인회생, 영통구 개인회생, {{ site.keywords }}{% endblock %}
+{% block meta_desc %}{{ site.region }}개인회생 지역별 안내. 장안구·권선구·팔달구·영통구 31개 동별로 관할 법원, 오시는 길, 자주 묻는 질문을 정리했습니다.{% endblock %}
 
 {% block content %}
-{% with crumbs=[('수원 지역별 개인회생', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+{% with crumbs=[(site.region ~ ' 지역별 개인회생', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
 <div class="wrap">
   <div class="page-head">
     <p class="cat">지역별 안내</p>
-    <h1>수원 지역별 개인회생 안내</h1>
-    <p class="lead">거주하시는 동에서 사무소까지 오시는 길, 관할 법원, 자주 묻는 질문을 동별로 정리했습니다. 수원시 전 지역이 수원회생법원 관할이며, 사무소는 영통구(수원지방법원 인근) 한 곳입니다.</p>
+    <h1>{{ site.region }} 지역별 개인회생 안내</h1>
+    <p class="lead">거주하시는 동에서 사무소까지 오시는 길, 관할 법원, 자주 묻는 질문을 동별로 정리했습니다. {{ site.region_full }} 전 지역이 {{ site.court }} 관할이며, 사무소는 영통구({{ site.region }}지방법원 인근) 한 곳입니다.</p>
   </div>
 </div>
 
@@ -25,7 +25,7 @@
 
   <div style="border:1px solid var(--line);padding:28px;margin-top:16px">
     <h3 style="margin-bottom:6px">우리 동네가 없나요?</h3>
-    <p style="color:var(--ink-2);margin-bottom:16px">수원 인근(화성·용인·오산·의왕 등 경기 남부)도 수원회생법원 관할인 경우가 많습니다. 주소지만 알려주시면 관할과 예상 변제금을 확인해드립니다.</p>
+    <p style="color:var(--ink-2);margin-bottom:16px">{{ site.region }} 인근({{ site.nearby }})도 {{ site.court }} 관할인 경우가 많습니다. 주소지만 알려주시면 관할과 예상 변제금을 확인해드립니다.</p>
     <a class="btn red" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>
     <a class="btn" href="{{ url_for('contact.contact') }}#form" style="margin-left:6px">상담 신청</a>
   </div>

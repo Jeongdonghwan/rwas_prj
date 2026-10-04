@@ -14,6 +14,7 @@
 
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -21,6 +22,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 SAMPLE = 400
+
+# 사이트맵·RSS의 시각 필드. 소스 파일 mtime에서 나오므로 **코드를 고치면 당연히
+# 바뀐다.** 이것까지 FAIL로 잡으면 게이트가 매번 울려서 쓸모가 없어진다.
+# 그래서 본문 해시와 따로 기록해 "시각만 바뀜"과 "내용이 바뀜"을 구분한다.
+# 응답을 bytes 그대로 해싱하므로 패턴도 bytes여야 한다
+TIME_FIELDS = re.compile(
+    rb"<lastmod>.*?</lastmod>|<pubDate>.*?</pubDate>|<lastBuildDate>.*?</lastBuildDate>",
+    re.S,
+)
 
 
 def fixed_paths():
@@ -65,7 +75,14 @@ def build(out_path, sample=SAMPLE):
         if r.status_code != 200:
             missing.append((p, r.status_code))
             continue
-        shots[p] = hashlib.blake2b(r.get_data(), digest_size=16).hexdigest()
+        body = r.get_data()
+        full = hashlib.blake2b(body, digest_size=16).hexdigest()
+        core = full
+        if p.endswith(".xml"):
+            core = hashlib.blake2b(
+                TIME_FIELDS.sub(b"", body), digest_size=16
+            ).hexdigest()
+        shots[p] = [full, core]
 
     Path(out_path).write_text(
         json.dumps({"shots": shots, "missing": missing}, ensure_ascii=False, indent=1),
@@ -80,18 +97,26 @@ def build(out_path, sample=SAMPLE):
 def diff(a_path, b_path):
     a = json.loads(Path(a_path).read_text(encoding="utf-8"))["shots"]
     b = json.loads(Path(b_path).read_text(encoding="utf-8"))["shots"]
+    def core(v):
+        """시각 필드를 뺀 본문 해시. 구버전 스냅샷(문자열)도 읽을 수 있게 둔다."""
+        return v[1] if isinstance(v, list) else v
+
     only_a = sorted(set(a) - set(b))
     only_b = sorted(set(b) - set(a))
-    changed = sorted(k for k in set(a) & set(b) if a[k] != b[k])
+    both = set(a) & set(b)
+    changed = sorted(k for k in both if core(a[k]) != core(b[k]))
+    time_only = sorted(k for k in both if core(a[k]) == core(b[k]) and a[k] != b[k])
 
     print("기준 %d개 / 비교 %d개" % (len(a), len(b)))
-    print("  사라진 경로 : %d" % len(only_a))
-    print("  새 경로     : %d" % len(only_b))
-    print("  내용 바뀜   : %d" % len(changed))
+    print("  사라진 경로   : %d" % len(only_a))
+    print("  새 경로       : %d" % len(only_b))
+    print("  내용 바뀜     : %d" % len(changed))
+    print("  시각만 바뀜   : %d  (사이트맵 lastmod — 소스를 고쳤으면 정상)"
+          % len(time_only))
     for k in (only_a + only_b + changed)[:20]:
         print("    %s" % k)
     ok = not (only_a or only_b or changed)
-    print("\n%s" % ("PASS — 출력이 동일하다" if ok else "FAIL — 위 경로를 확인할 것"))
+    print("\n%s" % ("PASS — 본문이 동일하다" if ok else "FAIL — 위 경로를 확인할 것"))
     return 0 if ok else 1
 
 

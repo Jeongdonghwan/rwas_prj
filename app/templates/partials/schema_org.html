@@ -4,8 +4,8 @@
   "@type": "LegalService",
   "@id": "{{ site.base_url }}/#legalservice",
   "name": {{ site.brand | tojson }},
-  "alternateName": ["수원개인회생", "수원개인회생파산", {{ site.firm_name | tojson }}],
-  "description": "수원개인회생·수원개인회생파산 전담. 수원회생법원 앞에서 이재열 변호사가 개인회생·개인파산 사건을 직접 진행합니다.",
+  "alternateName": ["{{ site.region }}개인회생", "{{ site.region }}개인회생파산", {{ site.firm_name | tojson }}],
+  "description": "{{ site.region }}개인회생·{{ site.region }}개인회생파산 전담. {{ site.office_court }} 앞에서 이재열 변호사가 개인회생·개인파산 사건을 직접 진행합니다.",
   "url": "{{ site.base_url }}/",
   "logo": "{{ site.base_url }}{{ url_for('static', filename='img/logo.png') }}",
   "image": "{{ site.base_url }}{{ url_for('static', filename='img/og.jpg') }}",
@@ -16,16 +16,15 @@
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "광교중앙로248번길 7-2, D동 10층 1002호",
-    "addressLocality": "수원시 영통구",
+    "addressLocality": "{{ site.region_full }} 영통구",
     "addressRegion": "경기도",
     "addressCountry": "KR"
   },
   "areaServed": [
-    { "@type": "City", "name": "수원시" },
-    { "@type": "AdministrativeArea", "name": "수원시 장안구" },
-    { "@type": "AdministrativeArea", "name": "수원시 권선구" },
-    { "@type": "AdministrativeArea", "name": "수원시 팔달구" },
-    { "@type": "AdministrativeArea", "name": "수원시 영통구" },
+    { "@type": "City", "name": "{{ site.region_full }}" },
+{%- for a in site.area_served %}
+    { "@type": "AdministrativeArea", "name": "{{ a }}" },
+{%- endfor %}
     { "@type": "AdministrativeArea", "name": "경기 남부" }
   ],
   "knowsAbout": ["개인회생", "개인파산", "채무조정", "신용회복", "면책", "변제계획"],

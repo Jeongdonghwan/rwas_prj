@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}수원개인회생 진행 사례 | 법률사무소 레이{% endblock %}
-{% block meta_keywords %}수원개인회생 사례, 개인회생 인가 사례, 개인회생 후기, {{ site.keywords }}{% endblock %}
-{% block meta_desc %}수원개인회생·수원개인회생파산 진행 사례. 법률사무소 레이가 실제 진행한 사건을 의뢰인 동의를 받아 사실 위주로 기록합니다.{% endblock %}
+{% block title %}{{ site.region }}개인회생 진행 사례 | 법률사무소 레이{% endblock %}
+{% block meta_keywords %}{{ site.region }}개인회생 사례, 개인회생 인가 사례, 개인회생 후기, {{ site.keywords }}{% endblock %}
+{% block meta_desc %}{{ site.region }}개인회생·{{ site.region }}개인회생파산 진행 사례. 법률사무소 레이가 실제 진행한 사건을 의뢰인 동의를 받아 사실 위주로 기록합니다.{% endblock %}
 
 {% block content %}
 {% with crumbs=[('진행 사례', None)] %}{% include "_breadcrumb.html" %}{% endwith %}

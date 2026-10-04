@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}수원개인회생 진행절차 | 신청부터 면책까지 안내{% endblock %}
-{% block meta_keywords %}수원개인회생 절차, 개인회생 기간, 금지명령, 개시결정, 변제계획 인가, {{ site.keywords }}{% endblock %}
-{% block meta_desc %}수원개인회생 진행절차를 수원회생법원 기준으로 단계별 정리. 신청·금지명령·개시결정·인가·면책까지 확인사항을 안내합니다.{% endblock %}
+{% block title %}{{ site.region }}개인회생 진행절차 | 신청부터 면책까지 안내{% endblock %}
+{% block meta_keywords %}{{ site.region }}개인회생 절차, 개인회생 기간, 금지명령, 개시결정, 변제계획 인가, {{ site.keywords }}{% endblock %}
+{% block meta_desc %}{{ site.region }}개인회생 진행절차를 {{ site.court }} 기준으로 단계별 정리. 신청·금지명령·개시결정·인가·면책까지 확인사항을 안내합니다.{% endblock %}
 
 {% macro pico(name) -%}
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -41,7 +41,7 @@
     </li>
     <li class="reveal">
       <div class="pn2"><em>03</em><span class="tic">{{ pico('landmark') }}</span></div>
-      <div><h3>법원 신청</h3><p class="pd">준비된 서류를 토대로 개인회생 신청서와 변제계획안을 수원회생법원에 제출합니다.</p></div>
+      <div><h3>법원 신청</h3><p class="pd">준비된 서류를 토대로 개인회생 신청서와 변제계획안을 {{ site.court }}에 제출합니다.</p></div>
       <div class="pc"><b>체크포인트</b>누락된 채권자·재산이 없는지 최종 확인</div>
     </li>
     <li class="reveal">

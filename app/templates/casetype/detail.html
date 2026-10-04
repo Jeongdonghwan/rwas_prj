@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}{{ case.name }} 개인회생 | 수원개인회생파산 법률사무소 레이{% endblock %}
-{% block meta_keywords %}{{ case.name }} 개인회생, {{ case.name }} 채무, 수원 {{ case.name }} 개인회생, {{ site.keywords }}{% endblock %}
-{% block meta_desc %}{{ case.name }}(으)로 생긴 채무의 수원개인회생 안내. 면책 가능 여부와 준비할 것, 주의할 점을 정리했습니다.{% endblock %}
+{% block title %}{{ case.name }} 개인회생 | {{ site.brand }}{% endblock %}
+{% block meta_keywords %}{{ case.name }} 개인회생, {{ case.name }} 채무, {{ site.region }} {{ case.name }} 개인회생, {{ site.keywords }}{% endblock %}
+{% block meta_desc %}{{ case.name }}(으)로 생긴 채무의 {{ site.region }}개인회생 안내. 면책 가능 여부와 준비할 것, 주의할 점을 정리했습니다.{% endblock %}
 {% block head %}{% include "partials/faq_jsonld.html" %}{% endblock %}
 
 {% block content %}
@@ -27,7 +27,7 @@
     <ul class="points" style="margin-bottom:64px">
       <li><h3>면책 대상인지</h3><p>{{ vtext(seed, 'case_dischargeable', name=case.name) }}</p></li>
       <li><h3>채무 구성 확인</h3><p>{{ vtext(seed, 'case_composition', name=case.name) }}</p></li>
-      <li><h3>관할 법원</h3><p>수원·용인·화성 등 경기 남부에 주소지가 있으면 수원회생법원에 신청합니다. 법원마다 실무 기준이 달라 변제계획안 작성 단계에서부터 반영합니다.</p></li>
+      <li><h3>관할 법원</h3><p>{{ site.area_served_text }}에 주소지가 있으면 {{ site.court }}에 신청합니다. 법원마다 실무 기준이 달라 변제계획안 작성 단계에서부터 반영합니다.</p></li>
       <li><h3>예상 기간</h3><p>{{ vtext(seed, 'dong_period') }}</p></li>
       <li><h3>비용</h3><p>{{ vtext(seed, 'cost_note') }}</p></li>
     </ul>
@@ -66,7 +66,7 @@
       <ul class="kv">
         <li><b>변제 기간</b><span>원칙 3년(최장 5년)</span></li>
         <li><b>채무 한도</b><span>무담보 10억, 담보 15억 이하</span></li>
-        <li><b>관할 법원</b><span>수원회생법원</span></li>
+        <li><b>관할 법원</b><span>{{ site.court }}</span></li>
         <li><b>상담</b><span>{{ site.hours }}</span></li>
       </ul>
       <a class="btn red wide" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>

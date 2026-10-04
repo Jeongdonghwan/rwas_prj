@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}수원개인회생 신청자격·변제기간 안내 | 법률사무소 레이{% endblock %}
-{% block meta_keywords %}수원개인회생 자격, 개인회생 신청자격, 개인회생 변제기간, 개인회생 탕감, {{ site.keywords }}{% endblock %}
-{% block meta_desc %}수원개인회생 신청자격과 변제기간, 탕감 범위, 신청 후 흐름을 수원회생법원 기준으로 정리했습니다. 24시간 상담 1644-6755{% endblock %}
+{% block title %}{{ site.region }}개인회생 신청자격·변제기간 안내 | 법률사무소 레이{% endblock %}
+{% block meta_keywords %}{{ site.region }}개인회생 자격, 개인회생 신청자격, 개인회생 변제기간, 개인회생 탕감, {{ site.keywords }}{% endblock %}
+{% block meta_desc %}{{ site.region }}개인회생 신청자격과 변제기간, 탕감 범위, 신청 후 흐름을 {{ site.court }} 기준으로 정리했습니다. 24시간 상담 1644-6755{% endblock %}
 
 {% block content %}
 {% with crumbs=[('개인회생', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
@@ -20,7 +20,7 @@
       <tr><th>소득 요건</th><td>계속적·반복적 소득이 있을 것<small>급여소득자, 사업소득자, 프리랜서(3.3%), 일용직 모두 가능</small></td></tr>
       <tr><th>채무 한도</th><td>무담보 10억 원, 담보 15억 원 이하</td></tr>
       <tr><th>지급불능 상태</th><td>현재 소득으로 채무를 정상 변제하기 어려운 상태<small>연체 전이라도 지급불능이 예견되면 신청 가능</small></td></tr>
-      <tr><th>관할</th><td>주소지 기준 — 수원시 거주자는 수원회생법원</td></tr>
+      <tr><th>관할</th><td>주소지 기준 — {{ site.region_full }} 거주자는 {{ site.court }}</td></tr>
     </table>
 
     <div class="prose">
@@ -60,7 +60,7 @@
       <ul class="kv">
         <li><b>변제 기간</b><span>원칙 3년(최장 5년)</span></li>
         <li><b>채무 한도</b><span>무담보 10억, 담보 15억 이하</span></li>
-        <li><b>관할 법원</b><span>수원회생법원</span></li>
+        <li><b>관할 법원</b><span>{{ site.court }}</span></li>
         <li><b>소요 기간</b><span>개시결정까지 3~6개월</span></li>
       </ul>
       <a class="btn red wide" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>

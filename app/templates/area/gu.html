@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}수원 {{ gu.name }} 개인회생 | 수원개인회생 법률사무소 레이{% endblock %}
-{% block meta_keywords %}{{ gu.name }} 개인회생, 수원 {{ gu.name }} 개인회생, {{ gu.name }} 개인파산, {{ site.keywords }}{% endblock %}
-{% block meta_desc %}수원 {{ gu.name }} 개인회생 안내. 관할 수원회생법원, 동별 오시는 길, 자주 묻는 질문을 정리했습니다. 24시간 상담 {{ site.phone }}{% endblock %}
+{% block title %}{{ site.region }} {{ gu.name }} 개인회생 | {{ site.brand_seo }}{% endblock %}
+{% block meta_keywords %}{{ gu.name }} 개인회생, {{ site.region }} {{ gu.name }} 개인회생, {{ gu.name }} 개인파산, {{ site.keywords }}{% endblock %}
+{% block meta_desc %}{{ site.region }} {{ gu.name }} 개인회생 안내. 관할 {{ site.court }}, 동별 오시는 길, 자주 묻는 질문을 정리했습니다. 24시간 상담 {{ site.phone }}{% endblock %}
 {% block head %}{% include "partials/faq_jsonld.html" %}{% endblock %}
 
 {% block content %}
-{% with crumbs=[('수원 지역별 개인회생', url_for('ko.area_hub')), (gu.name, None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+{% with crumbs=[(site.region ~ ' 지역별 개인회생', url_for('ko.area_hub')), (gu.name, None)] %}{% include "_breadcrumb.html" %}{% endwith %}
 <div class="wrap">
   <div class="page-head">
     <p class="cat">지역별 안내</p>
@@ -26,7 +26,7 @@
     {% for dong in gu.dongs %}<a href="{{ url_for('ko.page', name=dong.name) }}">{{ dong.name }} 개인회생</a>{% endfor %}
   </div>
   <div class="prose" style="max-width:820px;margin-bottom:64px">
-    <p>{{ gu.name }}에서는 {% for d in gu.dongs %}{{ d.name }}{% if not loop.last %}, {% endif %}{% endfor %} 등 {{ gu.dongs|length }}개 지역의 상담을 진행하고 있습니다. 주소지가 {{ gu.name }}에 있으면 관할은 수원회생법원 한 곳이므로 어느 동에 사시든 신청 법원은 같습니다. 동별 페이지에는 사무소까지 오시는 길과 그 지역에서 자주 나오는 질문을 따로 정리해두었습니다.</p>
+    <p>{{ gu.name }}에서는 {% for d in gu.dongs %}{{ d.name }}{% if not loop.last %}, {% endif %}{% endfor %} 등 {{ gu.dongs|length }}개 지역의 상담을 진행하고 있습니다. 주소지가 {{ gu.name }}에 있으면 관할은 {{ site.court }} 한 곳이므로 어느 동에 사시든 신청 법원은 같습니다. 동별 페이지에는 사무소까지 오시는 길과 그 지역에서 자주 나오는 질문을 따로 정리해두었습니다.</p>
   </div>
 
   {% with kw = gu.name ~ ' 개인회생' %}
@@ -41,7 +41,7 @@
 
   <div class="sec-head" style="margin-top:64px"><h2>{{ vtext(seed, 'h_links') }}</h2></div>
   <div class="linklist">
-    <a href="{{ url_for('ko.area_hub') }}">수원 지역별 안내</a>
+    <a href="{{ url_for('ko.area_hub') }}">{{ site.region }} 지역별 안내</a>
     <a href="{{ url_for('main.service_rehab') }}">개인회생 안내</a>
     <a href="{{ url_for('main.service_docs') }}">준비서류</a>
     <a href="{{ url_for('main.service_cost') }}">비용 안내</a>

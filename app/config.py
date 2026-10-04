@@ -38,6 +38,14 @@ class Config:
 REGION = {
     # 지역명 — 브랜드·타이틀·키워드·본문 전반에 들어간다
     "name": "수원",
+    # 행정 단위를 붙인 형태 (schema.org areaServed, "OO시 거주자" 문장)
+    "name_full": "수원시",
+    # 인근 지역 안내 문구 — "OO 인근(…)도 같은 법원 관할" 식으로 쓴다
+    "nearby": "화성·용인·오산·의왕 등 경기 남부",
+    # schema.org areaServed 목록
+    "area_served": ["수원시 장안구", "수원시 권선구", "수원시 팔달구", "수원시 영통구"],
+    # "OO 등 경기 남부에 주소지가 있으면" 식의 본문 문구
+    "area_served_text": "수원·용인·화성 등 경기 남부",
 
     "brand": "수원개인회생파산 법률사무소 레이",
     # 서브페이지 타이틀 접미사. 60자 상한이 있어 brand보다 짧게 유지할 것
@@ -104,8 +112,19 @@ SITE_DEFAULTS = {
     "keywords": REGION["keywords"],
     # 템플릿에서 지역명을 쓸 때 — 하드코딩 대신 {{ site.region }}
     "region": REGION["name"],
+    "region_full": REGION["name_full"],
+    "nearby": REGION["nearby"],
+    "area_served": REGION["area_served"],
+    "area_served_text": REGION["area_served_text"],
+    # 관할 법원 — 지역에 따라 달라진다
     "court": REGION["court"],
     "court_mode": REGION["court_mode"],
+    # ── 사무소 위치 — 지역 사이트가 몇 개든 사무소는 광교 한 곳이다 ──
+    # site.court(관할 법원)와 섞지 말 것. 안산·용인·성남은 둘이 같은 값이지만,
+    # 전국 사이트(도산레이)는 관할이 "주소지 관할 법원"이어도 사무소는 여전히
+    # 수원회생법원 앞이다. "OO 앞"은 사무소 설명이므로 아래 값을 쓴다.
+    "office_city": "수원",
+    "office_court": "수원회생법원",
 }
 
 # 대표변호사 약력 (about·메인 소개 섹션에서 사용)

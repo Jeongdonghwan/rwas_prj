@@ -153,7 +153,7 @@
   <ol class="tl stagger">
     <li><span class="tic">{{ ico('phone') }}<span class="tno">01</span></span><b>상담·검토</b><span>신청 가능 여부와<br>예상 변제금 확인</span></li>
     <li><span class="tic">{{ ico('file') }}<span class="tno">02</span></span><b>서류 준비</b><span>부채증명서·소득증빙<br>정리 (2~3주)</span></li>
-    <li><span class="tic">{{ ico('landmark') }}<span class="tno">03</span></span><b>법원 신청</b><span>수원회생법원에<br>신청서 접수</span></li>
+    <li><span class="tic">{{ ico('landmark') }}<span class="tno">03</span></span><b>법원 신청</b><span>{{ site.court }}에<br>신청서 접수</span></li>
     <li><span class="tic">{{ ico('ban') }}<span class="tno">04</span></span><b>금지명령</b><span>접수 후 1~2주,<br>압류·추심 중단</span></li>
     <li><span class="tic">{{ ico('search') }}<span class="tno">05</span></span><b>개시결정</b><span>신청 후 평균 3~6개월,<br>변제계획안에 따라 변제 진행</span></li>
     <li><span class="tic">{{ ico('check') }}<span class="tno">06</span></span><b>인가결정</b><span>변제계획이<br>인가됨</span></li>
@@ -209,7 +209,7 @@
 
 {% if gus %}
 <section class="sec"><div class="wrap">
-  <div class="sec-head reveal"><h2>수원 지역별 개인회생 안내</h2><p>거주하시는 동에서 사무소까지 오시는 길과 자주 묻는 질문을 동별로 정리했습니다.</p></div>
+  <div class="sec-head reveal"><h2>{{ site.region }} 지역별 개인회생 안내</h2><p>거주하시는 동에서 사무소까지 오시는 길과 자주 묻는 질문을 동별로 정리했습니다.</p></div>
   <div class="area-grid stagger">
     {% for gu in gus %}
     <div><h3><a href="{{ url_for('ko.page', name=gu.name) }}">{{ gu.name }}</a></h3><ul>
@@ -312,7 +312,7 @@
     <input name="name" required placeholder="이름" aria-label="이름">
     <input name="phone" type="tel" required placeholder="연락처 010-0000-0000" aria-label="연락처">
     <select name="debt" aria-label="총 채무액"><option value="">총 채무액</option><option>3천만원 이하</option><option>3천–7천만원</option><option>7천만–1억5천</option><option>1억5천 이상</option></select>
-    <select name="area" aria-label="거주 지역"><option value="">거주 지역</option><option>장안구</option><option>권선구</option><option>팔달구</option><option>영통구</option><option>수원 외 경기 남부</option></select>
+    <select name="area" aria-label="거주 지역"><option value="">거주 지역</option><option>장안구</option><option>권선구</option><option>팔달구</option><option>영통구</option><option>{{ site.region }} 외 경기 남부</option></select>
     <button class="btn gold" type="submit">상담 신청</button>
     <label class="agree"><input type="checkbox" name="agree" value="1" required> 개인정보 수집·이용에 동의합니다. (상담 목적 외 사용하지 않습니다)</label>
   </form>

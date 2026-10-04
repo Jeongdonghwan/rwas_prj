@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}{{ post.title }} | 수원개인회생 법률사무소 레이{% endblock %}
-{% block meta_keywords %}수원개인회생 사례, {{ post.title }}, {{ site.keywords }}{% endblock %}
+{% block title %}{{ post.title }} | {{ site.brand_seo }}{% endblock %}
+{% block meta_keywords %}{{ site.region }}개인회생 사례, {{ post.title }}, {{ site.keywords }}{% endblock %}
 {% block og_type %}article{% endblock %}
 {% block og_image %}{% if post.thumb_path %}{{ site.base_url }}{{ post.thumb_path }}{% else %}{{ site.base_url }}{{ url_for('static', filename='img/og.jpg') }}{% endif %}{% endblock %}
 {% block meta_desc %}{{ post.excerpt }}{% endblock %}
@@ -22,7 +22,7 @@
     "logo": { "@type": "ImageObject", "url": "{{ site.base_url }}{{ url_for('static', filename='img/logo.png') }}" }
   },
   "mainEntityOfPage": { "@type": "WebPage", "@id": "{{ canonical_url }}" },
-  "about": "수원개인회생"
+  "about": "{{ site.region }}개인회생"
 }
 </script>
 {% endblock %}

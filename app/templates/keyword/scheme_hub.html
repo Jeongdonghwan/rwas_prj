@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}{{ scheme_name }} 주제별 안내 | 수원개인회생 법률사무소 레이{% endblock %}
-{% block meta_desc %}{{ scheme_name }}을 주제별로 정리했습니다. {{ facts.intro }}. 수원개인회생 법률사무소 레이 {{ site.phone }}{% endblock %}
+{% block title %}{{ scheme_name }} 주제별 안내 | {{ site.brand_seo }}{% endblock %}
+{% block meta_desc %}{{ scheme_name }}을 주제별로 정리했습니다. {{ facts.intro }}. {{ site.brand_seo }} {{ site.phone }}{% endblock %}
 
 {% block content %}
 {% with crumbs=[('모아보기', url_for('keyword.hub')), (scheme_name, None)] %}{% include "_breadcrumb.html" %}{% endwith %}
