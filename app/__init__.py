@@ -102,6 +102,17 @@ def create_app():
     app.jinja_env.globals["lf_sections"] = SECTION_KEYS
     app.jinja_env.filters["josa"] = josa
 
+    # 문장 풀(variants·keyword_sections·DB 템플릿)에서 쓰는 지역 변수.
+    # render_tpl이 이 jinja_env를 쓰므로 풀 문장 안에서 {{ region }} 같은 식으로
+    # 참조할 수 있다. 지역마다 달라지는 값을 문장에 박지 않기 위한 장치다.
+    from app.config import REGION as _R
+    app.jinja_env.globals.update(
+        region=_R["name"], region_full=_R["name_full"],
+        court=_R["court"], court_long=_R["court_long"],
+        court_district=_R["court_district"],
+        area_long=_R["area_long"],
+    )
+
     # DB에는 UTC로 쌓이니 화면에 찍을 땐 전부 이 필터를 거친다.
     # 템플릿에서 .strftime()을 직접 부르면 9시간 이른 시각이 나온다.
     def _kst(dt, fmt="%Y-%m-%d %H:%M", empty="-"):

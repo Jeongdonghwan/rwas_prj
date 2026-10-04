@@ -100,6 +100,12 @@ def render_tpl(text, **vars):
     except RuntimeError:                    # 앱 컨텍스트 밖(스크립트 등)
         env = Environment(autoescape=True)
         env.filters["josa"] = josa
+        env.globals.update(
+            region=REGION["name"], region_full=REGION["name_full"],
+            court=REGION["court"], court_long=REGION["court_long"],
+            court_district=REGION["court_district"],
+            area_long=REGION["area_long"],
+        )
         return env.from_string(text).render(**vars)
 
 
