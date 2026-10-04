@@ -38,8 +38,11 @@ from app.keyword_rules import (  # noqa: E402
     SCHEMES, correction_terms, needs_correction, to_scheme,
 )
 
-DEFAULT_XLSX = (Path.home() / "Documents" / "카카오톡 받은 파일"
-                / "개인회생_서브키워드_2000개.xlsx")
+# 저장소에 사본을 둔다(54KB) — 서버에서 지역 사이트를 다시 만들 수 있어야 하고,
+# 거기엔 로컬 카톡 폴더가 없다. 원본이 있으면 그쪽을 쓴다.
+_LOCAL = (Path.home() / "Documents" / "카카오톡 받은 파일"
+          / "개인회생_서브키워드_2000개.xlsx")
+DEFAULT_XLSX = _LOCAL if _LOCAL.exists() else ROOT / "seed" / "keywords_source.xlsx"
 OUT = ROOT / "seed" / "keyword.csv"
 
 

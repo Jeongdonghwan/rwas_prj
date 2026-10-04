@@ -34,7 +34,8 @@ for _s in (sys.stdout, sys.stderr):
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-SKIP_DIRS = {".git", "__pycache__", "instance", ".qa_tmp", "uploads", ".pytest_cache"}
+SKIP_DIRS = {".git", "__pycache__", "instance", ".qa_tmp", "uploads",
+             ".pytest_cache", "venv", ".venv", "node_modules"}
 SKIP_FILES = {".env", "keyword.csv", "snapshot.json"}
 
 
