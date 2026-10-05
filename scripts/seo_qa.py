@@ -5,7 +5,7 @@
     python scripts/seo_qa.py --quiet    # 요약만
 
 검사 항목
-  · 타이틀 60자 이내 / 설명 40~160자 / 사이트 전체 중복 금지
+  · 타이틀 60자 이내 / 설명 40~79자 / 사이트 전체 중복 금지
   · H1 정확히 1개, 본문 최소 분량, img alt 누락 0, canonical 존재
   · 핵심 키워드(수원개인회생) 타이틀·설명 포함
   · 같은 유형 페이지 간 3-gram Jaccard 유사도
@@ -36,7 +36,9 @@ CORE_KW = REGION.get("core_kw") or REGION["name"] + "개인회생"  # noqa: E402
 from app.models import CaseType, Dong, Gu, Job, Post  # noqa: E402
 
 TITLE_MAX = 60
-DESC_MIN, DESC_MAX = 40, 160
+# 네이버 서치어드바이저가 '사이트 설명'·'오픈그래프 설명'을 80자 기준으로 본다.
+# og:description은 base.html에서 meta_desc를 그대로 쓰므로 한쪽만 맞추면 된다.
+DESC_MIN, DESC_MAX = 40, 79
 BODY_MIN = 800          # 본문 공백 제외 최소 글자수
 SIM_WARN, SIM_FAIL = 0.55, 0.70   # 이름 제거 후 3-gram Jaccard
 

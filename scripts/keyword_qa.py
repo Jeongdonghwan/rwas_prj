@@ -192,7 +192,8 @@ def main():
     dup_t = [(t, n) for t, n in titles.items() if n > 1]
     dup_d = [(d, n) for d, n in descs.items() if n > 1]
     long_t = [t for t in titles if len(t) > 60]
-    bad_d = [d for d in descs if not (40 <= len(d) <= 160)]
+    # 네이버 기준 80자 미만 (seo_qa.DESC_MAX와 같은 값)
+    bad_d = [d for d in descs if not (40 <= len(d) <= 79)]
     print("\n=== 타이틀 · 메타 설명 ===")
     print("타이틀 고유 %d / 설명 고유 %d" % (len(titles), len(descs)))
     if dup_t:
@@ -207,7 +208,7 @@ def main():
         print("  ⚠ 60자 초과 타이틀 %d건" % len(long_t))
         errors.append("60자 초과 타이틀 %d건" % len(long_t))
     if bad_d:
-        print("  ⚠ 40~160자를 벗어난 설명 %d건" % len(bad_d))
+        print("  ⚠ 40~79자를 벗어난 설명 %d건" % len(bad_d))
         errors.append("설명 길이 위반 %d건" % len(bad_d))
     if not (dup_t or dup_d or long_t or bad_d):
         print("  중복 0건 · 길이 위반 0건")

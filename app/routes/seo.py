@@ -291,12 +291,16 @@ def rss():
     now = rfc822(datetime.now(timezone.utc))
     body = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">\n'
+        '<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"'
+        ' xmlns:atom="http://www.w3.org/2005/Atom">\n'
         "  <channel>\n"
         "    <title>%s 진행 사례</title>\n" % escape(site["brand"])
         + "    <link>%s</link>\n" % escape(abs_url("board.case_list"))
-        + "    <description>수원개인회생·수원개인회생파산 진행 사례. %s에서 실제 진행한 사건을 사실 위주로 기록합니다.</description>\n"
-          % escape(site["firm_name"])
+        # 자기 참조 링크 — 피드 검증기가 요구한다
+        + '    <atom:link href="%s" rel="self" type="application/rss+xml"/>\n'
+          % escape(base() + "/rss.xml")
+        + "    <description>%s개인회생 %s개인파산 진행 사례. 실제 진행한 사건을 사실 위주로 기록합니다.</description>\n"
+          % (escape(site["region"]), escape(site["region"]))
         + "    <language>ko</language>\n"
         + "    <lastBuildDate>%s</lastBuildDate>\n" % now
         + "    <generator>lei-law</generator>\n"

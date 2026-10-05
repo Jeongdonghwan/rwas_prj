@@ -3,7 +3,7 @@
 {% block meta_keywords %}{{ site.region }}개인회생 사례, {{ post.title }}, {{ site.keywords }}{% endblock %}
 {% block og_type %}article{% endblock %}
 {% block og_image %}{% if post.thumb_path %}{{ site.base_url }}{{ post.thumb_path }}{% else %}{{ site.base_url }}{{ url_for('static', filename='img/og.jpg') }}{% endif %}{% endblock %}
-{% block meta_desc %}{{ post.excerpt }}{% endblock %}
+{% block meta_desc %}{{ post.excerpt|truncate(74, true, "…") }}{% endblock %}
 
 {% block head %}
 <script type="application/ld+json">

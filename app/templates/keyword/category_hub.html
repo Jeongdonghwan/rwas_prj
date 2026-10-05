@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ scheme_name }} {{ category }} 안내 | {{ site.brand_seo }}{% endblock %}
-{% block meta_desc %}{{ scheme_name }} {{ category }} 관련 안내를 모았습니다. {{ site.brand_seo }}에서 이재열 변호사가 직접 상담합니다.{% endblock %}
+{% block meta_desc %}{{ scheme_name }} {{ category }} 안내 모음. {{ site.region }}개인회생 신청자격·비용·절차 정리.{% endblock %}
 
 {% block content %}
 {% with crumbs=[('모아보기', url_for('keyword.hub')), (scheme_name, url_for('keyword.scheme_hub', scheme=scheme)), (category, None)] %}{% include "_breadcrumb.html" %}{% endwith %}
