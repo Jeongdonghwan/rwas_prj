@@ -10,7 +10,7 @@
   <div class="field"><label for="d">총 채무액</label>
     <select id="d" name="debt"><option value="">선택</option><option>3천만원 이하</option><option>3천–7천만원</option><option>7천만–1억5천</option><option>1억5천 이상</option></select></div>
   <div class="field"><label for="a">거주 지역</label>
-    <select id="a" name="area"><option value="">선택</option><option>장안구</option><option>권선구</option><option>팔달구</option><option>영통구</option><option>{{ site.region }} 외 경기 남부</option></select></div>
+    <select id="a" name="area"><option value="">선택</option>{% for a in area_options %}<option>{{ a }}</option>{% endfor %}<option>{{ site.region }} 외 경기 남부</option></select></div>
   <label class="agree"><input type="checkbox" name="agree" value="1" required> 개인정보 수집·이용에 동의합니다. (상담 목적 외 사용하지 않습니다)</label>
   <button class="btn red wide" type="submit">상담 신청하기</button>
   <p class="tel">전화가 편하시면 <b>{{ site.phone }}</b></p>

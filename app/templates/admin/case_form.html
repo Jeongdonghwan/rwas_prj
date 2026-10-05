@@ -14,7 +14,7 @@
 <div class="card" style="padding:24px 26px 30px">
 <form class="form" method="post" enctype="multipart/form-data" id="pform">
   <label style="margin-top:0">제목</label>
-  <input type="text" name="title" required maxlength="200" value="{{ post.title if post else '' }}" placeholder="예: 영통구 40대 직장인, 채무 1억 2천만 원 변제계획 인가">
+  <input type="text" name="title" required maxlength="200" value="{{ post.title if post else '' }}" placeholder="예: 40대 직장인, 채무 1억 2천만 원 변제계획 인가">
 
   <label>본문 <span class="hint">이미지는 끌어다 놓으면 자동 업로드됩니다</span></label>
   <div id="editor"></div>

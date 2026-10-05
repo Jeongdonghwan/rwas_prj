@@ -66,6 +66,19 @@ def create_app():
     except OSError:
         asset_ver = "1"
 
+    _areas = []
+
+    def _area_options():
+        """구(또는 시도) 이름 목록. 한 번 읽어 캐시한다 — 전 페이지에서 쓰이므로
+        매 요청 조회하면 낭비고, 지역 목록은 배포 중에 바뀌지 않는다."""
+        if not _areas:
+            try:
+                from app.models import Gu
+                _areas.extend(g.name for g in Gu.query.order_by(Gu.sort).all())
+            except Exception:       # DB가 아직 없을 때(최초 기동 등)
+                return []
+        return _areas
+
     @app.context_processor
     def inject_site():
         # canonical/og:url은 사이트맵과 같은 표기여야 한다. request.path는 디코딩된
@@ -79,6 +92,9 @@ def create_app():
             "lawyer": LAWYER,
             "asset_ver": asset_ver,
             "canonical_url": canonical,
+            # 상담폼 거주 지역 선택지. **하드코딩하면 안 된다** — 수원 구 이름을
+            # 박아두는 바람에 안산 사이트 상담폼에 장안구·권선구가 떴다.
+            "area_options": _area_options(),
         }
 
     # Flask는 정적 파일을 파일 핸들 그대로(스트리밍) 내보낸다. 그러면

@@ -312,7 +312,7 @@
     <input name="name" required placeholder="이름" aria-label="이름">
     <input name="phone" type="tel" required placeholder="연락처 010-0000-0000" aria-label="연락처">
     <select name="debt" aria-label="총 채무액"><option value="">총 채무액</option><option>3천만원 이하</option><option>3천–7천만원</option><option>7천만–1억5천</option><option>1억5천 이상</option></select>
-    <select name="area" aria-label="거주 지역"><option value="">거주 지역</option><option>장안구</option><option>권선구</option><option>팔달구</option><option>영통구</option><option>{{ site.region }} 외 경기 남부</option></select>
+    <select name="area" aria-label="거주 지역"><option value="">거주 지역</option>{% for a in area_options %}<option>{{ a }}</option>{% endfor %}<option>{{ site.region }} 외 경기 남부</option></select>
     <button class="btn gold" type="submit">상담 신청</button>
     <label class="agree"><input type="checkbox" name="agree" value="1" required> 개인정보 수집·이용에 동의합니다. (상담 목적 외 사용하지 않습니다)</label>
   </form>
