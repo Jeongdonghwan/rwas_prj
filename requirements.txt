@@ -4,6 +4,7 @@ Flask-Compress>=1.14
 PyMySQL>=1.1
 python-dotenv>=1.0
 Pillow>=10.0
+fonttools>=4.40   # app/thumbs.py — 폰트 서브셋에 있는 글자 확인
 requests>=2.31   # 알리고 문자 API
 gunicorn>=23.0; sys_platform != "win32"
 openpyxl>=3.1   # scripts/import_keywords.py (키워드 생성용)
