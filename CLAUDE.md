@@ -248,6 +248,33 @@ FLASK_APP=run.py flask seed && FLASK_APP=run.py flask seed-keywords
 **배포**: 포트는 `REGION["port"]`에 있다(수원 8038 / 안산 8040 / 용인 8041 / 성남 8042 /
 도산 8043). 사이트마다 도메인·DB·`.env`·systemd 유닛도 따로 필요하다. 아직 안 했다.
 
+### 법률칼럼 자동 발행 (2026-10-20)
+사이트당 하루 2편(5개 합계 10편), 서버 cron이 새벽에 `flask write-columns`를 부른다.
+
+```
+seed/column_keywords.csv  (scripts/build_column_keywords.py)
+  → flask seed-column-keywords   ColumnKeyword 테이블, status 보존
+  → flask write-columns          큐 2개 → GPT → 검증 게이트 → Post(kind=column) 공개
+```
+
+**꼭 알아야 할 것**
+
+1. **진행 사례(case)와 법률칼럼(column)을 절대 섞지 말 것.** 사례는 실제 사건 기록이라
+   **사람만 쓴다** — 없는 사건을 생성하면 변호사 광고규정상 허위광고다. 칼럼은 제도 일반
+   안내라 자동 생성이 가능하다. 고지 문구도 다르다(사례: 의뢰인 동의·사실 위주 /
+   칼럼: 개별 사건 법률 자문 아님). 보드·어드민·사이트맵 모두 `Post.kind`로 갈린다.
+2. **칼럼 키워드는 생활 사건 축이다**(22분류 171주제). 양산 페이지가 제도 용어 축 25분류를
+   이미 덮고 있어 같은 축을 쓰면 자기 사이트 안에서 경쟁한다.
+3. **검증 게이트가 핵심이다** — `scripts/test_column_gate.py`로 10개 항목 확인.
+   금칙어 / **scheme_facts에 없는 기간·금액·비율** / 외부·없는 링크 / 길이 / 유사도.
+   본문 HTML은 허용 태그만 남긴다(`|safe`로 출력되므로). 3회 떨어지면 failed —
+   어드민 `/leilaw/columns/queue`에서 '다시 대기'.
+4. **글은 DB에 직접 쓴다.** md 파일로 두면 어드민에서 고친 뒤 재시드할 때 덮어써진다.
+5. **큐 순서는 사이트 소금으로 섞는다.** 안 섞으면 첫날 4개 사이트가 같은 키워드를 쓴다.
+6. 경로는 `REGION["column_path"]`(현재 `법률칼럼`). **색인 후 바꾸면 301이 필요하다.**
+7. 모델은 `.env`의 `MODEL_WRITER`. 2026-10 기준 `gpt-5` — 편당 60~76초, 출력 토큰 약 4,400.
+   **API 키는 `.env`에만.** 코드·저장소·채팅에 두지 말 것.
+
 ### 대표변호사 사진 보정·카드 재디자인 (2026-09-30)
 - **사진 보정은 `scripts/build_lawyer_photo.py`로 한다.** 원본(Downloads/CSY_5372/CSY_5372.JPG)에서
   다시 만들므로 화질 손실이 없다. 값을 바꾸고 다시 돌리면 3종(card/900/480)이 한 번에 갱신된다.
