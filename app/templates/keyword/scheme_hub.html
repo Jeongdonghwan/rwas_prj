@@ -1,6 +1,16 @@
 {% extends "base.html" %}
+{% from "partials/itemlist_jsonld.html" import itemlist %}
 {% block title %}{{ scheme_name }} 주제별 안내 | {{ site.brand_seo }}{% endblock %}
 {% block meta_desc %}{{ scheme_name }} 주제별 안내. {{ site.region }}개인회생 법률사무소 레이가 정리했습니다.{% endblock %}
+{% block head %}
+{%- set _items = [] -%}
+{%- for c in categories -%}
+  {%- set _ = _items.append({'name': scheme_name ~ ' ' ~ c.name,
+        'url': site.base_url ~ url_for('keyword.category_hub',
+                                        scheme=scheme, category=c.name)}) -%}
+{%- endfor -%}
+{{ itemlist(_items, scheme_name ~ ' 주제별 안내') }}
+{% endblock %}
 
 {% block content %}
 {% with crumbs=[('모아보기', url_for('keyword.hub')), (scheme_name, None)] %}{% include "_breadcrumb.html" %}{% endwith %}

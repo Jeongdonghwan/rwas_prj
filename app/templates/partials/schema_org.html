@@ -43,3 +43,42 @@
   }
 }
 </script>
+
+{# ── WebSite + Organization ────────────────────────────────────────────
+   LegalService만 있으면 검색엔진이 "이 사이트"를 하나의 개체로 못 묶는다.
+   WebSite 는 사이트 자체, Organization 은 발행 주체. 둘 다 메인 URL을 @id 로
+   잡아 LegalService 와 같은 개체임을 publisher 로 연결한다.
+   **SearchAction 은 넣지 않는다** — 사이트 내 검색 기능이 없는데 선언하면 거짓이다. #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{ site.base_url }}/#organization",
+      "name": {{ site.brand | tojson }},
+      "url": "{{ site.base_url }}/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{{ site.base_url }}{{ url_for('static', filename='img/logo.png') }}"
+      },
+      "telephone": {{ site.phone | tojson }},
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "광교중앙로248번길 7-2, D동 10층 1002호",
+        "addressLocality": "{{ site.office_locality }}",
+        "addressRegion": "{{ site.office_region }}",
+        "addressCountry": "KR"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "{{ site.base_url }}/#website",
+      "url": "{{ site.base_url }}/",
+      "name": {{ site.brand | tojson }},
+      "inLanguage": "ko-KR",
+      "publisher": { "@id": "{{ site.base_url }}/#organization" }
+    }
+  ]
+}
+</script>

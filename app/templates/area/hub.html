@@ -1,7 +1,20 @@
 {% extends "base.html" %}
+{% from "partials/itemlist_jsonld.html" import itemlist %}
 {% block title %}{{ site.region }} 지역별 개인회생 안내 | {{ site.brand_seo }}{% endblock %}
 {% block meta_keywords %}{{ site.region }}개인회생 지역, {% for a in area_options %}{{ a }} 개인회생, {% endfor %}{{ site.keywords }}{% endblock %}
 {% block meta_desc %}{{ site.region }}개인회생 지역별 안내. 동별 관할 법원, 오시는 길, 자주 묻는 질문을 정리했습니다.{% endblock %}
+{% block head %}
+{%- set _items = [] -%}
+{%- for gu in gus -%}
+  {%- set _ = _items.append({'name': gu.name ~ ' 개인회생',
+        'url': site.base_url ~ url_for('ko.page', name=gu.name)}) -%}
+  {%- for d in gu.dongs -%}
+    {%- set _ = _items.append({'name': d.name ~ ' 개인회생',
+          'url': site.base_url ~ url_for('ko.page', name=d.name)}) -%}
+  {%- endfor -%}
+{%- endfor -%}
+{{ itemlist(_items, site.region ~ ' 지역별 개인회생 안내') }}
+{% endblock %}
 
 {% block content %}
 {% with crumbs=[(site.region ~ ' 지역별 개인회생', None)] %}{% include "_breadcrumb.html" %}{% endwith %}

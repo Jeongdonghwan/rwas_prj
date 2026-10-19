@@ -1,0 +1,40 @@
+{#
+  목록 페이지용 ItemList — 네이버 검색 캐러셀의 조건이다.
+
+  호출:
+    {% from "partials/itemlist_jsonld.html" import itemlist %}
+    {{ itemlist(items) }}
+
+  items 는 {name, url, image(선택), desc(선택)} 의 리스트.
+
+  **썸네일 자리에 로고를 넣지 말 것.** 캐러셀 심사에서 탈락한다.
+  image 가 없으면 그 항목은 image 필드 자체를 뺀다 — 없는 값을 채워 넣으면
+  리치결과가 아니라 패널티다.
+#}
+{%- macro itemlist(items, list_name='') -%}
+{%- if items -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList"{% if list_name %},
+  "name": {{ list_name | tojson }}{% endif %},
+  "itemListElement": [
+{%- for it in items %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "url": {{ it.url | tojson }},
+      "name": {{ it.name | tojson }}
+      {%- if it.image %},
+      "image": {{ it.image | tojson }}
+      {%- endif %}
+      {%- if it.desc %},
+      "description": {{ it.desc | tojson }}
+      {%- endif %}
+    }{{ "," if not loop.last }}
+{%- endfor %}
+  ]
+}
+</script>
+{%- endif -%}
+{%- endmacro -%}
