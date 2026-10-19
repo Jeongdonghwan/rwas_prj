@@ -275,3 +275,16 @@ def admin_reset_command(username, password):
     click.echo("'%s' 비밀번호를 재설정했습니다." % username)
     click.echo("  임시 비밀번호: %s" % pw)
     click.echo("  로그인 후 바로 변경하게 됩니다.")
+
+
+@click.command("seed-column-keywords")
+@with_appcontext
+def seed_column_keywords_command():
+    """법률칼럼 키워드 큐 적재. 이미 있는 키워드의 status 는 보존한다."""
+    from app.column_queue import load_csv, stats
+
+    db.create_all()
+    added = load_csv()
+    s = stats()
+    click.echo("추가 %d개 / 대기 %d · 완료 %d · 실패 %d"
+               % (added, s.get("pending", 0), s.get("done", 0), s.get("failed", 0)))

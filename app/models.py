@@ -181,6 +181,28 @@ class Post(db.Model):
     updated_at = db.Column(db.DateTime, default=now_utc, onupdate=now_utc)
 
 
+class ColumnKeyword(db.Model):
+    """법률칼럼 키워드 큐. seed/column_keywords.csv 에서 적재.
+
+    status: pending → done(발행됨) / failed(재시도 한도 초과, 어드민에서 되살릴 수 있음)
+    큐를 다시 적재해도 status 는 보존한다 — 같은 키워드를 두 번 쓰지 않기 위해서다.
+    """
+
+    __tablename__ = "column_keyword"
+
+    id = db.Column(db.Integer, primary_key=True)
+    keyword = db.Column(db.String(160), unique=True, nullable=False, index=True)
+    category = db.Column(db.String(20), index=True)
+    scheme = db.Column(db.String(20))
+    area = db.Column(db.String(30), default="")
+    intent = db.Column(db.String(40))
+    status = db.Column(db.String(10), default="pending", nullable=False, index=True)
+    attempts = db.Column(db.Integer, default=0, nullable=False)
+    last_error = db.Column(db.String(300))
+    post_id = db.Column(db.Integer)
+    published_at = db.Column(db.DateTime)
+
+
 class Inquiry(db.Model):
     __tablename__ = "inquiry"
 

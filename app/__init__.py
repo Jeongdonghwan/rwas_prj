@@ -161,13 +161,15 @@ def create_app():
 
     app.register_blueprint(keyword_bp)
 
-    from app.seed import (admin_reset_command, seed_command,
-                          seed_keywords_command, sms_check_command)
+    from app.seed import (admin_reset_command, seed_column_keywords_command,
+                          seed_command, seed_keywords_command,
+                          sms_check_command)
 
     app.cli.add_command(seed_command)
     app.cli.add_command(seed_keywords_command)
     app.cli.add_command(sms_check_command)
     app.cli.add_command(admin_reset_command)
+    app.cli.add_command(seed_column_keywords_command)
 
     with app.app_context():
         from app import models  # noqa: F401
