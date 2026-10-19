@@ -296,7 +296,7 @@ def rss():
             "      <pubDate>%s</pubDate>" % rfc822(p.published_at),
             "      <description><![CDATA[%s]]></description>" % (p.excerpt or ""),
             "      <content:encoded><![CDATA[%s]]></content:encoded>" % (p.body_html or ""),
-            "      <category>%s</category>" % ("법칼럼" if p.kind == Post.KIND_COLUMN else "진행 사례"),
+            "      <category>%s</category>" % ("법률칼럼" if p.kind == Post.KIND_COLUMN else "진행 사례"),
         ]
         if p.thumb_path:
             item.append('      <enclosure url="%s" type="image/webp" length="0"/>'

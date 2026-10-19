@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% from "partials/itemlist_jsonld.html" import itemlist %}
-{% block title %}{{ site.region }}개인회생 법칼럼 | 법률사무소 레이{% endblock %}
+{% block title %}{{ site.region }}개인회생 법률칼럼 | 법률사무소 레이{% endblock %}
 {% block meta_keywords %}{{ site.region }}개인회생 칼럼, 개인회생 절차 안내, 개인파산 궁금증, {{ site.keywords }}{% endblock %}
-{% block meta_desc %}{{ site.region }}개인회생 {{ site.region }}개인파산 법칼럼. 제도와 절차에서 자주 묻는 것을 정리합니다.{% endblock %}
+{% block meta_desc %}{{ site.region }}개인회생 {{ site.region }}개인파산 법률칼럼. 제도와 절차에서 자주 묻는 것을 정리합니다.{% endblock %}
 {% block head %}
 {%- set _items = [] -%}
 {%- for p in posts -%}
@@ -12,15 +12,15 @@
         'image': (site.base_url ~ p.thumb_path) if p.thumb_path else none,
         'desc': p.excerpt}) -%}
 {%- endfor -%}
-{{ itemlist(_items, site.region ~ '개인회생 법칼럼') }}
+{{ itemlist(_items, site.region ~ '개인회생 법률칼럼') }}
 {% endblock %}
 
 {% block content %}
-{% with crumbs=[('법칼럼', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+{% with crumbs=[('법률칼럼', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
 <div class="wrap">
   <div class="page-head">
-    <p class="cat">법칼럼</p>
-    <h1>법칼럼</h1>
+    <p class="cat">법률칼럼</p>
+    <h1>법률칼럼</h1>
     <p class="lead">개인회생·개인파산 제도와 절차에서 자주 나오는 질문을 정리합니다. 개인 사정에 따라 결과는 달라질 수 있으며, 특정 결과를 보장하지 않습니다.</p>
   </div>
 </div>
@@ -34,7 +34,7 @@
         {% if p.thumb_path %}<img src="{{ p.thumb_path }}" alt="{{ p.thumb_alt or p.title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover">{% else %}<div class="ph"></div>{% endif %}
       </a>
       <div>
-        <p class="cat">법칼럼</p>
+        <p class="cat">법률칼럼</p>
         <h3><a href="{{ url_for('board.column_view', slug=p.slug) }}">{{ p.title }}</a></h3>
         <p class="ex">{{ p.excerpt }}</p>
         <p class="date">{{ p.published_at|kst('%Y.%m.%d') }}</p>

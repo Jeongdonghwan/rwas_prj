@@ -28,12 +28,12 @@
 {% endblock %}
 
 {% block content %}
-{% with crumbs=[('법칼럼', url_for('board.column_list')), (post.title[:24] ~ ('…' if post.title|length > 24 else ''), None)] %}{% include "_breadcrumb.html" %}{% endwith %}
+{% with crumbs=[('법률칼럼', url_for('board.column_list')), (post.title[:24] ~ ('…' if post.title|length > 24 else ''), None)] %}{% include "_breadcrumb.html" %}{% endwith %}
 
 <section class="sec" style="padding-top:16px"><div class="wrap detail">
   <article>
     <div class="post-head">
-      <p class="cat">법칼럼</p>
+      <p class="cat">법률칼럼</p>
       <h1>{{ post.title }}</h1>
       <p class="meta"><span>{{ post.published_at|kst('%Y.%m.%d') }}</span><span>{{ site.firm_name }}</span><span>조회 {{ post.view_count or 0 }}</span></p>
     </div>
