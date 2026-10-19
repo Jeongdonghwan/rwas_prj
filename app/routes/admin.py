@@ -370,6 +370,19 @@ def _list(kind):
                            posts=posts, public_count=public_count)
 
 
+def _auto_thumb(post):
+    """사진을 안 올렸으면 제목 카드를 그린다. 자동 카드는 제목이 바뀌면 다시 그린다.
+    파일명이 글 id 라 커밋 뒤에 부른다."""
+    from app.thumbs import is_auto, make
+    if post.thumb_path and not is_auto(post.thumb_path):
+        return
+    try:
+        make(post)
+        db.session.commit()
+    except Exception:
+        current_app.logger.exception("기본 썸네일 실패 post=%s", post.id)
+
+
 def _new(kind):
     ep = KINDS[kind]
     if request.method == "POST":
@@ -380,6 +393,7 @@ def _new(kind):
                                    post=post, error="제목과 본문을 입력하세요.")
         db.session.add(post)
         db.session.commit()
+        _auto_thumb(post)
         return redirect(url_for(ep["list"]))
     return render_template("admin/case_form.html", nav=ep["nav"], ep=ep,
                            post=None, error=None)
@@ -397,6 +411,7 @@ def _edit(kind, post_id):
             return render_template("admin/case_form.html", nav=ep["nav"], ep=ep,
                                    post=post, error="제목과 본문을 입력하세요.")
         db.session.commit()
+        _auto_thumb(post)
         return redirect(url_for(ep["list"]))
     return render_template("admin/case_form.html", nav=ep["nav"], ep=ep,
                            post=post, error=None)

@@ -289,3 +289,21 @@ def write_columns_command(n, dry_run):
     res = run(n, dry_run=dry_run, log=click.echo)
     ok = sum(1 for _, good, _ in res if good)
     click.echo("완료 %d / %d%s" % (ok, len(res), " (dry-run)" if dry_run else ""))
+
+
+@click.command("post-thumbs")
+@click.option("--redo", is_flag=True, help="자동 썸네일도 다시 그린다")
+@with_appcontext
+def post_thumbs_command(redo):
+    """썸네일 없는 글에 기본 타이틀 카드를 붙인다(올린 사진은 건드리지 않는다)."""
+    from app.models import Post
+    from app.thumbs import is_auto, make
+
+    n = 0
+    for p in Post.query.all():
+        if p.thumb_path and not (redo and is_auto(p.thumb_path)):
+            continue
+        make(p)
+        n += 1
+    db.session.commit()
+    click.echo("기본 썸네일 %d개" % n)

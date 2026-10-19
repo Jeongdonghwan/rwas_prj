@@ -166,7 +166,8 @@ def create_app():
 
     from app.seed import (admin_reset_command, seed_column_keywords_command,
                           seed_command, seed_keywords_command,
-                          sms_check_command, write_columns_command)
+                          sms_check_command, write_columns_command,
+                          post_thumbs_command)
 
     app.cli.add_command(seed_command)
     app.cli.add_command(seed_keywords_command)
@@ -174,6 +175,7 @@ def create_app():
     app.cli.add_command(admin_reset_command)
     app.cli.add_command(seed_column_keywords_command)
     app.cli.add_command(write_columns_command)
+    app.cli.add_command(post_thumbs_command)
 
     with app.app_context():
         from app import models  # noqa: F401

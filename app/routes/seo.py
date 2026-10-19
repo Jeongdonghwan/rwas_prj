@@ -299,8 +299,9 @@ def rss():
             "      <category>%s</category>" % ("법률칼럼" if p.kind == Post.KIND_COLUMN else "진행 사례"),
         ]
         if p.thumb_path:
-            item.append('      <enclosure url="%s" type="image/webp" length="0"/>'
-                        % escape(base() + p.thumb_path))
+            mime = "image/jpeg" if ".jpg" in p.thumb_path else "image/webp"
+            item.append('      <enclosure url="%s" type="%s" length="0"/>'
+                        % (escape(base() + p.thumb_path), mime))
         item.append("    </item>")
         items.append("\n".join(item))
 

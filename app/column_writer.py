@@ -48,6 +48,16 @@ BANNED = [
     "전문 변호사", "전문가", "전문으로", "다른 사무소", "타 사무소", "어느 곳보다",
 ]
 
+# '사례' 키워드 글이 실제 처리 사건처럼 읽히면 광고규정 위반(허위·과장 광고)이다.
+# 사례 게시판은 사람이 쓴 실제 사건만 — 칼럼은 '이런 상황이라면' 가상 예시로만 쓴다.
+FAKE_CASE = [
+    "저희가 진행한", "저희가 맡은", "저희 사무소가 진행", "저희 사무소에서 진행",
+    "실제 사례", "실제로 진행한", "수임한", "의뢰인 A", "의뢰인 B",
+    "인가를 받았습니다", "인가를 받으셨", "면책을 받았습니다", "면책을 받으셨",
+    "면책 결정을 받았", "인가 결정을 받았",
+]
+FAKE_NAME_RE = re.compile(r"[A-Z]씨|[가-힣]모 ?씨")
+
 NAME_TO_CODE = {v: k for k, v in SCHEMES.items()}
 
 
@@ -92,6 +102,14 @@ def build_prompt(kw):
                  "자연스럽게 1~2번 언급하라. 지점이 있는 것처럼 쓰지 마라 — "
                  "사무소는 수원 광교 한 곳이다." % kw.area) if kw.area else ""
 
+    case_line = (
+        "이 키워드는 '사례'를 찾는 검색이다. **실제로 처리한 사건처럼 쓰면 안 된다**"
+        "(광고규정). '예를 들어 이런 상황이라면'처럼 가상의 상황을 하나 들고, 그 상황에서 "
+        "법원이 무엇을 보는지·어떤 점이 쟁점이 되는지·준비할 것을 설명하라. "
+        "인물 이름·이니셜(A씨 등)·'의뢰인'·'저희가 진행한'·'인가를 받았다' 같은 결과 서술 금지. "
+        "결과는 '사정에 따라 달라진다'로 끝낸다."
+    ) if "사례" in kw.keyword else ""
+
     system = (
         "너는 한국 법률사무소 '%s'의 법률칼럼을 쓴다. 독자는 빚 때문에 불안한 일반인이다.\n"
         "원칙:\n"
@@ -112,14 +130,16 @@ def build_prompt(kw):
         "구성:\n"
         "- 첫 <p>: 질문에 대한 답 2~3문장\n"
         "- <h2> 소제목 3~4개, 각 아래 <p> 또는 <ul><li>\n"
-        "- 마지막 <h2>정리</h2> 아래 요점 2~3문장 + 상담 안내 한 문장\n"
+        "- 마지막 <h2>은 '이런 경우 상담을 권합니다'류 소제목: 이 글의 독자가 지금 상담을 "
+        "받아 보면 좋은 상황 2~3가지를 <ul>로 들고, 상담 신청 링크를 반드시 건다\n"
         "- 본문 전체 1,400~2,000자(공백 포함, 태그 제외)\n"
         "- 허용 태그: h2 p ul ol li b a(href만). 그 외 태그·속성 금지\n\n"
+        "%s\n\n"
         "JSON 으로만 답한다:\n"
         '{"title": "키워드가 자연스럽게 들어간 제목(40자 이내)", '
         '"excerpt": "검색결과용 요약 — 반드시 75자 이내 한두 문장", "body_html": "..."}'
         % (kw.keyword, kw.category, kw.intent, kw.scheme,
-           region_line, area_line, kv, link_list)
+           region_line, area_line, kv, link_list, case_line)
     )
     return system, user
 
@@ -286,10 +306,17 @@ def validate(kw, data, existing_grams):
     if bad_links:
         errs.append("없는 경로 링크 %s" % bad_links[:2])
 
+    from flask import url_for
+    if url_for("contact.contact") not in links:
+        errs.append("상담 신청 링크 없음")
+
     whole = title + " " + excerpt + " " + text
     hit = [b for b in BANNED if b in whole]
     if hit:
         errs.append("금칙어 %s" % hit)
+    fake = [b for b in FAKE_CASE if b in whole] + FAKE_NAME_RE.findall(whole)
+    if fake:
+        errs.append("실제 사건처럼 서술 %s" % fake[:3])
 
     allowed = {re.sub(r"\s+", "", x) for x in _allowed_numbers(code)}
     nums = {re.sub(r"\s+", "", x) for x in NUM_RE.findall(whole)}
@@ -363,6 +390,12 @@ def _run(n, dry_run, log):
                     body_html=out["body_html"], is_public=True)
         db.session.add(post)
         db.session.commit()
+        try:                      # 썸네일이 실패해도 글은 살린다
+            from app.thumbs import make
+            make(post)
+            db.session.commit()
+        except Exception as e:
+            log("    썸네일 실패: %s" % e)
         mark_done(kw, post.id)
         existing.append(_grams(plain(out["body_html"])))
         results.append((kw.keyword, True, post.slug))
