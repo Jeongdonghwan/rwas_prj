@@ -254,28 +254,36 @@ TOPICS = [
 ]
 
 # 지역을 붙이는 비율 — 전부 붙이면 양산형이 된다
+# 제도가 여럿인 사이트: 주제 2개마다 지역 1개. 전부 붙이면 양산형이 된다.
 REGION_EVERY = 2
 
-
-def _region_every(schemes):
-    """제도가 하나뿐인 사이트(도산레이)는 제도 축이 안 펼쳐져 공급이 1/5로 준다.
-    전국 사이트라 "경기도에서는 어느 법원" 같은 질문이 실제로 성립하므로
-    그쪽은 지역을 촘촘히 붙인다 — 양산형 부풀리기가 아니라 의미 있는 축이다."""
-    return 1 if len(schemes) == 1 else REGION_EVERY
+# 제도가 하나뿐인 사이트(도산레이)가 다른 사이트와 같은 분량을 갖도록 맞추는 값.
+# 제도 축이 1/5로 줄어든 만큼 지역 축이 그 자리를 메운다 — 전국 사이트라
+# "경기도에서는 어느 법원에 내나"가 실제로 다른 답을 갖는 질문이라 성립한다.
+# 수원 기준 171주제 × 5제도 × 1.5 ≈ 1,282 → 171 × 1 × 7.5 이 되도록 7로 잡는다.
+REGIONS_PER_TOPIC = 7
 
 
 def build(region, schemes, areas):
     """(분류, 키워드, 제도, 지역, 검색의도) 목록."""
-    every = _region_every(schemes)
+    single = len(schemes) == 1
     rows, n = [], 0
     for scheme_name in schemes:
         for cat, tpl, intent in TOPICS:
             kw = tpl.format(s=scheme_name)
             rows.append((cat, kw, scheme_name, "", intent))
             n += 1
-            # 3개마다 하나씩만 지역을 붙인다
-            if n % every == 0 and areas:
-                area = areas[(n // every - 1) % len(areas)]
+            if not areas:
+                continue
+            if single:
+                # 주제마다 서로 다른 지역 여러 개를 붙이되, 시작 위치를 돌려
+                # 특정 시도에 몰리지 않게 한다
+                for j in range(min(REGIONS_PER_TOPIC, len(areas))):
+                    area = areas[(n * REGIONS_PER_TOPIC + j) % len(areas)]
+                    rows.append((cat, "%s %s" % (area, kw),
+                                 scheme_name, area, intent))
+            elif n % REGION_EVERY == 0:
+                area = areas[(n // REGION_EVERY - 1) % len(areas)]
                 rows.append((cat, "%s %s" % (area, kw), scheme_name, area, intent))
     return rows
 
