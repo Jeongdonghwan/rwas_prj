@@ -36,7 +36,9 @@ sys.path.insert(0, str(ROOT))
 
 SKIP_DIRS = {".git", "__pycache__", "instance", ".qa_tmp", "uploads",
              ".pytest_cache", "venv", ".venv", "node_modules"}
-SKIP_FILES = {".env", "keyword.csv", "snapshot.json"}
+# keyword.csv·column_keywords.csv 는 지역마다 다시 만든다 — 복사하면 원본(수원)
+# 키워드가 그대로 들어가 도산레이가 수원 제도 5종 키워드를 갖게 된다.
+SKIP_FILES = {".env", "keyword.csv", "column_keywords.csv", "snapshot.json"}
 
 
 def _ignore(dirpath, names):
