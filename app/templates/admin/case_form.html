@@ -1,12 +1,12 @@
 {% extends "admin/_base.html" %}
-{% block title %}{{ '사례 수정' if post and post.id else '새 사례 작성' }}{% endblock %}
+{% block title %}{{ ep.label }} {{ '수정' if post and post.id else '작성' }}{% endblock %}
 {% block head %}<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">{% endblock %}
 
 {% block content %}
 <div class="phead">
-  <h1>{{ '사례 수정' if post and post.id else '새 사례 작성' }}</h1>
-  <p>{% if post and post.id %}/사례/{{ post.slug }}/{% else %}제목을 저장하면 주소가 자동으로 만들어집니다{% endif %}</p>
-  <div class="act"><a class="btn line" href="{{ url_for('admin.cases') }}">목록으로</a></div>
+  <h1>{{ ep.label }} {{ '수정' if post and post.id else '작성' }}</h1>
+  <p>{% if post and post.id %}{{ url_for(ep.public_view, slug=post.slug) | urldecode }}{% else %}제목을 저장하면 주소가 자동으로 만들어집니다{% endif %}</p>
+  <div class="act"><a class="btn line" href="{{ url_for(ep.list) }}">목록으로</a></div>
 </div>
 
 {% if error %}<p class="alert">{{ error }}</p>{% endif %}
@@ -47,13 +47,13 @@
 
   <div class="actions">
     <button class="btn" type="submit">저장</button>
-    <a class="btn line" href="{{ url_for('admin.cases') }}">취소</a>
+    <a class="btn line" href="{{ url_for(ep.list) }}">취소</a>
     <span class="sp"></span>
   </div>
 </form>
 {% if post and post.id %}
 {# 삭제는 저장 버튼과 떨어뜨려 둔다 — 실수로 누르지 않게 #}
-<form method="post" action="{{ url_for('admin.case_delete', post_id=post.id) }}"
+<form method="post" action="{{ url_for(ep.delete, post_id=post.id) }}"
       style="margin-top:14px;padding-top:16px;border-top:1px solid var(--line-2)"
       onsubmit="return confirm('“{{ post.title }}” 글을 삭제할까요? 되돌릴 수 없습니다.')">
   <button class="btn sm danger" type="submit">이 글 삭제</button>

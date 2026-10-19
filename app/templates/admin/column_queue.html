@@ -1,0 +1,76 @@
+{% extends "admin/_base.html" %}
+{% block title %}칼럼 자동 발행{% endblock %}
+
+{% block content %}
+<div class="phead">
+  <h1>칼럼 자동 발행</h1>
+  <p>매일 새벽 키워드 큐에서 꺼내 작성·검증 후 자동 공개합니다. 검증을 통과하지 못한 키워드는 다음 날 다시 시도하고, 3번 넘게 떨어지면 '실패'로 빠집니다.</p>
+  <div class="act">
+    <a class="btn line" href="{{ url_for('admin.columns') }}">발행된 칼럼 ↗</a>
+  </div>
+</div>
+
+{% with msgs = get_flashed_messages(with_categories=true) %}
+  {% for cat, m in msgs %}<p class="{{ 'alert' if cat == 'error' else 'okmsg' }}">{{ m }}</p>{% endfor %}
+{% endwith %}
+
+<div class="stats">
+  <div class="stat"><p class="lb">대기</p><p class="nm">{{ s.get('pending', 0) }}<small>개</small></p></div>
+  <div class="stat"><p class="lb">발행</p><p class="nm">{{ s.get('done', 0) }}<small>편</small></p></div>
+  <div class="stat{{ ' hl' if s.get('failed') }}"><p class="lb">실패</p><p class="nm">{{ s.get('failed', 0) }}<small>개</small></p></div>
+  <div class="stat"><p class="lb">남은 기간</p><p class="nm">{{ (s.get('pending', 0) // 2) }}<small>일</small></p></div>
+</div>
+
+<div class="card">
+  <div class="ct"><h2>검증에서 떨어진 키워드</h2></div>
+  {% if failed %}
+  <div class="tblwrap">
+  <table class="tbl">
+    <thead><tr><th>키워드</th><th class="hide-sm">분류</th><th>시도</th><th>사유</th><th style="width:110px"></th></tr></thead>
+    <tbody>
+      {% for k in failed %}
+      <tr>
+        <td class="strong">{{ k.keyword }}</td>
+        <td class="hide-sm muted nowrap">{{ k.category }}</td>
+        <td class="num">{{ k.attempts }}{% if k.status == 'failed' %} <span class="bd off">실패</span>{% endif %}</td>
+        <td class="muted" style="font-size:13px">{{ k.last_error }}</td>
+        <td>
+          {% if k.status != 'done' %}
+          <form method="post" action="{{ url_for('admin.column_retry', kw_id=k.id) }}">
+            <button class="btn sm line" type="submit">다시 대기</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <div class="empty"><b>떨어진 키워드가 없습니다</b></div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="ct"><h2>최근 발행</h2></div>
+  {% if recent %}
+  <div class="tblwrap">
+  <table class="tbl">
+    <thead><tr><th>키워드</th><th class="hide-sm">분류</th><th class="hide-sm">발행</th><th style="width:80px"></th></tr></thead>
+    <tbody>
+      {% for k in recent %}
+      <tr>
+        <td>{{ k.keyword }}</td>
+        <td class="hide-sm muted nowrap">{{ k.category }}</td>
+        <td class="hide-sm num nowrap">{{ k.published_at|kst('%m-%d %H:%M') }}</td>
+        <td>{% if k.post_id %}<a class="btn sm line" href="{{ url_for('admin.column_edit', post_id=k.post_id) }}">수정</a>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <div class="empty"><b>아직 발행된 칼럼이 없습니다</b></div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -341,63 +341,169 @@ def fill_post(post):
     post.slug = unique_slug(post.title, post.id)
 
 
+# ── 글 관리: 진행 사례 / 법률칼럼 ───────────────────────────────────
+# 같은 편집 화면(Toast UI + 이미지·썸네일 업로드)을 쓰되 목록은 종류별로 나눈다.
+# **사례 목록에 자동 생성 칼럼이 섞이면 안 된다** — 사례는 사람이 쓴 실제 기록이다.
+
+KINDS = {
+    Post.KIND_CASE: {
+        "label": "진행 사례", "nav": "case",
+        "list": "admin.cases", "new": "admin.case_new", "edit": "admin.case_edit",
+        "toggle": "admin.case_toggle", "delete": "admin.case_delete",
+        "public_list": "board.case_list", "public_view": "board.case_view",
+    },
+    Post.KIND_COLUMN: {
+        "label": "법률칼럼", "nav": "column",
+        "list": "admin.columns", "new": "admin.column_new", "edit": "admin.column_edit",
+        "toggle": "admin.column_toggle", "delete": "admin.column_delete",
+        "public_list": "board.column_list", "public_view": "board.column_view",
+    },
+}
+
+
+def _list(kind):
+    posts = (Post.query.filter_by(kind=kind)
+             .order_by(Post.published_at.desc()).all())
+    public_count = sum(1 for p in posts if p.is_public)
+    ep = KINDS[kind]
+    return render_template("admin/cases.html", nav=ep["nav"], ep=ep,
+                           posts=posts, public_count=public_count)
+
+
+def _new(kind):
+    ep = KINDS[kind]
+    if request.method == "POST":
+        post = Post(kind=kind)
+        fill_post(post)
+        if not post.title or not post.body_html.strip():
+            return render_template("admin/case_form.html", nav=ep["nav"], ep=ep,
+                                   post=post, error="제목과 본문을 입력하세요.")
+        db.session.add(post)
+        db.session.commit()
+        return redirect(url_for(ep["list"]))
+    return render_template("admin/case_form.html", nav=ep["nav"], ep=ep,
+                           post=None, error=None)
+
+
+def _edit(kind, post_id):
+    ep = KINDS[kind]
+    post = db.session.get(Post, post_id)
+    # 다른 종류의 글 id 로 들어오면 목록으로 돌린다(사례 화면에서 칼럼을 고치지 않게)
+    if not post or post.kind != kind:
+        return redirect(url_for(ep["list"]))
+    if request.method == "POST":
+        fill_post(post)
+        if not post.title or not post.body_html.strip():
+            return render_template("admin/case_form.html", nav=ep["nav"], ep=ep,
+                                   post=post, error="제목과 본문을 입력하세요.")
+        db.session.commit()
+        return redirect(url_for(ep["list"]))
+    return render_template("admin/case_form.html", nav=ep["nav"], ep=ep,
+                           post=post, error=None)
+
+
+def _delete(kind, post_id):
+    post = db.session.get(Post, post_id)
+    if post and post.kind == kind:
+        db.session.delete(post)
+        db.session.commit()
+    return redirect(url_for(KINDS[kind]["list"]))
+
+
+def _toggle(kind, post_id):
+    post = db.session.get(Post, post_id)
+    if post and post.kind == kind:
+        post.is_public = not post.is_public
+        db.session.commit()
+    return redirect(url_for(KINDS[kind]["list"]))
+
+
 @bp.route("/cases")
 @requires_auth
 def cases():
-    posts = Post.query.order_by(Post.published_at.desc()).all()
-    public_count = sum(1 for p in posts if p.is_public)
-    return render_template(
-        "admin/cases.html", nav="case", posts=posts, public_count=public_count
-    )
+    return _list(Post.KIND_CASE)
 
 
 @bp.route("/cases/new", methods=["GET", "POST"])
 @requires_auth
 def case_new():
-    if request.method == "POST":
-        post = Post()
-        fill_post(post)
-        if not post.title or not post.body_html.strip():
-            return render_template("admin/case_form.html", nav="case", post=post, error="제목과 본문을 입력하세요.")
-        db.session.add(post)
-        db.session.commit()
-        return redirect(url_for("admin.cases"))
-    return render_template("admin/case_form.html", nav="case", post=None, error=None)
+    return _new(Post.KIND_CASE)
 
 
 @bp.route("/cases/<int:post_id>/edit", methods=["GET", "POST"])
 @requires_auth
 def case_edit(post_id):
-    post = db.session.get(Post, post_id)
-    if not post:
-        return redirect(url_for("admin.cases"))
-    if request.method == "POST":
-        fill_post(post)
-        if not post.title or not post.body_html.strip():
-            return render_template("admin/case_form.html", nav="case", post=post, error="제목과 본문을 입력하세요.")
-        db.session.commit()
-        return redirect(url_for("admin.cases"))
-    return render_template("admin/case_form.html", nav="case", post=post, error=None)
+    return _edit(Post.KIND_CASE, post_id)
 
 
 @bp.route("/cases/<int:post_id>/delete", methods=["POST"])
 @requires_auth
 def case_delete(post_id):
-    post = db.session.get(Post, post_id)
-    if post:
-        db.session.delete(post)
-        db.session.commit()
-    return redirect(url_for("admin.cases"))
+    return _delete(Post.KIND_CASE, post_id)
 
 
 @bp.route("/cases/<int:post_id>/toggle", methods=["POST"])
 @requires_auth
 def case_toggle(post_id):
-    post = db.session.get(Post, post_id)
-    if post:
-        post.is_public = not post.is_public
+    return _toggle(Post.KIND_CASE, post_id)
+
+
+@bp.route("/columns")
+@requires_auth
+def columns():
+    return _list(Post.KIND_COLUMN)
+
+
+@bp.route("/columns/new", methods=["GET", "POST"])
+@requires_auth
+def column_new():
+    return _new(Post.KIND_COLUMN)
+
+
+@bp.route("/columns/<int:post_id>/edit", methods=["GET", "POST"])
+@requires_auth
+def column_edit(post_id):
+    return _edit(Post.KIND_COLUMN, post_id)
+
+
+@bp.route("/columns/<int:post_id>/delete", methods=["POST"])
+@requires_auth
+def column_delete(post_id):
+    return _delete(Post.KIND_COLUMN, post_id)
+
+
+@bp.route("/columns/<int:post_id>/toggle", methods=["POST"])
+@requires_auth
+def column_toggle(post_id):
+    return _toggle(Post.KIND_COLUMN, post_id)
+
+
+@bp.route("/columns/queue")
+@requires_auth
+def column_queue():
+    """키워드 큐 상태 — 대기·완료·실패, 최근 실패 사유. 실패를 다시 대기로 돌릴 수 있다."""
+    from app.column_queue import stats
+    from app.models import ColumnKeyword
+
+    failed = (ColumnKeyword.query.filter(ColumnKeyword.last_error.isnot(None))
+              .order_by(ColumnKeyword.attempts.desc(), ColumnKeyword.id.desc())
+              .limit(50).all())
+    recent = (ColumnKeyword.query.filter_by(status="done")
+              .order_by(ColumnKeyword.published_at.desc()).limit(20).all())
+    return render_template("admin/column_queue.html", nav="column",
+                           s=stats(), failed=failed, recent=recent)
+
+
+@bp.route("/columns/queue/<int:kw_id>/retry", methods=["POST"])
+@requires_auth
+def column_retry(kw_id):
+    from app.models import ColumnKeyword
+    kw = db.session.get(ColumnKeyword, kw_id)
+    if kw and kw.status != "done":
+        kw.status, kw.attempts, kw.last_error = "pending", 0, None
         db.session.commit()
-    return redirect(url_for("admin.cases"))
+        flash("'%s' 을(를) 다시 대기열에 넣었습니다." % kw.keyword, "ok")
+    return redirect(url_for("admin.column_queue"))
 
 
 @bp.route("/upload", methods=["POST"])

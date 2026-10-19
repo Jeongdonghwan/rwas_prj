@@ -136,6 +136,9 @@ def create_app():
         return dt.strftime(fmt) if dt else empty
 
     app.jinja_env.filters["kst"] = _kst
+    # 어드민에서 /%EB%B2%95… 대신 /법률칼럼/… 으로 읽히게
+    from urllib.parse import unquote as _unq
+    app.jinja_env.filters["urldecode"] = _unq
 
     from app.routes.main import bp as main_bp
     from app.routes.contact import bp as contact_bp
@@ -163,13 +166,14 @@ def create_app():
 
     from app.seed import (admin_reset_command, seed_column_keywords_command,
                           seed_command, seed_keywords_command,
-                          sms_check_command)
+                          sms_check_command, write_columns_command)
 
     app.cli.add_command(seed_command)
     app.cli.add_command(seed_keywords_command)
     app.cli.add_command(sms_check_command)
     app.cli.add_command(admin_reset_command)
     app.cli.add_command(seed_column_keywords_command)
+    app.cli.add_command(write_columns_command)
 
     with app.app_context():
         from app import models  # noqa: F401

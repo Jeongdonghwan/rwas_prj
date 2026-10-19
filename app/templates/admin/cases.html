@@ -1,13 +1,14 @@
 {% extends "admin/_base.html" %}
-{% block title %}진행 사례{% endblock %}
+{% block title %}{{ ep.label }}{% endblock %}
 
 {% block content %}
 <div class="phead">
-  <h1>진행 사례</h1>
+  <h1>{{ ep.label }}</h1>
   <p>총 {{ posts|length }}건 · 공개 {{ public_count }}건</p>
   <div class="act">
-    <a class="btn line" href="{{ url_for('board.case_list') }}" target="_blank" rel="noopener">게시판 보기 ↗</a>
-    <a class="btn" href="{{ url_for('admin.case_new') }}">새 사례 작성</a>
+    <a class="btn line" href="{{ url_for(ep.public_list) }}" target="_blank" rel="noopener">게시판 보기 ↗</a>
+    {% if ep.nav == 'column' %}<a class="btn line" href="{{ url_for('admin.column_queue') }}">자동 발행 현황</a>{% endif %}
+    <a class="btn" href="{{ url_for(ep.new) }}">새 글 작성</a>
   </div>
 </div>
 
@@ -25,8 +26,8 @@
       {% for p in posts %}
       <tr>
         <td>
-          <a class="ln" href="{{ url_for('admin.case_edit', post_id=p.id) }}">{{ p.title }}</a>
-          <span class="sub">/사례/{{ p.slug }}/</span>
+          <a class="ln" href="{{ url_for(ep.edit, post_id=p.id) }}">{{ p.title }}</a>
+          <span class="sub">{{ url_for(ep.public_view, slug=p.slug) | urldecode }}</span>
         </td>
         <td class="hide-sm num nowrap">{{ p.published_at|kst('%Y-%m-%d') }}</td>
         <td><span class="bd {{ 'on' if p.is_public else 'off' }}">{{ '공개' if p.is_public else '비공개' }}</span></td>
@@ -34,14 +35,14 @@
         <td>
           {# 행에 마우스를 올려야 또렷해진다 — 목록을 훑을 땐 조용하게 #}
           <div class="ract">
-            <a class="btn sm line" href="{{ url_for('admin.case_edit', post_id=p.id) }}">수정</a>
+            <a class="btn sm line" href="{{ url_for(ep.edit, post_id=p.id) }}">수정</a>
             {% if p.is_public %}
-            <a class="btn sm line" href="{{ url_for('board.case_view', slug=p.slug) }}" target="_blank" rel="noopener">보기</a>
+            <a class="btn sm line" href="{{ url_for(ep.public_view, slug=p.slug) }}" target="_blank" rel="noopener">보기</a>
             {% endif %}
-            <form method="post" action="{{ url_for('admin.case_toggle', post_id=p.id) }}">
+            <form method="post" action="{{ url_for(ep.toggle, post_id=p.id) }}">
               <button class="btn sm line" type="submit">{{ '숨기기' if p.is_public else '공개' }}</button>
             </form>
-            <form method="post" action="{{ url_for('admin.case_delete', post_id=p.id) }}"
+            <form method="post" action="{{ url_for(ep.delete, post_id=p.id) }}"
                   onsubmit="return confirm('“{{ p.title }}” 글을 삭제할까요? 되돌릴 수 없습니다.')">
               <button class="btn sm ghost" type="submit" title="삭제">삭제</button>
             </form>
@@ -54,8 +55,8 @@
   </div>
   {% else %}
   <div class="empty">
-    <b>아직 작성된 사례가 없습니다</b>
-    사례 글을 올리면 홈페이지 메인·사례 목록과 네이버 RSS·사이트맵에 자동으로 반영됩니다.
+    <b>아직 작성된 글이 없습니다</b>
+    {{ ep.label }} 글을 올리면 홈페이지 메인·사례 목록과 네이버 RSS·사이트맵에 자동으로 반영됩니다.
   </div>
   {% endif %}
 </div>

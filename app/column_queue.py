@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app import db
+from app.config import REGION
 from app.models import ColumnKeyword
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -42,6 +43,18 @@ def load_csv(path=CSV_PATH):
     return added
 
 
+def _order(s):
+    """사이트마다 다른 순서. **5개 사이트가 같은 날 같은 주제를 쓰지 않게 한다.**
+
+    큐 CSV 는 다섯 사이트가 같은 주제 목록에서 만들어져 순서가 똑같다.
+    id 순으로 꺼내면 첫날 수원·안산·용인·성남이 전부 "배우자 재산도 보나요"를
+    쓴다 — 같은 사업자 도메인 네 개가 같은 날 같은 글을 올리는 건 도어웨이 신호다.
+    사이트 소금을 섞은 해시로 순서를 정해 사이트마다 다른 길로 큐를 돈다.
+    """
+    from app.content import stable_hash
+    return stable_hash("%s::col::%s" % (REGION.get("site_salt") or REGION["name"], s))
+
+
 def pick(n):
     """오늘 쓸 키워드 n개. 최근에 덜 쓴 분류부터 하나씩."""
     # 분류별 마지막 발행 시각 — 한 번도 안 쓴 분류가 가장 앞
@@ -55,18 +68,17 @@ def pick(n):
     cats = [c for (c,) in db.session.query(ColumnKeyword.category)
             .filter(ColumnKeyword.status == "pending").distinct()]
     epoch = datetime(1970, 1, 1)
-    cats.sort(key=lambda c: (last_used.get(c) or epoch, c))
+    cats.sort(key=lambda c: (last_used.get(c) or epoch, _order(c)))
 
     picked = []
     for cat in cats:
         if len(picked) >= n:
             break
-        kw = (ColumnKeyword.query
-              .filter_by(status="pending", category=cat)
-              .order_by(ColumnKeyword.attempts, ColumnKeyword.id)
-              .first())
-        if kw:
-            picked.append(kw)
+        cands = ColumnKeyword.query.filter_by(status="pending", category=cat).all()
+        if cands:
+            # 재시도 횟수가 적은 것 우선, 그 안에서는 사이트별 순서
+            picked.append(min(cands, key=lambda k: (k.attempts or 0,
+                                                    _order(k.keyword))))
     return picked
 
 
