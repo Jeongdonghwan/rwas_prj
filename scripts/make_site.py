@@ -129,21 +129,39 @@ def main():
         sys.exit("site_data/%s.py에 빠진 키: %s" % (args.site, ", ".join(missing)))
     dst = Path(args.out) if args.out else ROOT.parent / ("%s_prj" % args.site)
 
+    # --force 로 다시 만들 때 **지우면 안 되는 것.** 코드는 원본으로 갈아끼우되
+    # 운영 중에 생긴 것들은 그대로 둔다.
+    #   .git                — 이력
+    #   .env                — 키·DB 접속·SECRET_KEY (새로 만들면 관리자 로그인이 전부 풀린다)
+    #   venv / .venv        — 매번 다시 깔면 배포가 수 분씩 늘어난다
+    #   instance            — 로컬 SQLite
+    #   app/static/uploads  — **어드민에서 올린 사례·칼럼 이미지.** 지우면 글의 이미지가 전부 깨진다
+    preserve = [".git", ".env", "venv", ".venv", "instance", "app/static/uploads"]
+    stash = None
     if dst.exists():
         if not args.force:
             sys.exit("이미 있습니다: %s  (--force로 덮어쓰기)" % dst)
-        # .git은 남긴다 — 생성한 프로젝트도 저장소라 통째로 지우면 이력이 날아간다.
-        # (복사 대상에서 .git을 빼 두었으므로 그대로 둬도 덮어쓰이지 않는다.)
-        for child in dst.iterdir():
-            if child.name == ".git":
-                continue
-            shutil.rmtree(child) if child.is_dir() else child.unlink()
-        dst.rmdir() if not any(dst.iterdir()) else None
+        import tempfile
+        stash = Path(tempfile.mkdtemp(prefix="make_site_"))
+        for rel in preserve:
+            src = dst / rel
+            if src.exists():
+                (stash / rel).parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(src), str(stash / rel))
+        shutil.rmtree(dst)
 
-    if dst.exists():                       # .git만 남은 경우 — 그 위에 덮어쓴다
-        shutil.copytree(ROOT, dst, ignore=_ignore, dirs_exist_ok=True)
-    else:
-        shutil.copytree(ROOT, dst, ignore=_ignore)
+    shutil.copytree(ROOT, dst, ignore=_ignore)
+
+    if stash:
+        for rel in preserve:
+            src = stash / rel
+            if src.exists():
+                target = dst / rel
+                if target.exists():          # 원본에서 복사돼 온 빈 폴더 등
+                    shutil.rmtree(target) if target.is_dir() else target.unlink()
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(src), str(target))
+        shutil.rmtree(stash, ignore_errors=True)
     write_region(dst, mod.REGION)
     n_gu, n_dong = write_seeds(dst, mod.GU, mod.DONG)
 
