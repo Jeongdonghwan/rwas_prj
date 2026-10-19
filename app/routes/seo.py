@@ -234,18 +234,30 @@ def sitemap_case():
 
 @bp.route("/sitemap-board.xml")
 def sitemap_board():
-    posts = (
-        Post.query.filter_by(is_public=True)
-        .order_by(Post.published_at.desc())
-        .all()
-    )
-    newest = posts[0].updated_at or posts[0].published_at if posts else template_mtime("board")
-    entries = [url_entry(abs_url("board.case_list"), newest, "daily", "0.9")]
-    for p in posts:
-        entries.append(url_entry(
-            abs_url("board.case_view", slug=p.slug),
-            p.updated_at or p.published_at, "monthly", "0.7",
-        ))
+    entries = []
+    # 사례와 칼럼은 라우트가 달라 따로 돈다. 한 보드로 묶으면 칼럼 글이
+    # /사례/<slug>/ 로 잘못된 URL을 사이트맵에 올린다.
+    for kind, list_ep, view_ep in (
+        (Post.KIND_CASE, "board.case_list", "board.case_view"),
+        (Post.KIND_COLUMN, "board.column_list", "board.column_view"),
+    ):
+        posts = (
+            Post.query.filter_by(is_public=True, kind=kind)
+            .order_by(Post.published_at.desc())
+            .all()
+        )
+        if not posts:
+            continue
+        newest = posts[0].updated_at or posts[0].published_at
+        entries.append(url_entry(abs_url(list_ep), newest, "daily", "0.9"))
+        for p in posts:
+            entries.append(url_entry(
+                abs_url(view_ep, slug=p.slug),
+                p.updated_at or p.published_at, "monthly", "0.7",
+            ))
+    if not entries:
+        entries = [url_entry(abs_url("board.case_list"),
+                             template_mtime("board"), "daily", "0.9")]
     return xml_response(urlset(entries))
 
 
@@ -257,10 +269,12 @@ def sitemap_board():
 @bp.route("/feed.xml")
 def rss():
     site = SITE_DEFAULTS
+    # **사례와 칼럼을 함께 싣는다.** 네이버는 사이트맵보다 RSS를 빨리 먹고,
+    # 사례만 실으면 글이 1건에 멈춰 신선도 신호가 없다.
     posts = (
         Post.query.filter_by(is_public=True)
         .order_by(Post.published_at.desc())
-        .limit(30)
+        .limit(50)
         .all()
     )
 
@@ -271,7 +285,9 @@ def rss():
 
     items = []
     for p in posts:
-        link = abs_url("board.case_view", slug=p.slug)
+        ep = ("board.column_view" if p.kind == Post.KIND_COLUMN
+              else "board.case_view")
+        link = abs_url(ep, slug=p.slug)
         item = [
             "    <item>",
             "      <title>%s</title>" % escape(p.title),
@@ -280,7 +296,7 @@ def rss():
             "      <pubDate>%s</pubDate>" % rfc822(p.published_at),
             "      <description><![CDATA[%s]]></description>" % (p.excerpt or ""),
             "      <content:encoded><![CDATA[%s]]></content:encoded>" % (p.body_html or ""),
-            "      <category>진행 사례</category>",
+            "      <category>%s</category>" % ("법칼럼" if p.kind == Post.KIND_COLUMN else "진행 사례"),
         ]
         if p.thumb_path:
             item.append('      <enclosure url="%s" type="image/webp" length="0"/>'

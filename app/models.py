@@ -150,11 +150,24 @@ class Faq(db.Model):
 
 
 class Post(db.Model):
-    """진행 사례 게시판 (단일 보드)."""
+    """글. kind 로 성격이 갈린다.
+
+    **case(진행 사례)와 column(법칼럼)을 절대 섞지 말 것.**
+    사례는 실제 사건 기록이라 "의뢰인 동의를 받아 사실 위주로 작성" 고지가 붙고
+    **사람이 직접 쓴다** — 없는 사건을 생성하면 변호사 광고규정상 허위광고다.
+    칼럼은 제도·절차 일반 안내라 자동 생성이 가능하고, "개별 사건의 법률 자문이
+    아니다"라는 다른 고지가 붙는다.
+    """
 
     __tablename__ = "post"
 
+    KIND_CASE = "case"
+    KIND_COLUMN = "column"
+
     id = db.Column(db.Integer, primary_key=True)
+    # 기존 행은 전부 진행 사례다 → default/서버 기본값 모두 case
+    kind = db.Column(db.String(16), default=KIND_CASE, nullable=False,
+                     server_default=KIND_CASE, index=True)
     slug = db.Column(db.String(200), unique=True, nullable=False)
     title = db.Column(db.String(200), nullable=False)
     excerpt = db.Column(db.String(300))
