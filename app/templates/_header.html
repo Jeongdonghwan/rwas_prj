@@ -14,6 +14,7 @@
     <a href="{{ url_for('main.service_bankruptcy') }}"{% if request.path.startswith('/service/bankruptcy') %} class="on"{% endif %}>개인파산</a>
     <a href="{{ url_for('main.service_cost') }}"{% if request.path.startswith('/service/cost') %} class="on"{% endif %}>비용 안내</a>
     <a href="{{ url_for('board.case_list') }}"{% if request.path.startswith('/사례') %} class="on"{% endif %}>진행 사례</a>
+    <a href="{{ url_for('board.column_list') }}"{% if request.path.startswith('/' ~ site.column_path) %} class="on"{% endif %}>{{ site.column_path }}</a>
     <a href="{{ url_for('ko.area_hub') }}"{% if request.path.startswith('/지역별') %} class="on"{% endif %}>지역별 안내</a>
     <a href="{{ url_for('ko.job_hub') }}"{% if request.path.startswith('/직업별') or request.path.startswith('/상황별') %} class="on"{% endif %}>직업별 안내</a>
     <a href="{{ url_for('main.faq') }}"{% if request.path.startswith('/faq') %} class="on"{% endif %}>자주 묻는 질문</a>

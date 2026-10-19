@@ -110,8 +110,11 @@ p{margin:0}
 .ftr .flogo span{font-weight:800;font-size:17px;color:#d9bd8a;line-height:1.15}
 .ftr .flogo span small{display:block;font-weight:600;font-size:9px;letter-spacing:.24em;color:rgba(217,189,138,.65)}
 .logo small{display:block;font-weight:600;font-size:10.5px;color:var(--ink-3);letter-spacing:.2em;line-height:1.2;margin-top:2px}
-.gnb{display:flex;gap:4px;font-weight:600;font-size:15px;margin-left:auto}
-.gnb a{padding:9px 13px;border-radius:9px;transition:color .15s,background .15s;white-space:nowrap;color:var(--ink-2)}
+/* 메뉴는 기본부터 압축형이다. 컨테이너가 --w(1140px)에서 멈춰 넓은 화면도 쓸 수 있는
+   폭이 같은데, 15px·간격 13px로는 메뉴 9개일 때도 42px, 10개(법률칼럼 추가)면
+   124px 넘쳤다. 1280px 이하에만 걸려 있던 압축값을 기본으로 올렸다. */
+.gnb{display:flex;gap:0;font-weight:600;font-size:14px;margin-left:auto}
+.gnb a{padding:9px 9px;border-radius:9px;transition:color .15s,background .15s;white-space:nowrap;color:var(--ink-2)}
 .gnb a.on,.gnb a:hover{color:var(--green);background:var(--mint)}
 .hdr-tel{text-align:right;line-height:1.2;margin-left:6px}
 .hdr-tel b{display:block;font-size:20px;font-weight:800;color:var(--green);letter-spacing:-.01em;white-space:nowrap}
