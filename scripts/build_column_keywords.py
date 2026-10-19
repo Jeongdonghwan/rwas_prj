@@ -264,6 +264,16 @@ REGION_EVERY = 2
 REGIONS_PER_TOPIC = 7
 
 
+def _label(region, area):
+    """키워드에 붙일 지역 표기.
+
+    두 글자 동 이름은 일반 단어와 겹친다 — 안산 '이동'은 "이동 워크아웃 상담"처럼
+    '옮김'으로 읽히고, 사동·일동·와동·평동·지동도 마찬가지다. 이런 동은 앞에
+    도시명을 붙인다("안산 이동"). 세 글자 이상이나 시도 이름은 그대로 둔다.
+    """
+    return "%s %s" % (region, area) if len(area) <= 2 else area
+
+
 def build(region, schemes, areas):
     """(분류, 키워드, 제도, 지역, 검색의도) 목록."""
     single = len(schemes) == 1
@@ -280,11 +290,11 @@ def build(region, schemes, areas):
                 # 특정 시도에 몰리지 않게 한다
                 for j in range(min(REGIONS_PER_TOPIC, len(areas))):
                     area = areas[(n * REGIONS_PER_TOPIC + j) % len(areas)]
-                    rows.append((cat, "%s %s" % (area, kw),
+                    rows.append((cat, "%s %s" % (_label(region, area), kw),
                                  scheme_name, area, intent))
             elif n % REGION_EVERY == 0:
                 area = areas[(n // REGION_EVERY - 1) % len(areas)]
-                rows.append((cat, "%s %s" % (area, kw), scheme_name, area, intent))
+                rows.append((cat, "%s %s" % (_label(region, area), kw), scheme_name, area, intent))
     return rows
 
 
