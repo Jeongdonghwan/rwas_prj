@@ -117,7 +117,7 @@ def build_prompt(kw):
         "- 허용 태그: h2 p ul ol li b a(href만). 그 외 태그·속성 금지\n\n"
         "JSON 으로만 답한다:\n"
         '{"title": "키워드가 자연스럽게 들어간 제목(40자 이내)", '
-        '"excerpt": "검색결과용 요약(60~78자)", "body_html": "..."}'
+        '"excerpt": "검색결과용 요약 — 반드시 75자 이내 한두 문장", "body_html": "..."}'
         % (kw.keyword, kw.category, kw.intent, kw.scheme,
            region_line, area_line, kv, link_list)
     )
@@ -234,10 +234,32 @@ def _grams(t, n=3):
     return {t[i:i + n] for i in range(len(t) - n + 1)}
 
 
+def fit_excerpt(text, limit=79):
+    """요약을 limit 자 안으로. 문장 경계에서 자르고, 안 되면 어절에서 자르고 '…'.
+
+    모델은 "60~78자"를 지시받아도 83~90자를 자주 낸다(운영 첫 실행 5편 중 4편).
+    90초짜리 글을 요약 10자 때문에 버리면 아깝다 — 요약만 다듬는다.
+    """
+    text = re.sub(r"\s+", " ", text or "").strip()
+    if len(text) <= limit:
+        return text
+    head = text[:limit]
+    # 1) 마지막 문장 끝(다. 요. 니다.)에서 자를 수 있으면 거기서
+    ends = [m.end() for m in re.finditer(r"[다요]\.", head)]
+    if ends and ends[-1] >= 40:
+        return head[:ends[-1]]
+    # 2) 아니면 어절 경계에서 자르고 말줄임
+    cut = head[:limit - 1]
+    sp = cut.rfind(" ")
+    if sp >= 40:
+        cut = cut[:sp]
+    return cut.rstrip(" ,·") + "…"
+
+
 def validate(kw, data, existing_grams):
     errs = []
     title = (data.get("title") or "").strip()
-    excerpt = (data.get("excerpt") or "").strip()
+    excerpt = fit_excerpt(data.get("excerpt") or "")
     body = clean_html(data.get("body_html") or "")
     text = plain(body)
     code = NAME_TO_CODE.get(kw.scheme, "rehab")

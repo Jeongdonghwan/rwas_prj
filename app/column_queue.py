@@ -20,27 +20,41 @@ MAX_ATTEMPTS = 3   # 검증에서 이만큼 떨어지면 failed — 어드민에
 
 
 def load_csv(path=CSV_PATH):
-    """CSV → 테이블. **기존 행의 status 는 건드리지 않는다.**
+    """CSV → 테이블. (추가 수, 정리 수)를 돌려준다.
+
+    **기존 행의 status 는 건드리지 않는다.**
 
     키워드 목록을 다시 만들어 넣어도 이미 쓴 키워드가 pending 으로
     돌아가면 같은 글을 두 번 쓰게 된다.
     """
+    with open(path, encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    wanted = {r["keyword"] for r in rows}
+
+    # CSV 에서 빠진 키워드 중 **아직 안 쓴 것(pending)만** 지운다.
+    # 키워드 규칙을 고친 뒤(예: "이동 …" → "안산 이동 …") 다시 적재하면 옛 표기가
+    # 대기열에 남아 그대로 발행된다 — 운영 첫 실행에서 실제로 그랬다.
+    # done/failed 는 절대 건드리지 않는다(발행 이력·실패 기록).
+    removed = (ColumnKeyword.query
+               .filter(ColumnKeyword.status == "pending",
+                       ColumnKeyword.keyword.notin_(wanted))
+               .delete(synchronize_session=False))
+
     existing = {k.keyword for k in ColumnKeyword.query.with_entities(
         ColumnKeyword.keyword)}
     added = 0
-    with open(path, encoding="utf-8") as f:
-        for r in csv.DictReader(f):
-            if r["keyword"] in existing:
-                continue
-            db.session.add(ColumnKeyword(
-                keyword=r["keyword"], category=r["category"],
-                scheme=r["scheme"], area=r.get("area") or "",
-                intent=r.get("intent") or "",
-            ))
-            existing.add(r["keyword"])
-            added += 1
+    for r in rows:
+        if r["keyword"] in existing:
+            continue
+        db.session.add(ColumnKeyword(
+            keyword=r["keyword"], category=r["category"],
+            scheme=r["scheme"], area=r.get("area") or "",
+            intent=r.get("intent") or "",
+        ))
+        existing.add(r["keyword"])
+        added += 1
     db.session.commit()
-    return added
+    return added, removed
 
 
 def _order(s):

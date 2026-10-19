@@ -267,10 +267,11 @@ def seed_column_keywords_command():
     from app.column_queue import load_csv, stats
 
     db.create_all()
-    added = load_csv()
+    added, removed = load_csv()
     s = stats()
-    click.echo("추가 %d개 / 대기 %d · 완료 %d · 실패 %d"
-               % (added, s.get("pending", 0), s.get("done", 0), s.get("failed", 0)))
+    click.echo("추가 %d · 옛 대기 정리 %d / 대기 %d · 완료 %d · 실패 %d"
+               % (added, removed, s.get("pending", 0), s.get("done", 0),
+                  s.get("failed", 0)))
 
 
 @click.command("write-columns")

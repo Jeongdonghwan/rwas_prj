@@ -55,6 +55,9 @@ def main():
         ("스크립트 주입", {"body_html": article()["body_html"]
                           + "<script>alert(1)</script>"}, None),
         ("제목에 핵심어 없음", {"title": "알아두면 좋은 이야기"}, "제목"),
+        # 모델이 요약을 80자 넘게 쓰는 일이 잦다 — 버리지 않고 다듬어 통과시켜야 한다
+        ("긴 요약 90자", {"excerpt": "개인회생 중 이직해도 절차는 계속되지만 소득이 바뀌면 법원에 알려야 합니다. "
+                                    "변제계획 변경 여부와 필요한 서류, 놓치기 쉬운 신고 시점을 함께 정리했습니다."}, None),
     ]
 
     fail = 0
@@ -66,6 +69,8 @@ def main():
                 ok = not errs
                 if name == "스크립트 주입":
                     ok = ok and "<script" not in out["body_html"]
+                if name.startswith("긴 요약"):
+                    ok = ok and len(out["excerpt"]) <= 79
             else:
                 ok = must in joined
             fail += not ok
