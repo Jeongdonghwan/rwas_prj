@@ -55,6 +55,10 @@ def main():
         ("스크립트 주입", {"body_html": article()["body_html"]
                           + "<script>alert(1)</script>"}, None),
         ("제목에 핵심어 없음", {"title": "알아두면 좋은 이야기"}, "제목"),
+        # 운영 첫 샘플에서 실제로 걸린 두 가지 — 버리지 않고 고쳐서 통과해야 한다
+        ("슬래시 없는 /contact", {"body_html": article()["body_html"]
+                                 .replace('/contact/', '/contact')}, None),
+        ("요약 37자", {"excerpt": "병원비 때문에 생긴 빚도 개인회생으로 정리할 수 있는지 살펴봅니다."[:37]}, None),
         # '사례' 키워드 글이 실제 처리 사건처럼 쓰이면 광고규정 위반
         ("지어낸 사례", {"body_html": article()["body_html"]
                          .replace("이어집니다", "이어집니다. 저희가 진행한 A씨는 인가를 받았습니다")},
@@ -73,8 +77,10 @@ def main():
                 ok = not errs
                 if name == "스크립트 주입":
                     ok = ok and "<script" not in out["body_html"]
-                if name.startswith("긴 요약"):
-                    ok = ok and len(out["excerpt"]) <= 79
+                if name.startswith("긴 요약") or name.startswith("요약 37"):
+                    ok = ok and 40 <= len(out["excerpt"]) <= 79
+                if name.startswith("슬래시"):
+                    ok = ok and '/contact/' in out["body_html"]
             else:
                 ok = must in joined
             fail += not ok

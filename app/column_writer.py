@@ -279,10 +279,23 @@ def fit_excerpt(text, limit=79):
 def validate(kw, data, existing_grams):
     errs = []
     title = (data.get("title") or "").strip()
-    excerpt = fit_excerpt(data.get("excerpt") or "")
     body = clean_html(data.get("body_html") or "")
     text = plain(body)
     code = NAME_TO_CODE.get(kw.scheme, "rehab")
+
+    # 모델이 "/contact" 처럼 끝 슬래시를 빼고 쓰는 일이 잦다 — 사이트 경로는 전부 슬래시로
+    # 끝나므로(308 리다이렉트) 유효한 경로의 슬래시 누락은 고쳐 준다. 그 외는 그대로 두어 걸린다.
+    valid = {p for _, p in link_targets(code)[0]}
+    body = re.sub(r'<a href="(/[^"]*?)"',
+                  lambda m: '<a href="%s/"' % m.group(1)
+                  if not m.group(1).endswith("/") and m.group(1) + "/" in valid
+                  else m.group(0), body)
+
+    # 요약이 너무 짧으면(모델이 한 토막만 쓴 경우) 첫 문단으로 채운다 — 버리기엔 아까운 글이다
+    excerpt = fit_excerpt(data.get("excerpt") or "")
+    if len(excerpt) < 40:
+        first = re.search(r"<p>(.*?)</p>", body, re.S)
+        excerpt = fit_excerpt(plain(first.group(1)) if first else text)
 
     if not title:
         errs.append("제목 없음")
@@ -301,7 +314,6 @@ def validate(kw, data, existing_grams):
     links = re.findall(r'<a href="(/[^"]*)">', body)
     if len(links) < MIN_LINKS:
         errs.append("내부링크 %d개(%d개 이상)" % (len(links), MIN_LINKS))
-    valid = {p for _, p in link_targets(code)[0]}
     bad_links = [l for l in links if l not in valid]
     if bad_links:
         errs.append("없는 경로 링크 %s" % bad_links[:2])
