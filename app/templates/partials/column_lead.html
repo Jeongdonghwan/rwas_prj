@@ -1,50 +1,97 @@
-{# 칼럼 본문 아래 고정 — 읽은 내용을 내 상황에 대입해 보게 하는 짧은 선택형 폼.
-   선택지는 contact.submit 이 q_ 접두 필드로 받아 memo 에 적는다(채무 규모는 debt_range).
-   "탕감·무료·진단 결과" 같은 말은 쓰지 않는다 — 광고규정. 가능성 확인을 '요청'하는 폼이다. #}
-<form class="lead" id="form" data-consult action="{{ url_for('contact.submit') }}" method="post">
-  <div class="lead-head">
-    <p class="k">읽은 내용, 내 상황에도 해당될까</p>
-    <h2>세 가지만 고르시면 가능성을 먼저 확인해 드립니다</h2>
-    <p class="sub">접수 후 30분 안에 담당자가 연락드립니다 · 전국 비대면 · 익명 상담 가능</p>
+{# 칼럼 본문 아래 고정 블록 — 랜딩(상세페이지)형 훅 + 선택형 신청 폼.
+   순서: 훅 배너(사실 수치 3개) → 지금 확인할 상황 4개 → 진행 4단계 → 신뢰 3줄 → 폼.
+   수치는 전부 app/scheme_facts.py 와 같은 값이다(1~2주 금지명령 / 3년·2년 / 10억·15억 / 3~6개월).
+   "탕감률·무료·실시간 신청 현황" 같은 레퍼런스 장치는 광고규정(결과 보장·허위)이라 넣지 않는다.
+   선택지는 contact.submit 이 q_ 접두 필드로 받아 memo 에 적는다(채무 규모는 debt_range). #}
+<section class="lp" aria-label="상담 안내">
+
+  <div class="lp-hook">
+    <p class="k">{% if site.area_mode == 'sido' %}전국{% else %}{{ site.region }}{% endif %} 개인회생 · 개인파산 상담</p>
+    <h2>독촉 전화가 오기 전에 확인하면,<br>선택지가 더 많습니다</h2>
+    <p class="sub">채무 현황만 알려주시면 가능성과 예상 월 변제금을 먼저 계산해 드립니다. <br class="pc">신청 여부는 그 뒤에 정하셔도 됩니다.</p>
+    <ul class="facts">
+      <li><b>1~2주</b><span>접수 후 금지명령으로 <br>추심·압류 중단</span></li>
+      <li><b>3년</b><span>변제기간 원칙 <br>사정에 따라 2년까지 단축</span></li>
+      <li><b>10억</b><span>무담보 채무 한도 <br>담보 채무는 15억까지</span></li>
+    </ul>
+    <div class="acts">
+      <a class="btn red" href="#form">내 상황으로 확인 요청</a>
+      <a class="btn ghost" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>
+    </div>
   </div>
-  {% with messages = get_flashed_messages(category_filter=['error']) %}
-    {% for m in messages %}<p class="flash">{{ m }}</p>{% endfor %}
-  {% endwith %}
-  <input type="hidden" name="source_path" value="{{ request.path }}">
 
-  <fieldset class="q">
-    <legend>현재 빚은 모두 얼마쯤인가요</legend>
-    <div class="opts">
-      <label><input type="radio" name="debt" value="3천만원 이하"><span>3천만원 이하</span></label>
-      <label><input type="radio" name="debt" value="3천–7천만원" checked><span>3천~7천만원</span></label>
-      <label><input type="radio" name="debt" value="7천만–1억5천"><span>7천~1억 5천</span></label>
-      <label><input type="radio" name="debt" value="1억5천 이상"><span>1억 5천 이상</span></label>
-    </div>
-  </fieldset>
-
-  <fieldset class="q">
-    <legend>매달 들어오는 소득이 있나요</legend>
-    <div class="opts">
-      <label><input type="radio" name="q_소득" value="고정 소득 있음" checked><span>고정 소득 있음</span></label>
-      <label><input type="radio" name="q_소득" value="불규칙하지만 있음"><span>불규칙하지만 있음</span></label>
-      <label><input type="radio" name="q_소득" value="지금은 없음"><span>지금은 없음</span></label>
-    </div>
-  </fieldset>
-
-  <fieldset class="q">
-    <legend>연체는 어느 단계인가요</legend>
-    <div class="opts">
-      <label><input type="radio" name="q_연체" value="아직 연체 전" checked><span>아직 연체 전</span></label>
-      <label><input type="radio" name="q_연체" value="1~3개월"><span>1~3개월</span></label>
-      <label><input type="radio" name="q_연체" value="3개월 이상·추심 중"><span>3개월 이상 · 추심 중</span></label>
-    </div>
-  </fieldset>
-
-  <div class="who">
-    <div class="field"><label for="ln">이름</label><input id="ln" name="name" required placeholder="홍길동" autocomplete="name"></div>
-    <div class="field"><label for="lp">연락처</label><input id="lp" name="phone" type="tel" required placeholder="010-0000-0000" autocomplete="tel"></div>
+  <div class="lp-sec">
+    <h3>이런 상황이면 지금 확인해 보세요</h3>
+    <ul class="who">
+      <li><b>대출로 대출을 갚고 있다</b><span>돌려막기는 매달 원금이 늘어납니다. 소득이 있을 때 정리해야 변제계획을 세울 수 있습니다.</span></li>
+      <li><b>연체가 한 달을 넘겼다</b><span>연체 3개월부터 채권이 추심사로 넘어가고 소송·압류가 뒤따릅니다. 그 전이 가장 유리합니다.</span></li>
+      <li><b>추심 전화·압류가 시작됐다</b><span>신청 접수 후 1~2주 안에 금지명령이 나오면 급여·통장 압류와 추심이 멈춥니다.</span></li>
+      <li><b>사업을 정리하려 한다</b><span>사업자 대출·보증·미수금은 폐업 전후로 처리 순서가 다릅니다. 정리 전에 상담이 필요합니다.</span></li>
+    </ul>
   </div>
-  <label class="agree"><input type="checkbox" name="agree" value="1" required> 개인정보 수집·이용에 동의합니다. (상담 목적 외 사용하지 않습니다)</label>
-  <button class="btn red wide" type="submit">내 상황으로 가능성 확인 요청</button>
-  <p class="tel">전화가 편하시면 <a href="tel:{{ site.phone_link }}"><b>{{ site.phone }}</b></a> · {{ site.hours }}</p>
-</form>
+
+  <div class="lp-sec">
+    <h3>상담 후 진행은 이렇게</h3>
+    <ol class="flow">
+      <li><em>01</em><b>상담 · 가능성 확인</b><span>소득·채무·재산을 듣고 예상 변제금 계산</span></li>
+      <li><em>02</em><b>서류 준비</b><span>부채증명서·소득증빙 정리, 보통 2~3주</span></li>
+      <li><em>03</em><b>법원 신청 · 금지명령</b><span>접수 후 1~2주, 추심·압류 중단</span></li>
+      <li><em>04</em><b>개시 · 인가</b><span>신청 후 평균 3~6개월, 변제 시작</span></li>
+    </ol>
+  </div>
+
+  <ul class="lp-trust">
+    <li><b>변호사 직접 상담</b><span>상담부터 인가까지 담당 변호사가 봅니다</span></li>
+    <li><b>{{ site.since }}년 개업</b><span>{{ site.office_court }} 앞 사무소, 지점 없음</span></li>
+    <li><b>전국 비대면 · 익명</b><span>방문 없이 진행, 비용 분할 가능</span></li>
+  </ul>
+
+  <form class="lead" id="form" data-consult action="{{ url_for('contact.submit') }}" method="post">
+    <div class="lead-head">
+      <p class="k">읽은 내용, 내 상황에도 해당될까</p>
+      <h2>세 가지만 고르시면 가능성을 먼저 확인해 드립니다</h2>
+      <p class="sub">접수 후 30분 안에 담당자가 연락드립니다 · {{ site.hours }}</p>
+    </div>
+    {% with messages = get_flashed_messages(category_filter=['error']) %}
+      {% for m in messages %}<p class="flash">{{ m }}</p>{% endfor %}
+    {% endwith %}
+    <input type="hidden" name="source_path" value="{{ request.path }}">
+
+    <fieldset class="q">
+      <legend>현재 빚은 모두 얼마쯤인가요</legend>
+      <div class="opts">
+        <label><input type="radio" name="debt" value="3천만원 이하"><span>3천만원 이하</span></label>
+        <label><input type="radio" name="debt" value="3천–7천만원" checked><span>3천~7천만원</span></label>
+        <label><input type="radio" name="debt" value="7천만–1억5천"><span>7천~1억 5천</span></label>
+        <label><input type="radio" name="debt" value="1억5천 이상"><span>1억 5천 이상</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>매달 들어오는 소득이 있나요</legend>
+      <div class="opts">
+        <label><input type="radio" name="q_소득" value="고정 소득 있음" checked><span>고정 소득 있음</span></label>
+        <label><input type="radio" name="q_소득" value="불규칙하지만 있음"><span>불규칙하지만 있음</span></label>
+        <label><input type="radio" name="q_소득" value="지금은 없음"><span>지금은 없음</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>연체는 어느 단계인가요</legend>
+      <div class="opts">
+        <label><input type="radio" name="q_연체" value="아직 연체 전" checked><span>아직 연체 전</span></label>
+        <label><input type="radio" name="q_연체" value="1~3개월"><span>1~3개월</span></label>
+        <label><input type="radio" name="q_연체" value="3개월 이상·추심 중"><span>3개월 이상 · 추심 중</span></label>
+      </div>
+    </fieldset>
+
+    <div class="who2">
+      <div class="field"><label for="ln">이름</label><input id="ln" name="name" required placeholder="홍길동" autocomplete="name"></div>
+      <div class="field"><label for="lp">연락처</label><input id="lp" name="phone" type="tel" required placeholder="010-0000-0000" autocomplete="tel"></div>
+    </div>
+    <label class="agree"><input type="checkbox" name="agree" value="1" required> 개인정보 수집·이용에 동의합니다. (상담 목적 외 사용하지 않습니다)</label>
+    <button class="btn red wide" type="submit">내 상황으로 가능성 확인 요청</button>
+    <p class="tel">전화가 편하시면 <a href="tel:{{ site.phone_link }}"><b>{{ site.phone }}</b></a></p>
+  </form>
+
+</section>

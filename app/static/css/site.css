@@ -965,6 +965,55 @@ body.modal-open{overflow:hidden}
   .hero .scroll-hint .drip::after{animation:none;top:0}
 }
 
+/* 칼럼 하단 고정 블록(랜딩형 훅 + 리드 폼) — partials/column_lead.html */
+.lp{margin-top:48px}
+.lp-hook{position:relative;overflow:hidden;border-radius:var(--r);padding:48px 44px 44px;color:#fff;background:linear-gradient(100deg,rgba(14,15,18,.94) 0%,rgba(24,25,30,.86) 55%,rgba(60,22,30,.78) 100%),url('../img/bg-court.webp') center 40%/cover no-repeat var(--green-dark)}
+.lp-hook .k{font-size:13px;font-weight:700;letter-spacing:.02em;color:rgba(255,255,255,.62);margin-bottom:12px}
+.lp-hook h2{color:#fff;font-size:30px;line-height:1.3;margin:0 0 14px;letter-spacing:-.02em}
+.lp-hook .sub{font-size:15px;line-height:1.7;color:rgba(255,255,255,.78);margin-bottom:28px}
+.lp-hook .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 28px;padding:0;list-style:none}
+.lp-hook .facts li{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:18px 18px 16px}
+.lp-hook .facts b{display:block;font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1;margin-bottom:9px;color:#fff}
+.lp-hook .facts span{font-size:13px;line-height:1.55;color:rgba(255,255,255,.72)}
+.lp-hook .acts{display:flex;gap:10px;flex-wrap:wrap}
+.lp-hook .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
+.lp-hook .btn.ghost:hover{background:rgba(255,255,255,.1);border-color:#fff}
+.lp-sec{margin-top:36px}
+.lp-sec h3,.lp-trust+.lead .lead-head h2{letter-spacing:-.01em}
+.lp-sec h3{font-size:20px;margin-bottom:16px}
+.lp .who{display:grid;grid-template-columns:1fr 1fr;gap:12px;list-style:none;margin:0;padding:0}
+.lp .who li{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 22px;border-left:4px solid var(--green)}
+.lp .who b{display:block;font-size:16px;margin-bottom:6px}
+.lp .who span{font-size:14px;line-height:1.65;color:var(--ink-2)}
+.lp .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;list-style:none;margin:0;padding:0;counter-reset:none}
+.lp .flow li{position:relative;background:var(--paper-2);border-radius:14px;padding:18px 16px 16px}
+.lp .flow li+li::before{content:"";position:absolute;left:-10px;top:50%;width:10px;height:1px;background:var(--mint-2)}
+.lp .flow em{font-style:normal;font-size:12px;font-weight:800;color:var(--green-2);letter-spacing:.06em}
+.lp .flow b{display:block;font-size:15px;margin:8px 0 6px}
+.lp .flow span{font-size:13px;line-height:1.55;color:var(--ink-2)}
+.lp-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:0;list-style:none;margin:32px 0 0;padding:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.lp-trust li{padding:18px 20px}
+.lp-trust li+li{border-left:1px solid var(--line-2)}
+.lp-trust b{display:block;font-size:15px;margin-bottom:4px}
+.lp-trust span{font-size:13px;color:var(--ink-2)}
+.lp .lead{margin-top:20px;background:var(--mint)}
+.lp .lead .opts span{background:#fff}
+.lp .who2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+@media (max-width:720px){
+  .lp-hook{padding:34px 22px 30px}
+  .lp-hook h2{font-size:23px}
+  .lp-hook .sub .pc{display:none}
+  .lp-hook .facts{grid-template-columns:1fr;gap:8px}
+  .lp-hook .facts li{display:flex;align-items:center;gap:16px;padding:14px 16px}
+  .lp-hook .facts b{font-size:24px;margin:0;min-width:74px}
+  .lp-hook .facts span br{display:none}
+  .lp-hook .acts .btn{flex:1;text-align:center}
+  .lp .who,.lp .flow,.lp .who2{grid-template-columns:1fr}
+  .lp .flow li+li::before{display:none}
+  .lp-trust{grid-template-columns:1fr}
+  .lp-trust li+li{border-left:0;border-top:1px solid var(--line-2)}
+}
+
 /* 칼럼 하단 고정 리드 폼 — partials/column_lead.html */
 .lead{margin-top:44px;background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r);padding:34px 32px}
 .lead-head{margin-bottom:22px}
@@ -980,7 +1029,6 @@ body.modal-open{overflow:hidden}
 .lead .opts span:hover{border-color:var(--mint-2)}
 .lead .opts input:checked+span{background:var(--green);border-color:var(--green);color:#fff}
 .lead .opts input:focus-visible+span{box-shadow:0 0 0 3px var(--mint-2)}
-.lead .who{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
 .lead .field{margin-bottom:0}
 .lead .agree{display:flex;gap:7px;align-items:center;font-size:12.5px;color:var(--ink-2);margin:14px 0}
 .lead .agree input{accent-color:var(--green-2);margin:0;flex:none}
@@ -990,6 +1038,5 @@ body.modal-open{overflow:hidden}
 @media (max-width:600px){
   .lead{padding:26px 18px}
   .lead-head h2{font-size:19px}
-  .lead .who{grid-template-columns:1fr}
   .lead .opts span{padding:9px 13px;font-size:13.5px}
 }
