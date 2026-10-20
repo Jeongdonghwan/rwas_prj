@@ -964,3 +964,32 @@ body.modal-open{overflow:hidden}
   .deep > *{opacity:1!important;transform:none!important;transition:none!important}
   .hero .scroll-hint .drip::after{animation:none;top:0}
 }
+
+/* 칼럼 하단 고정 리드 폼 — partials/column_lead.html */
+.lead{margin-top:44px;background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r);padding:34px 32px}
+.lead-head{margin-bottom:22px}
+.lead-head .k{font-size:13px;font-weight:700;color:var(--green-2);letter-spacing:.01em;margin-bottom:6px}
+.lead-head h2{font-size:22px;line-height:1.35;margin:0 0 8px}
+.lead-head .sub{font-size:13.5px;color:var(--ink-2)}
+.lead .q{border:0;padding:0;margin:0 0 18px}
+.lead .q legend{font-size:14px;font-weight:700;margin-bottom:9px;padding:0}
+.lead .opts{display:flex;flex-wrap:wrap;gap:8px}
+.lead .opts label{position:relative;margin:0}
+.lead .opts input{position:absolute;opacity:0;width:1px;height:1px}
+.lead .opts span{display:block;padding:10px 16px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:14px;font-weight:600;color:var(--ink-2);cursor:pointer;transition:background var(--t-fast),color var(--t-fast),border-color var(--t-fast)}
+.lead .opts span:hover{border-color:var(--mint-2)}
+.lead .opts input:checked+span{background:var(--green);border-color:var(--green);color:#fff}
+.lead .opts input:focus-visible+span{box-shadow:0 0 0 3px var(--mint-2)}
+.lead .who{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.lead .field{margin-bottom:0}
+.lead .agree{display:flex;gap:7px;align-items:center;font-size:12.5px;color:var(--ink-2);margin:14px 0}
+.lead .agree input{accent-color:var(--green-2);margin:0;flex:none}
+.lead .btn{height:56px;font-size:16px}
+.lead .tel{margin-top:12px;font-size:13.5px;color:var(--ink-2);text-align:center}
+.lead .flash{color:var(--green-bright);font-size:13.5px;margin-bottom:12px}
+@media (max-width:600px){
+  .lead{padding:26px 18px}
+  .lead-head h2{font-size:19px}
+  .lead .who{grid-template-columns:1fr}
+  .lead .opts span{padding:9px 13px;font-size:13.5px}
+}

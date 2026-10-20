@@ -24,7 +24,10 @@ W, H = 1200, 630
 AUTO_DIR = "uploads/auto"
 PAD = 84
 
-# 사이트 팔레트(버건디·차콜) 안에서만 돌린다 — 목록이 한 색으로 도배되지 않게
+# 배경은 사이트가 이미 쓰는 Unsplash 무료 사진(상업용 무료·저작자표시 불요) 중 하나를
+# 제목 해시로 고른다. 사진이 없으면 팔레트 그라데이션으로 떨어진다.
+PHOTOS = ["hero-justice.webp", "bg-court.webp", "bg-library.webp",
+          "consult.webp", "books.webp"]
 BGS = [((124, 34, 49), (74, 18, 30)),     # 딥 버건디
        ((48, 44, 46), (24, 22, 24)),      # 차콜
        ((96, 30, 44), (40, 20, 26))]      # 와인→차콜
@@ -69,13 +72,33 @@ def _wrap(draw, text, font, width):
     return lines
 
 
-def render(title, label="법률칼럼"):
-    """PIL 이미지를 돌려준다."""
+def _flat_bg(title):
     top, bottom = BGS[stable_hash(title) % len(BGS)]
     img = Image.new("RGB", (W, H), top)
-    # 세로 그라데이션
     grad = Image.linear_gradient("L").resize((W, H))
-    img = Image.composite(Image.new("RGB", (W, H), bottom), img, grad)
+    return Image.composite(Image.new("RGB", (W, H), bottom), img, grad)
+
+
+def _photo_bg(title):
+    """스톡 사진을 1200×630 으로 채워 자르고, 글자가 읽히게 어둡게 깐다."""
+    name = PHOTOS[stable_hash("photo::" + title) % len(PHOTOS)]
+    path = Path(current_app.static_folder) / "img" / name
+    if not path.exists():
+        return None
+    ph = Image.open(path).convert("RGB")
+    scale = max(W / ph.width, H / ph.height)
+    ph = ph.resize((round(ph.width * scale), round(ph.height * scale)), Image.LANCZOS)
+    x, y = (ph.width - W) // 2, (ph.height - H) // 2
+    ph = ph.crop((x, y, x + W, y + H))
+    # 좌측(글자 쪽) 더 어둡게 — 가로 그라데이션 알파로 검정을 덮는다
+    shade = Image.linear_gradient("L").rotate(90, expand=True).resize((W, H))
+    shade = shade.point(lambda v: 150 + (255 - v) * 70 // 255)   # 좌 220 → 우 150
+    return Image.composite(Image.new("RGB", (W, H), (16, 14, 15)), ph, shade)
+
+
+def render(title, label="법률칼럼"):
+    """PIL 이미지를 돌려준다."""
+    img = _photo_bg(title) or _flat_bg(title)
     d = ImageDraw.Draw(img)
 
     f600 = lambda s: ImageFont.truetype(str(_font_path(600)), s)

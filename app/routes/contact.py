@@ -62,6 +62,11 @@ def submit():
     debt_range = (request.form.get("debt") or "").strip()[:50]
     area_text = (request.form.get("area") or "").strip()[:100]
     memo = (request.form.get("memo") or "").strip()[:2000]
+    # 칼럼 하단 리드 폼의 선택지(q_소득 등) — 자유 입력 칸 없이 memo 에 "소득: 고정 소득 있음" 식으로
+    picks = ["%s: %s" % (k[2:], v.strip()[:50]) for k, v in request.form.items()
+             if k.startswith("q_") and v.strip()]
+    if picks:
+        memo = "\n".join(picks + ([memo] if memo else []))[:2000]
     source_path = (request.form.get("source_path") or "").strip()[:255]
     agree = request.form.get("agree")
 

@@ -1,0 +1,50 @@
+{# 칼럼 본문 아래 고정 — 읽은 내용을 내 상황에 대입해 보게 하는 짧은 선택형 폼.
+   선택지는 contact.submit 이 q_ 접두 필드로 받아 memo 에 적는다(채무 규모는 debt_range).
+   "탕감·무료·진단 결과" 같은 말은 쓰지 않는다 — 광고규정. 가능성 확인을 '요청'하는 폼이다. #}
+<form class="lead" id="form" data-consult action="{{ url_for('contact.submit') }}" method="post">
+  <div class="lead-head">
+    <p class="k">읽은 내용, 내 상황에도 해당될까</p>
+    <h2>세 가지만 고르시면 가능성을 먼저 확인해 드립니다</h2>
+    <p class="sub">접수 후 30분 안에 담당자가 연락드립니다 · 전국 비대면 · 익명 상담 가능</p>
+  </div>
+  {% with messages = get_flashed_messages(category_filter=['error']) %}
+    {% for m in messages %}<p class="flash">{{ m }}</p>{% endfor %}
+  {% endwith %}
+  <input type="hidden" name="source_path" value="{{ request.path }}">
+
+  <fieldset class="q">
+    <legend>현재 빚은 모두 얼마쯤인가요</legend>
+    <div class="opts">
+      <label><input type="radio" name="debt" value="3천만원 이하"><span>3천만원 이하</span></label>
+      <label><input type="radio" name="debt" value="3천–7천만원" checked><span>3천~7천만원</span></label>
+      <label><input type="radio" name="debt" value="7천만–1억5천"><span>7천~1억 5천</span></label>
+      <label><input type="radio" name="debt" value="1억5천 이상"><span>1억 5천 이상</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset class="q">
+    <legend>매달 들어오는 소득이 있나요</legend>
+    <div class="opts">
+      <label><input type="radio" name="q_소득" value="고정 소득 있음" checked><span>고정 소득 있음</span></label>
+      <label><input type="radio" name="q_소득" value="불규칙하지만 있음"><span>불규칙하지만 있음</span></label>
+      <label><input type="radio" name="q_소득" value="지금은 없음"><span>지금은 없음</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset class="q">
+    <legend>연체는 어느 단계인가요</legend>
+    <div class="opts">
+      <label><input type="radio" name="q_연체" value="아직 연체 전" checked><span>아직 연체 전</span></label>
+      <label><input type="radio" name="q_연체" value="1~3개월"><span>1~3개월</span></label>
+      <label><input type="radio" name="q_연체" value="3개월 이상·추심 중"><span>3개월 이상 · 추심 중</span></label>
+    </div>
+  </fieldset>
+
+  <div class="who">
+    <div class="field"><label for="ln">이름</label><input id="ln" name="name" required placeholder="홍길동" autocomplete="name"></div>
+    <div class="field"><label for="lp">연락처</label><input id="lp" name="phone" type="tel" required placeholder="010-0000-0000" autocomplete="tel"></div>
+  </div>
+  <label class="agree"><input type="checkbox" name="agree" value="1" required> 개인정보 수집·이용에 동의합니다. (상담 목적 외 사용하지 않습니다)</label>
+  <button class="btn red wide" type="submit">내 상황으로 가능성 확인 요청</button>
+  <p class="tel">전화가 편하시면 <a href="tel:{{ site.phone_link }}"><b>{{ site.phone }}</b></a> · {{ site.hours }}</p>
+</form>
