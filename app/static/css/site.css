@@ -579,7 +579,7 @@ p{margin:0}
 .blog-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 28px}
 .bcard{display:grid;grid-template-columns:200px 1fr;gap:20px;padding:18px;border:1px solid var(--line);border-radius:var(--r);background:#fff;transition:transform .22s,box-shadow .22s}
 .bcard:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
-.bcard .thumb{aspect-ratio:16/10;background:var(--paper-2);position:relative;overflow:hidden;border-radius:10px}
+.bcard .thumb{aspect-ratio:40/21;background:var(--paper-2);position:relative;overflow:hidden;border-radius:10px}
 .bcard .thumb .ph{font-size:11px;padding:10px}
 .bcard .cat{font-size:12.5px;color:var(--green-2);font-weight:700}
 .bcard h3{font-size:16.5px;margin:4px 0 8px;line-height:1.5}
@@ -826,7 +826,7 @@ p.note{font-size:13px;color:var(--ink-3);line-height:1.75;margin:14px 0 0}
 .ccard{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);
   border-radius:var(--r);overflow:hidden;height:100%;transition:box-shadow .2s,transform .2s}
 .ccard:hover{box-shadow:0 14px 34px rgba(20,20,25,.10);transform:translateY(-3px)}
-.ccard .thumb{display:block;aspect-ratio:16/10;background:var(--mint);overflow:hidden}
+.ccard .thumb{display:block;aspect-ratio:40/21;background:var(--mint);overflow:hidden}
 .ccard .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
 .ccard:hover .thumb img{transform:scale(1.04)}
 .ccard .thumb .ph{display:block;width:100%;height:100%;
@@ -1039,4 +1039,31 @@ body.modal-open{overflow:hidden}
   .lead{padding:26px 18px}
   .lead-head h2{font-size:19px}
   .lead .opts span{padding:9px 13px;font-size:13.5px}
+}
+
+/* 칼럼 타입 1 — 본문 삽화 + 변호사 카드 + 관련 글 (partials/column_author.html) */
+.post-body figure.pic{margin:22px 0 30px;border-radius:var(--r);overflow:hidden;aspect-ratio:16/9;background:var(--paper-2)}
+.post-body figure.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.author{display:flex;gap:24px;align-items:flex-start;margin-top:44px;padding:28px;border:1px solid var(--line);border-radius:var(--r);background:#fff}
+.author>img{width:112px;height:140px;object-fit:cover;border-radius:14px;flex:none}
+.author .k{font-size:12.5px;font-weight:700;color:var(--green-2);margin-bottom:6px}
+.author h3{font-size:21px;margin:0 0 8px}
+.author h3 small{font-size:13px;font-weight:600;color:var(--ink-2);margin-left:6px}
+.author .who>p{font-size:14.5px;color:var(--ink-2);line-height:1.7;margin-bottom:16px}
+.author .acts{display:flex;gap:8px;flex-wrap:wrap}
+.author .acts .btn{padding:12px 20px;font-size:14px}
+.related{margin-top:36px}
+.related h3{font-size:19px;margin-bottom:14px}
+.related ul{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;list-style:none;margin:0;padding:0}
+.related a{display:block;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;transition:transform .22s var(--ease),box-shadow .22s}
+.related a:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.related .th{display:block;aspect-ratio:16/9;background:var(--paper-2)}
+.related .th img{width:100%;height:100%;object-fit:cover;display:block}
+.related b{display:block;padding:12px 14px 4px;font-size:14.5px;line-height:1.45;color:var(--ink)}
+.related .d{display:block;padding:0 14px 12px;font-size:12.5px;color:var(--ink-3)}
+@media (max-width:720px){
+  .author{flex-direction:column;padding:22px}
+  .author>img{width:88px;height:110px}
+  .related ul{grid-template-columns:1fr}
+  .related .th{aspect-ratio:21/9}
 }

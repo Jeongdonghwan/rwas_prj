@@ -11,6 +11,7 @@ og.jpg 로 채워진다. 같은 그림이 수백 편에 붙으면 네이버 캐�
 - 폰트는 사이트 self-host 서브셋(woff2)을 그대로 쓴다. 서브셋에 없는 글자는
   두부(□)로 나오므로 그 글자만 빼고 그린다.
 """
+import re
 from pathlib import Path
 
 from flask import current_app
@@ -178,3 +179,37 @@ if __name__ == "__main__":
             assert im.size == (W, H)
             im.save(out / ("thumb-test-%d.jpg" % i), quality=86)
         print("OK", out)
+
+
+# ── 본문 삽화(타입 1) ─────────────────────────────────────────────
+_H2 = re.compile(r"(<h2>(.*?)</h2>)", re.S)
+PHOTO_SIZE = {"hero-justice.webp": (1600, 1067), "bg-court.webp": (1600, 1067),
+              "bg-library.webp": (1600, 1067), "consult.webp": (1200, 801),
+              "books.webp": (1200, 800)}
+
+
+def illustrate(body_html, title, n=2):
+    """1번째·3번째 소제목 아래에 스톡 사진을 넣는다(대륜식 '대목차마다 사진').
+
+    대표 이미지에 쓴 사진은 피하고, alt 는 '제목 — 소제목'으로 써서 이미지 검색에
+    글 내용이 걸리게 한다. 소제목이 2개 이하면 1장만 넣는다.
+    """
+    hero = PHOTOS[stable_hash("photo::" + title) % len(PHOTOS)]
+    pool = [p for p in PHOTOS if p != hero]
+    start = stable_hash("ill::" + title) % len(pool)
+    out, k, hits = [], 0, 0
+    pos = 0
+    for i, m in enumerate(_H2.finditer(body_html)):
+        out.append(body_html[pos:m.end()])
+        pos = m.end()
+        if i in (0, 2) and hits < n:
+            name = pool[(start + hits) % len(pool)]
+            w, h = PHOTO_SIZE.get(name, (1600, 1067))
+            sub = re.sub(r"<[^>]+>", "", m.group(2)).strip()
+            alt = ("%s — %s" % (title, sub))[:120]
+            out.append('<figure class="pic"><img src="/static/img/%s" alt="%s" '
+                       'width="%d" height="%d" loading="lazy"></figure>'
+                       % (name, alt.replace('"', "'"), w, h))
+            hits += 1
+    out.append(body_html[pos:])
+    return "".join(out)

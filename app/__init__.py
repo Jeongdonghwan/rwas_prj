@@ -164,6 +164,9 @@ def create_app():
 
     app.register_blueprint(keyword_bp)
 
+    from app.thumbs import illustrate
+    app.jinja_env.filters["illustrate"] = illustrate
+
     from app.seed import (admin_reset_command, seed_column_keywords_command,
                           seed_command, seed_keywords_command,
                           sms_check_command, write_columns_command,

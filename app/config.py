@@ -15,6 +15,9 @@ class Config:
     )
     SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
     JSON_AS_ASCII = False
+    # 법률칼럼 하단 유형: "1" 글+사진(변호사 소개·관련 글) / "2" 랜딩 블록+선택형 폼.
+    # 미리보기는 ?type=1|2 로 덮어쓸 수 있다.
+    COLUMN_LAYOUT = os.environ.get("COLUMN_LAYOUT", "2")
 
     # 어드민 세션 쿠키. Secure는 https에서만 켠다 — 로컬 http 개발에서 켜면
     # 브라우저가 쿠키를 저장하지 않아 로그인이 무한 반복된다.
