@@ -277,8 +277,10 @@ def seed_column_keywords_command():
 @click.command("write-columns")
 @click.option("--n", type=int, default=None, help="편수 (기본 .env COLUMN_PER_DAY)")
 @click.option("--dry-run", is_flag=True, help="저장·큐 갱신 없이 생성·검증만")
+@click.option("--pool", type=click.Choice(["any", "general", "region"]), default="any",
+              help="general=지역 없는 질문·사례(새벽) / region=지역 키워드(오후)")
 @with_appcontext
-def write_columns_command(n, dry_run):
+def write_columns_command(n, dry_run, pool):
     """법률칼럼 자동 작성 — cron 이 매일 새벽 부른다."""
     import os
 
@@ -286,7 +288,7 @@ def write_columns_command(n, dry_run):
 
     db.create_all()
     n = n or int(os.environ.get("COLUMN_PER_DAY") or 2)
-    res = run(n, dry_run=dry_run, log=click.echo)
+    res = run(n, dry_run=dry_run, log=click.echo, pool=pool)
     ok = sum(1 for _, good, _ in res if good)
     click.echo("완료 %d / %d%s" % (ok, len(res), " (dry-run)" if dry_run else ""))
 

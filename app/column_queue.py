@@ -69,7 +69,17 @@ def _order(s):
     return stable_hash("%s::col::%s" % (REGION.get("site_salt") or REGION["name"], s))
 
 
-def pick(n):
+def _pool_filter(q, pool):
+    """pool: 'general'(지역 없는 질문·사례·비교) / 'region'(지역 키워드) / 'any'.
+    새벽은 일반, 오후는 지역 — 하루 두 번 다른 성격의 글이 올라가게 나눈다."""
+    if pool == "region":
+        return q.filter(ColumnKeyword.area != "")
+    if pool == "general":
+        return q.filter(ColumnKeyword.area == "")
+    return q
+
+
+def pick(n, pool="any"):
     """오늘 쓸 키워드 n개. 최근에 덜 쓴 분류부터 하나씩."""
     # 분류별 마지막 발행 시각 — 한 번도 안 쓴 분류가 가장 앞
     last_used = {}
@@ -79,8 +89,8 @@ def pick(n):
                     .group_by(ColumnKeyword.category)):
         last_used[cat] = ts
 
-    cats = [c for (c,) in db.session.query(ColumnKeyword.category)
-            .filter(ColumnKeyword.status == "pending").distinct()]
+    cats = [c for (c,) in _pool_filter(db.session.query(ColumnKeyword.category)
+            .filter(ColumnKeyword.status == "pending"), pool).distinct()]
     epoch = datetime(1970, 1, 1)
     cats.sort(key=lambda c: (last_used.get(c) or epoch, _order(c)))
 
@@ -88,7 +98,8 @@ def pick(n):
     for cat in cats:
         if len(picked) >= n:
             break
-        cands = ColumnKeyword.query.filter_by(status="pending", category=cat).all()
+        cands = _pool_filter(ColumnKeyword.query.filter_by(status="pending", category=cat),
+                             pool).all()
         if cands:
             # 재시도 횟수가 적은 것 우선, 그 안에서는 사이트별 순서
             picked.append(min(cands, key=lambda k: (k.attempts or 0,

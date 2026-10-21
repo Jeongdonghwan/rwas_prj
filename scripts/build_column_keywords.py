@@ -204,6 +204,22 @@ SIDO_SHORT = {
     "경상남도": "경남", "제주특별자치도": "제주",
 }
 
+# 지역 × 질문 — **구·동(도산레이는 시도) 단위에만** 쓴다. 시 단위("수원 개인회생 비용")는
+# 양산 페이지 11,952개가 이미 "수원 개인회생 + 세부어"로 덮고 있어 같은 자리에서 자기들끼리 경쟁한다.
+# 동은 아래 풀에서 해시로 4개만 고른다 — 31개 동이 전부 같은 12개 질문을 가지면 양산형이다.
+REGION_Q = [
+    ("{r} {s} 신청 방법", R), ("{r} {s} 비용 얼마나 드나요", R),
+    ("{r} {s} 상담 전 준비할 것", R), ("{r} {s} 서류 어디서 떼나요", R),
+    ("{r} {s} 기간 얼마나 걸리나요", R), ("{r} {s} 변제금 계산 방법", R),
+    ("{r} {s} 법원 어디로 가나요", R), ("{r} {s} 금지명령 언제 나오나요", R),
+    ("{r} {s} 변호사 상담 어떻게 받나요", R), ("{r} {s} 월급 압류 중 신청", R),
+    ("{r} {s} 신청 방법", P), ("{r} {s} 면책까지 기간", P),
+]
+REGION_Q_DONG_TAKE = 4
+# 동 × 직업·상황 — 동마다 다른 2+2 를 해시로 고른다(전부 조합하면 31×6 이 같은 글이 된다)
+DONG_JOBS = ["직장인", "자영업자", "프리랜서", "주부"]
+DONG_CASES = ["카드빚", "대출 돌려막기", "도박빚", "사업 실패"]
+
 BANNED_IN_KW = ("후기", "추천", "잘하는", "1위", "무료", "최고", "싼 곳", "저렴한 곳")
 
 
@@ -291,6 +307,27 @@ def build():
     for r, lv in levels:
         for j, _ in jobs_for("gu" if lv == "gu" else ("city" if multi_city else "gu")):
             add(cat, tpl.format(r=r, j=j, s=R), R, r, intent)
+
+    # 6-2) 지역×질문 — 구(·시도) 전부, 동은 4개씩 회전
+    from app.content import stable_hash
+    q_levels = [(r, "gu") for r in gus] + ([(r, "city") for r in cities] if multi_city else [])
+    for r, _ in q_levels:
+        for tpl, sch in REGION_Q:
+            add("지역질문", tpl.format(r=r, s=sch), sch, r, "지역 상담 탐색")
+    for r in dongs:
+        start = stable_hash("rq::" + r) % len(REGION_Q)
+        for i in range(REGION_Q_DONG_TAKE):
+            tpl, sch = REGION_Q[(start + i * 3) % len(REGION_Q)]   # 3칸씩 건너 회생·파산이 섞이게
+            add("지역질문", tpl.format(r=r, s=sch), sch, r, "지역 상담 탐색")
+
+    # 6-3) 동×직업, 동×상황 — 동마다 2+2 회전
+    for r in dongs:
+        h = stable_hash("dj::" + r)
+        for i in range(2):
+            j = DONG_JOBS[(h + i * 2) % len(DONG_JOBS)]
+            add("지역직업", COMBO_REGION_JOB[1].format(r=r, j=j, s=R), R, r, COMBO_REGION_JOB[2])
+            c = DONG_CASES[(h // 7 + i * 2) % len(DONG_CASES)]
+            add("지역상황", COMBO_REGION_CASE[1].format(r=r, c=c, s=R), R, r, COMBO_REGION_CASE[2])
 
     # 7) 직업×질문
     for j, grp in JOBS:

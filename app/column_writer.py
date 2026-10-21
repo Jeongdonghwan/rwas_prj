@@ -353,17 +353,17 @@ def _existing_grams():
             for p in Post.query.filter_by(kind=Post.KIND_COLUMN).all()]
 
 
-def run(n, dry_run=False, log=print):
+def run(n, dry_run=False, log=print, pool="any"):
     # cron(CLI)에는 요청이 없어 url_for 가 실패한다 — 내부링크 후보를 만들려면 필요하다
     from flask import current_app
     with current_app.test_request_context():
-        return _run(n, dry_run, log)
+        return _run(n, dry_run, log, pool)
 
 
-def _run(n, dry_run, log):
+def _run(n, dry_run, log, pool="any"):
     from app.routes.admin import unique_slug
 
-    kws = pick(n)
+    kws = pick(n, pool)
     if not kws:
         log("대기 키워드 없음")
         return []
