@@ -15,10 +15,17 @@ def index():
         if not job_groups or job_groups[-1][0] != j.category:
             job_groups.append((j.category, []))
         job_groups[-1][1].append(j)
+    # kind 를 안 가리면 자동 칼럼이 사례 캐러셀에 섞여 /사례/<slug>/ 로 404 링크가 난다
     posts = (
-        Post.query.filter_by(is_public=True)
+        Post.query.filter_by(is_public=True, kind=Post.KIND_CASE)
         .order_by(Post.published_at.desc())
         .limit(4)
+        .all()
+    )
+    columns = (
+        Post.query.filter_by(is_public=True, kind=Post.KIND_COLUMN)
+        .order_by(Post.published_at.desc())
+        .limit(8)
         .all()
     )
     return render_template(
@@ -28,6 +35,7 @@ def index():
         job_groups=job_groups,
         cases=cases,
         posts=posts,
+        columns=columns,
     )
 
 

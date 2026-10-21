@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 {% from "partials/carousel.html" import carousel %}
+{% from "partials/itemlist_jsonld.html" import itemlist %}
+{# 메인에도 최신 칼럼 ItemList — 네이버 웹사이트 캐러셀은 목록 구조화 데이터로 심사한다 #}
+{% block head %}
+{%- set _items = [] -%}
+{%- for p in columns -%}
+  {%- set _ = _items.append({'name': p.title, 'url': site.base_url ~ url_for('board.column_view', slug=p.slug),
+        'image': (site.base_url ~ p.thumb_path) if p.thumb_path else none, 'desc': p.excerpt}) -%}
+{%- endfor -%}
+{{ itemlist(_items, site.region ~ '개인회생 법률칼럼') }}
+{% endblock %}
 
 {% macro ico(name) -%}
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -269,6 +279,30 @@
     {% endfor %}
   {% endcall %}
   <p class="more"><a href="{{ url_for('board.case_list') }}">사례 전체 보기</a></p>
+</div></section>
+{% endif %}
+
+{% if columns %}
+<section class="sec"><div class="wrap">
+  <div class="sec-head reveal"><span class="label">법률칼럼</span><h2><span class="thin">신청 전에 많이 묻는 것,</span> 칼럼으로 정리했습니다</h2><p>제도 전반에 대한 일반적인 안내입니다. 개별 사건의 판단은 상담에서 확인하세요.</p></div>
+  {% call carousel('columns', label='법률칼럼', per=3, autoplay=7000) %}
+    {% for p in columns %}
+    <div class="carou-item">
+      <article class="ccard">
+        <a class="thumb" href="{{ url_for('board.column_view', slug=p.slug) }}">
+          {% if p.thumb_path %}<img src="{{ p.thumb_path }}" alt="{{ p.thumb_alt or p.title }}" loading="lazy" width="1200" height="630">{% else %}<span class="ph"></span>{% endif %}
+        </a>
+        <div class="bd">
+          <p class="cat">법률칼럼</p>
+          <h3><a href="{{ url_for('board.column_view', slug=p.slug) }}">{{ p.title }}</a></h3>
+          <p class="ex">{{ p.excerpt }}</p>
+          <p class="date">{{ p.published_at|kst('%Y.%m.%d') }}</p>
+        </div>
+      </article>
+    </div>
+    {% endfor %}
+  {% endcall %}
+  <p class="more"><a href="{{ url_for('board.column_list') }}">칼럼 전체 보기</a></p>
 </div></section>
 {% endif %}
 

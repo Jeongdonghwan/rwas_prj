@@ -78,7 +78,7 @@ def xml_response(body, mimetype="application/xml; charset=utf-8"):
     return Response(body, mimetype=mimetype, headers={"Cache-Control": CACHE})
 
 
-def url_entry(loc, lastmod=None, changefreq=None, priority=None):
+def url_entry(loc, lastmod=None, changefreq=None, priority=None, image=None):
     out = ["  <url>", "    <loc>%s</loc>" % escape(loc)]
     if lastmod:
         out.append("    <lastmod>%s</lastmod>" % lastmod.strftime("%Y-%m-%d"))
@@ -86,6 +86,8 @@ def url_entry(loc, lastmod=None, changefreq=None, priority=None):
         out.append("    <changefreq>%s</changefreq>" % changefreq)
     if priority:
         out.append("    <priority>%s</priority>" % priority)
+    if image:   # 이미지 사이트맵 확장 — 썸네일이 웹문서 결과·이미지 검색에 같이 잡히게
+        out.append("    <image:image><image:loc>%s</image:loc></image:image>" % escape(image))
     out.append("  </url>")
     return "\n".join(out)
 
@@ -93,7 +95,8 @@ def url_entry(loc, lastmod=None, changefreq=None, priority=None):
 def urlset(entries):
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+        'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
         + "\n".join(entries)
         + "\n</urlset>\n"
     )
@@ -254,6 +257,7 @@ def sitemap_board():
             entries.append(url_entry(
                 abs_url(view_ep, slug=p.slug),
                 p.updated_at or p.published_at, "monthly", "0.7",
+                image=(base() + p.thumb_path) if p.thumb_path else None,
             ))
     if not entries:
         entries = [url_entry(abs_url("board.case_list"),
