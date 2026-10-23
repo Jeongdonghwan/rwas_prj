@@ -16,12 +16,15 @@
   src:url('../fonts/pretendard-800.woff2') format('woff2')}
 
 :root{
-  --ink:#1d1d1f; --ink-2:#5f6064; --ink-3:#9a9ba0;
-  --line:#e7e6e6; --line-2:#f2f1f1;
-  --paper:#ffffff; --paper-2:#f7f6f6;
-  --green:#7c2231; --green-2:#8e2939; --green-bright:#b13a4a;
-  --green-dark:#17181c; --green-deep:#0f1013;
-  --mint:#f8eef0; --mint-2:#ecd8dc;
+  --ink:#15171c; --ink-2:#565960; --ink-3:#9a988f;
+  --line:#e3ded3; --line-2:#ebe7de;
+  --paper:#fbf9f4; --paper-2:#f3efe6;
+  /* 팔레트(2026-10-23 최종): 차콜 + 아이보리 + 곤색 포인트. 변수명 --green* 은 역사적 이름일 뿐
+     실값은 곤색이다. 포인트 색은 이것 하나 — 파스텔 멀티컬러·핑크·버건디는 "AI 느낌"으로 거부됨. */
+  --green:#1f2b48; --green-2:#2b3a5e; --green-bright:#1f2b48; --cta-hover:#2b3a5e;
+  --green-dark:#15171c; --green-deep:#0e0f12;
+  --mint:#eceef3; --mint-2:#d5dae6;
+  --ivory-hl:#e8dcc4;
   --gold:#a5854c; --gold-2:#84683a;
   /* 구명칭 별칭 */
   --navy:var(--green); --navy-2:var(--green-2); --red:var(--green-2);
@@ -59,8 +62,8 @@ p{margin:0}
 .sec-head{margin-bottom:42px}
 .sec-head .label{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--green-2);margin-bottom:12px}
 .sec-head .label::before{content:"";width:22px;height:2px;background:var(--green-2)}
-.sec.dark .sec-head .label{color:#d9a1ab}
-.sec.dark .sec-head .label::before{background:#d9a1ab}
+.sec.dark .sec-head .label{color:var(--ivory-hl)}
+.sec.dark .sec-head .label::before{background:var(--ivory-hl)}
 .sec-head h2{margin-bottom:12px}
 .sec-head.center{text-align:center}
 .sec-head.center .label::before{display:none}
@@ -68,11 +71,11 @@ p{margin:0}
 .sec.dark .sec-head p{color:rgba(255,255,255,.72)}
 .lead{font-size:17px;color:var(--ink-2);max-width:720px}
 .btn{display:inline-block;padding:15px 28px;font-weight:700;font-size:15px;border:1px solid var(--green);background:var(--green);color:#fff;line-height:1.3;border-radius:var(--r-s);transition:background .18s,transform .18s,box-shadow .18s,border-color .18s;cursor:pointer}
-.btn:hover{background:var(--green-2);border-color:var(--green-2);transform:translateY(-2px);box-shadow:0 10px 24px rgba(110,35,50,.18)}
+.btn:hover{background:var(--green-2);border-color:var(--green-2);transform:translateY(-2px);box-shadow:0 10px 24px rgba(21,23,28,.16)}
 .btn.line{background:#fff;color:var(--green);border-color:var(--line)}
 .btn.line:hover{background:var(--paper-2);box-shadow:0 8px 20px rgba(30,22,24,.08)}
 .btn.red,.btn.gold{background:var(--green-bright);border-color:var(--green-bright);font-weight:800}
-.btn.red:hover,.btn.gold:hover{background:#c14453;border-color:#c14453}
+.btn.red:hover,.btn.gold:hover{background:var(--cta-hover);border-color:var(--cta-hover)}
 .btn.wide{display:block;width:100%;text-align:center}
 :focus-visible{outline:2px solid var(--green-bright);outline-offset:2px}
 
@@ -166,16 +169,16 @@ p{margin:0}
    히어로는 배경이 풀블리드라 본문 컨테이너도 조금 더 넓게 쓴다. */
 .hero .wrap{position:relative;z-index:2;width:100%;max-width:1280px}
 .hero-copy{max-width:780px;padding:96px 0 104px}
-.hero .kicker{display:block;font-size:13.5px;font-weight:700;letter-spacing:.16em;color:#d99aa6;margin-bottom:20px;animation:heroUp .8s var(--ease) both}
+.hero .kicker{display:block;font-size:13.5px;font-weight:700;letter-spacing:.16em;color:var(--ivory-hl);margin-bottom:20px;animation:heroUp .8s var(--ease) both}
 .hero h1{font-size:clamp(34px,4.1vw,58px);color:#fff;margin-bottom:22px;font-weight:800;letter-spacing:-.03em;text-shadow:0 4px 24px rgba(0,0,0,.3);animation:heroUp .8s .1s var(--ease) both}
-.hero h1 em{font-style:normal;color:#e79aa6;position:relative;white-space:nowrap}
+.hero h1 em{font-style:normal;color:var(--ivory-hl);position:relative;white-space:nowrap}
 .hero h1 em::after{content:"";position:absolute;left:0;bottom:6px;height:12px;width:0;background:rgba(217,120,135,.30);z-index:-1;border-radius:4px;animation:emLine .7s 1s var(--ease) forwards}
 @keyframes emLine{to{width:100%}}
 .hero .sub{font-size:19px;color:rgba(255,255,255,.88);max-width:600px;margin-bottom:36px;animation:heroUp .8s .2s var(--ease) both}
 .hero .btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:30px;animation:heroUp .8s .3s var(--ease) both}
 .hero .btns .btn{padding:19px 38px;font-size:17px;border-radius:14px}
 .hero .btns .btn.gold{background:var(--green-bright);border-color:var(--green-bright);font-weight:800}
-.hero .btns .btn.gold:hover{background:#c14453;border-color:#c14453}
+.hero .btns .btn.gold:hover{background:var(--cta-hover);border-color:var(--cta-hover)}
 .hero .btns .btn.ghost{background:rgba(16,17,20,.35);border-color:rgba(255,255,255,.35);color:#fff;backdrop-filter:blur(3px)}
 .hero .btns .btn.ghost:hover{background:rgba(255,255,255,.14)}
 .hero .chips{display:flex;gap:8px;flex-wrap:wrap;animation:heroUp .8s .4s var(--ease) both}
@@ -370,10 +373,10 @@ p{margin:0}
 .pastel .card.t4 .big{color:#7c5cd8}
 .pastel .card .big::after{content:"";display:block;width:34px;height:3px;border-radius:2px;background:currentColor;opacity:.55;margin-top:10px}
 .pastel .card h3{font-size:16.5px;color:var(--ink-2)}
-.infobar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#f8eef0;border-radius:14px;padding:18px 24px;margin-top:22px;font-size:15px}
-.infobar .bico{flex:none;width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:#8e2939}
+.infobar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border-radius:14px;padding:18px 24px;margin-top:22px;font-size:15px}
+.infobar .bico{flex:none;width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--green)}
 .infobar .bico svg{width:19px;height:19px}
-.infobar b{color:#8e2939}
+.infobar b{color:var(--green)}
 .infobar .sub2{color:var(--ink-3);font-size:13.5px;margin-left:auto}
 
 /* 제도 비교 3열 컬러 카드 */
@@ -560,7 +563,7 @@ p{margin:0}
 .cta-band .btn{margin:0 5px;background:#fff;color:var(--green);border-color:#fff;border-radius:12px}
 .cta-band .btn:hover{background:var(--mint);border-color:var(--mint)}
 .cta-band .btn.red{background:var(--green-bright);color:#fff;border-color:var(--green-bright);font-weight:800}
-.cta-band .btn.red:hover{background:#c14453}
+.cta-band .btn.red:hover{background:var(--cta-hover)}
 
 /* 푸터 */
 .ftr{background:var(--green-deep);color:rgba(255,255,255,.6);padding:48px 0 56px;font-size:13px;line-height:1.9}
@@ -967,7 +970,7 @@ body.modal-open{overflow:hidden}
 
 /* 칼럼 하단 고정 블록(랜딩형 훅 + 리드 폼) — partials/column_lead.html */
 .lp{margin-top:48px}
-.lp-hook{position:relative;overflow:hidden;border-radius:var(--r);padding:48px 44px 44px;color:#fff;background:linear-gradient(100deg,rgba(14,15,18,.94) 0%,rgba(24,25,30,.86) 55%,rgba(60,22,30,.78) 100%),url('../img/bg-court.webp') center 40%/cover no-repeat var(--green-dark)}
+.lp-hook{position:relative;overflow:hidden;border-radius:var(--r);padding:48px 44px 44px;color:#fff;background:linear-gradient(100deg,rgba(14,15,18,.94) 0%,rgba(24,25,30,.86) 55%,rgba(31,43,72,.72) 100%),url('../img/bg-court.webp') center 40%/cover no-repeat var(--green-dark)}
 .lp-hook .k{font-size:13px;font-weight:700;letter-spacing:.02em;color:rgba(255,255,255,.62);margin-bottom:12px}
 .lp-hook h2{color:#fff;font-size:30px;line-height:1.3;margin:0 0 14px;letter-spacing:-.02em}
 .lp-hook .sub{font-size:15px;line-height:1.7;color:rgba(255,255,255,.78);margin-bottom:28px}
@@ -1040,3 +1043,37 @@ body.modal-open{overflow:hidden}
   .lead-head h2{font-size:19px}
   .lead .opts span{padding:9px 13px;font-size:13.5px}
 }
+
+/* ── 2026-10-23 의뢰인 수정: "AI 느낌" 제거 ───────────────────────
+   ① 섹션 라벨(알약 키커) 전면 제거 ② 파스텔 4색·3색 헤더·번호 뱃지 → 단일 톤
+   ③ 아이콘의 색 원형 배경 제거(라인 아이콘만) ④ 히어로 강조어 핑크 → 아이보리 */
+.sec-head .label{display:none}
+.hero h1 em{color:var(--ivory-hl)}
+.hero h1 em::after{background:rgba(232,220,196,.18)}
+.hero .btns .btn.gold{background:#fff;border-color:#fff;color:var(--ink)}
+.hero .btns .btn.gold:hover{background:var(--ivory-hl);border-color:var(--ivory-hl)}
+.cta-band .btn.red{background:transparent;border-color:rgba(255,255,255,.5);color:#fff}
+.cta-band .btn.red:hover{background:rgba(255,255,255,.12)}
+
+.card{background:#fff}
+.card .ico,.strip .ico,.prows2 .pn2 .tic{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.card .ico i{display:none}
+.pastel .card,.pastel .card.t1,.pastel .card.t2,.pastel .card.t3,.pastel .card.t4{background:#fff;border:1px solid var(--line)}
+.pastel .card .big,.pastel .card.t1 .big,.pastel .card.t2 .big,.pastel .card.t3 .big,.pastel .card.t4 .big{color:var(--ink)}
+.pastel .card .big::after{background:var(--green);opacity:1}
+.pastel .card h3{font-size:13.5px;font-weight:700;color:var(--ink-3);letter-spacing:.02em}
+.infobar{background:#fff;border:1px solid var(--line)}
+.infobar .bico{display:none}
+.infobar b{color:var(--green)}
+.pcol .phead,.pcol.c1 .phead,.pcol.c2 .phead,.pcol.c3 .phead{background:#fff;color:var(--ink);border-bottom:2px solid var(--ink)}
+.pcol .phead p{color:var(--ink-2)}
+.pcol .phead .pnum,.pcol .phead .pt svg{display:none}
+.pcol .prows li{grid-template-columns:76px 1fr}
+.pcol .prows li svg{display:none}
+.pcol .pfoot,.pcol.c1 .pfoot,.pcol.c2 .pfoot,.pcol.c3 .pfoot{background:var(--paper-2)}
+.tl .tic{color:var(--ink)}
+.tl .tno{background:var(--ink)}
+.sec-head .label::before{display:none}
+/* 어두운 배경 위 주 버튼은 흰색 — 곤색 버튼은 차콜 배경에 묻힌다 */
+.lp-hook .btn.red{background:#fff;border-color:#fff;color:var(--ink)}
+.lp-hook .btn.red:hover{background:var(--ivory-hl);border-color:var(--ivory-hl)}
