@@ -349,7 +349,8 @@ def kw_og_path(k):
     부르므로 주소만 만들고, 실제 생성은 kw_og() 가 그 이미지가 처음 요청될 때 한다.
     v= 는 키워드 문구 해시 — 문구가 바뀌면 캐시도 바뀐다."""
     from app.content import stable_hash
-    return "/og/kw/%d.jpg?v=%d" % (k.id, stable_hash(k.keyword) % 100000)
+    from app.thumbs import DESIGN_VER
+    return "/og/kw/%d.jpg?v=%d" % (k.id, stable_hash(DESIGN_VER + k.keyword) % 100000)
 
 
 @bp.route("/og/kw/<int:kid>.jpg")
@@ -358,10 +359,10 @@ def kw_og(kid):
     11,952(도산 35,784)장을 미리 만들면 수 GB 라서 검색로봇이 실제로 가져가는 것만 만든다."""
     from flask import current_app, send_file
     from app.content import stable_hash
-    from app.thumbs import AUTO_DIR, render
+    from app.thumbs import AUTO_DIR, DESIGN_VER, render
     k = Keyword.query.filter_by(id=kid, is_public=True).first_or_404()
     d = Path(current_app.static_folder) / AUTO_DIR / "kw"
-    f = d / ("%d-%d.jpg" % (kid, stable_hash(k.keyword) % 100000))
+    f = d / ("%d-%d.jpg" % (kid, stable_hash(DESIGN_VER + k.keyword) % 100000))
     if not f.exists():
         d.mkdir(parents=True, exist_ok=True)
         for old in d.glob("%d-*.jpg" % kid):

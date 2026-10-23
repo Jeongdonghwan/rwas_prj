@@ -33,6 +33,8 @@ W, H = 1200, 630
 SAFE = 600                      # 가운데 정사각형(630) 안쪽 여백 포함 실제 글자 폭
 CX = W // 2
 AUTO_DIR = "uploads/auto"
+# 카드 디자인 버전 — 레이아웃을 바꾸면 올린다. 파일명·URL 에 섞여 들어가 캐시된 옛 카드가 새로 그려진다.
+DESIGN_VER = "v3"
 
 BG = (251, 249, 244)            # 사이트 --paper(아이보리)
 BURGUNDY = (31, 43, 72)         # --green (실값 곤색, 2026-10-23 팔레트) — 이름은 호환용
@@ -78,13 +80,29 @@ def _wrap(draw, text, font, width):
     return lines
 
 
+def _balance(draw, lines, font, width):
+    """두 줄이면 어절 경계에서 두 줄 길이가 가장 비슷한 곳으로 다시 자른다
+    ("안산 이혼 빚 개인회생 / 사례"처럼 한 단어만 남는 줄을 막는다)."""
+    if len(lines) != 2:
+        return lines
+    words = (lines[0] + " " + lines[1]).split()
+    best = lines
+    best_w = max(draw.textlength(l, font=font) for l in lines)
+    for i in range(1, len(words)):
+        a, b = " ".join(words[:i]), " ".join(words[i:])
+        w = max(draw.textlength(a, font=font), draw.textlength(b, font=font))
+        if w <= width and w < best_w:
+            best, best_w = [a, b], w
+    return best
+
+
 def _fit(draw, text, weight, max_size, min_size, width, max_lines):
     """폭 안에 max_lines 줄 이하로 들어가는 가장 큰 글자 크기와 줄 목록."""
     for size in range(max_size, min_size - 1, -4):
         font = ImageFont.truetype(str(_font_path(weight)), size)
         lines = _wrap(draw, text, font, width)
         if len(lines) <= max_lines:
-            return font, size, lines
+            return font, size, _balance(draw, lines, font, width)
     lines = lines[:max_lines]
     lines[-1] = lines[-1].rstrip() + "…"
     return font, size, lines
@@ -110,18 +128,26 @@ def render(headline, phone=None):
     d.rectangle((0, H - 8, W, H), fill=BURGUNDY)
 
     # 1) 키워드 — 2줄까지, 폭에 맞춰 축소
-    kf, ks, klines = _fit(d, headline, 800, 92, 48, SAFE, 2)
+    kf, ks, klines = _fit(d, headline, 800, 68, 40, SAFE, 2)   # 키워드 최대 68px
     klh = int(ks * 1.18)
     kh = klh * len(klines)
 
     # 2) 전화번호 박스
-    pf, ps, _ = _fit(d, phone, 800, 124, 60, SAFE - 80, 1)
-    box_h = int(ps * 1.5)
+    # 전화번호가 카드의 주인공 — 안전영역 폭을 거의 다 쓴다(글자 폭 550px 이내, 박스 610px — 정사각형 630 안)
+    # 폭은 정사각형이 막으니 **세로로 1.5배 늘린 장체**로 그려 체감 크기를 키운다(레퍼런스 포스터와 같은 방식)
+    pf, ps, _ = _fit(d, phone, 800, 150, 80, SAFE - 50, 1)
+    STRETCH = 1.5
+    pb = d.textbbox((0, 0), phone, font=pf)
+    ph_w, ph_h = pb[2] - pb[0], pb[3] - pb[1]
+    ph_img = Image.new("RGBA", (ph_w, ph_h), (0, 0, 0, 0))
+    ImageDraw.Draw(ph_img).text((-pb[0], -pb[1]), phone, font=pf, fill=CHARCOAL)
+    ph_img = ph_img.resize((ph_w, int(ph_h * STRETCH)), Image.LANCZOS)
+    box_h = ph_img.height + 44
 
     # 3) 문구, 4) 사무소명
-    tf = ImageFont.truetype(str(_font_path(800)), 36)
+    tf = ImageFont.truetype(str(_font_path(800)), 32)
     bf = ImageFont.truetype(str(_font_path(700)), 26)
-    gap = 26
+    gap = 20
     total = kh + gap + box_h + gap + 44 + 18 + 40
     y = (H - total) // 2
 
@@ -130,10 +156,10 @@ def render(headline, phone=None):
         y += klh
     y += gap
 
-    bw = int(d.textlength(phone, font=pf)) + 80
-    d.rounded_rectangle((CX - bw // 2, y, CX + bw // 2, y + box_h), radius=22,
+    bw = ph_w + 56
+    d.rounded_rectangle((CX - bw // 2, y, CX + bw // 2, y + box_h), radius=24,
                         fill=(255, 255, 255), outline=CHARCOAL, width=4)
-    d.text((CX, y + box_h // 2), phone, font=pf, fill=CHARCOAL, anchor="mm")
+    img.paste(ph_img, (CX - ph_w // 2, y + (box_h - ph_img.height) // 2), ph_img)
     y += box_h + gap
 
     d.text((CX, y), TAGLINE, font=tf, fill=BURGUNDY, anchor="ma")
@@ -159,7 +185,7 @@ def page_og(headline):
     여러 워커가 동시에 그려도 깨지지 않게 임시 파일에 쓰고 rename 한다.
     """
     absdir = Path(current_app.static_folder) / AUTO_DIR / "page"
-    name = "page-%08d.jpg" % (stable_hash("og::" + headline) % 10 ** 8)
+    name = "page-%08d.jpg" % (stable_hash(DESIGN_VER + "::og::" + headline) % 10 ** 8)
     path = absdir / name
     if not path.exists():
         absdir.mkdir(parents=True, exist_ok=True)
@@ -191,7 +217,7 @@ def make(post):
     absdir = Path(current_app.static_folder) / AUTO_DIR
     absdir.mkdir(parents=True, exist_ok=True)
     stem = "%s-%d" % (post.kind or "post", post.id)
-    ver = stable_hash("v2::" + head) % 100000
+    ver = stable_hash(DESIGN_VER + "::" + head) % 100000
     name = "%s-%d.jpg" % (stem, ver)
     for old in absdir.glob(stem + "-*.jpg"):       # 이전 버전 정리
         if old.name != name:
