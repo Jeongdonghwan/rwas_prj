@@ -1,0 +1,21 @@
+.sec{background:#fff}.sec.alt{background:#efe9dc}.strip{background:#fff}
+
+/* D2 - photo cards + sand */
+.strip .ico{background:#efe9dc!important;border:0!important}
+.cards:not(.four) .card{padding:0;overflow:hidden}
+.cards:not(.four) .card .ico{display:none}
+.cards:not(.four) .card::before{content:"";display:block;position:static!important;height:150px!important;width:auto!important;transform:none!important;opacity:1!important;background:center/cover}
+.cards:not(.four) .card:nth-child(1)::before{background-image:linear-gradient(rgba(31,43,72,.15),rgba(31,43,72,.45)),url(/static/img/consult.webp)}
+.cards:not(.four) .card:nth-child(2)::before{background-image:linear-gradient(rgba(31,43,72,.15),rgba(31,43,72,.45)),url(/static/img/books.webp)}
+.cards:not(.four) .card:nth-child(3)::before{background-image:linear-gradient(rgba(31,43,72,.15),rgba(31,43,72,.45)),url(/static/img/bg-court.webp)}
+.cards:not(.four) .card h3,.cards:not(.four) .card p{padding:0 30px}.cards:not(.four) .card h3{margin-top:24px}.cards:not(.four) .card p{padding-bottom:30px}
+.pastel .card{position:relative;overflow:hidden;background:#1f2b48!important;border:0!important;color:#fff}
+.pastel .card h3{color:#e8dcc4!important}.pastel .card .big{color:#fff!important}.pastel .card .big::after{background:#e8dcc4!important}.pastel .card p{color:rgba(255,255,255,.75)}
+.pastel .card:nth-child(2n){background:#15171c!important}
+.pcol .phead{position:relative;color:#fff!important;background:#1f2b48 center/cover!important;border:0!important;padding:34px 22px}
+.pcol.c1 .phead{background-image:linear-gradient(rgba(31,43,72,.82),rgba(31,43,72,.9)),url(/static/img/consult.webp)!important}
+.pcol.c2 .phead{background-image:linear-gradient(rgba(21,23,28,.8),rgba(21,23,28,.9)),url(/static/img/bg-court.webp)!important}
+.pcol.c3 .phead{background-image:linear-gradient(rgba(60,52,38,.78),rgba(40,34,26,.9)),url(/static/img/bg-library.webp)!important}
+.pcol .phead p{color:rgba(255,255,255,.78)!important}
+.checks li::before{background:#efe9dc}
+.imgsplit .im{border-radius:0 80px 0 80px}

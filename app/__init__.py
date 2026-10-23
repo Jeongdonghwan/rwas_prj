@@ -79,14 +79,19 @@ def create_app():
                 return []
         return _areas
 
+    PREVIEW_THEMES = {"1": "현재", "2": "D1 라인 일러스트", "3": "D2 사진 카드",
+                      "4": "E1 차콜 블랙", "5": "E2 딥 페트롤", "6": "E3 딥 코코아"}
+
     @app.context_processor
     def inject_site():
         # canonical/og:url은 사이트맵과 같은 표기여야 한다. request.path는 디코딩된
         # 한글이라 그대로 쓰면 사이트맵(퍼센트 인코딩)과 달라져 크롤러가 같은 URL로
         # 묶지 못할 수 있다 → 여기서 인코딩해 한 가지 표기로 통일한다.
         canonical = SITE_DEFAULTS["base_url"].rstrip("/")
+        theme = None
         if has_request_context():
             canonical += quote(request.path)
+            theme = _preview_theme()
         return {
             "site": SITE_DEFAULTS,
             "lawyer": LAWYER,
@@ -95,7 +100,28 @@ def create_app():
             # 상담폼 거주 지역 선택지. **하드코딩하면 안 된다** — 수원 구 이름을
             # 박아두는 바람에 안산 사이트 상담폼에 장안구·권선구가 떴다.
             "area_options": _area_options(),
+            "preview_theme": theme,
+            "preview_themes": PREVIEW_THEMES,
         }
+
+    # ── 디자인 시안 미리보기 (?theme=1~6) ─────────────────────────────
+    # 의뢰인이 운영 사이트에서 시안을 비교하도록 둔 임시 장치. **CSS 만 바뀐다**(본문·URL 동일,
+    # canonical 은 쿼리 없는 주소). 쿠키로 유지해 페이지를 옮겨도 같은 시안이 보이고,
+    # ?theme=1 이 현재 디자인(쿠키 삭제). 쿠키 없는 방문자·검색로봇에겐 아무 변화가 없다.
+    # 시안이 확정되면 site.css 에 합치고 이 블록과 static/themes/ 를 지운다.
+    def _preview_theme():
+        t = request.args.get("theme") or request.cookies.get("lei_theme")
+        return t if t in PREVIEW_THEMES and t != "1" else None
+
+    @app.after_request
+    def _remember_theme(resp):
+        if has_request_context() and request.args.get("theme") in PREVIEW_THEMES:
+            t = request.args["theme"]
+            if t == "1":
+                resp.delete_cookie("lei_theme")
+            else:
+                resp.set_cookie("lei_theme", t, max_age=60 * 60 * 24 * 14, samesite="Lax")
+        return resp
 
     # Flask는 정적 파일을 파일 핸들 그대로(스트리밍) 내보낸다. 그러면
     # Flask-Compress가 스트리밍 전용 알고리즘만 써서 br은 되지만 gzip은 빠진다.
