@@ -1,0 +1,17 @@
+{# 이 지역·주제와 관련된 법률칼럼 — ItemList 의 앞부분과 같은 목록이다(구조화 데이터는 보이는 내용과 일치해야 한다). #}
+{% if related_cols %}
+<div class="sec-head" style="margin-top:64px"><h2>{{ ld_name|replace(' 관련 안내', '') }} 관련 칼럼</h2></div>
+<div class="relcols">
+  {% for c in related_cols[:6] %}
+  <a class="ccard" href="{{ url_for('board.column_view', slug=c.slug) }}">
+    <span class="thumb">{% if c.thumb_path %}<img src="{{ c.thumb_path }}" alt="{{ c.thumb_alt or c.title }}" loading="lazy" width="1200" height="630">{% else %}<span class="ph"></span>{% endif %}</span>
+    <span class="bd"><b>{{ c.title }}</b></span>
+  </a>
+  {% endfor %}
+</div>
+{% if related_cols|length > 6 %}
+<div class="linklist" style="margin-top:14px">
+  {% for c in related_cols[6:] %}<a href="{{ url_for('board.column_view', slug=c.slug) }}">{{ c.title }}</a>{% endfor %}
+</div>
+{% endif %}
+{% endif %}

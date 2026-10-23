@@ -309,3 +309,12 @@ def post_thumbs_command(redo):
         n += 1
     db.session.commit()
     click.echo("기본 썸네일 %d개" % n)
+
+    # 지역·직업·상황 페이지 OG 카드 — 첫 요청 때 그려도 되지만 미리 만들어 둔다
+    from app.models import CaseType, Dong, Gu, Job
+    from app.thumbs import page_og
+    names = ([g.name for g in Gu.query] + [d.name for d in Dong.query]
+             + [j.name for j in Job.query] + [c.name for c in CaseType.query])
+    for nm in names:
+        page_og("%s 개인회생" % nm)
+    click.echo("페이지 OG 카드 %d개" % len(names))

@@ -27,6 +27,10 @@ SAMPLE = 400
 # 바뀐다.** 이것까지 FAIL로 잡으면 게이트가 매번 울려서 쓸모가 없어진다.
 # 그래서 본문 해시와 따로 기록해 "시각만 바뀜"과 "내용이 바뀜"을 구분한다.
 # 응답을 bytes 그대로 해싱하므로 패턴도 bytes여야 한다
+# site.css·site.js 캐시 버스터(?v=파일 mtime). CSS 한 줄만 고쳐도 전 페이지가 바뀐 것으로
+# 잡혀 게이트가 쓸모없어진다(실제로 478페이지가 FAIL). 본문이 아니므로 지운다.
+ASSET_VER = re.compile(rb"\?v=\d+")
+
 TIME_FIELDS = re.compile(
     rb"<lastmod>.*?</lastmod>|<pubDate>.*?</pubDate>|<lastBuildDate>.*?</lastBuildDate>",
     re.S,
@@ -75,7 +79,7 @@ def build(out_path, sample=SAMPLE):
         if r.status_code != 200:
             missing.append((p, r.status_code))
             continue
-        body = r.get_data()
+        body = ASSET_VER.sub(b"", r.get_data())
         full = hashlib.blake2b(body, digest_size=16).hexdigest()
         # HTML은 공백을 접어서 비교한다. 템플릿에 {% if %}를 넣으면 빈 줄이
         # 생기는데 그것까지 FAIL로 잡으면 게이트가 매번 울려 쓸모가 없어진다.

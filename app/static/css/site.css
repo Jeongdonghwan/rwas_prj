@@ -1077,3 +1077,8 @@ body.modal-open{overflow:hidden}
 /* 어두운 배경 위 주 버튼은 흰색 — 곤색 버튼은 차콜 배경에 묻힌다 */
 .lp-hook .btn.red{background:#fff;border-color:#fff;color:var(--ink)}
 .lp-hook .btn.red:hover{background:var(--ivory-hl);border-color:var(--ivory-hl)}
+/* 상세 페이지 관련 칼럼 (partials/related_columns.html) */
+.relcols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.relcols .ccard .bd{padding:12px 14px 14px}
+.relcols .ccard b{display:block;font-size:14.5px;line-height:1.5;color:var(--ink)}
+@media (max-width:720px){.relcols{grid-template-columns:1fr 1fr}}

@@ -1,0 +1,5 @@
+{# 지역·직업·상황 상세 head — 페이지 전용 OG 카드 + ItemList(관련 칼럼 + 하단 링크 목록).
+   og_image·ld_items 는 routes/ko.py 의 _media() 가 만든다. #}
+{% from "partials/itemlist_jsonld.html" import itemlist %}
+{% include "partials/faq_jsonld.html" %}
+{{ itemlist(ld_items, ld_name) }}

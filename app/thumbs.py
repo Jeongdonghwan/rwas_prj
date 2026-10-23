@@ -151,6 +151,24 @@ def render(headline, phone=None):
     return img
 
 
+def page_og(headline):
+    """지역·직업·상황 페이지 전용 OG 카드 경로(/static/...). 없으면 그린다.
+
+    공통 og.jpg 를 모든 동 페이지가 쓰면 네이버 웹문서 썸네일이 전부 같은 그림이 된다.
+    파일명은 헤드라인 해시 — 한글 파일명을 피하고, 문구가 바뀌면 URL 도 바뀐다.
+    여러 워커가 동시에 그려도 깨지지 않게 임시 파일에 쓰고 rename 한다.
+    """
+    absdir = Path(current_app.static_folder) / AUTO_DIR / "page"
+    name = "page-%08d.jpg" % (stable_hash("og::" + headline) % 10 ** 8)
+    path = absdir / name
+    if not path.exists():
+        absdir.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".tmp%d" % (id(path) % 10000))
+        render(headline).save(tmp, "JPEG", quality=88, optimize=True, progressive=True)
+        tmp.replace(path)
+    return "/static/%s/page/%s" % (AUTO_DIR, name)
+
+
 def is_auto(path):
     return bool(path) and ("/%s/" % AUTO_DIR) in path
 

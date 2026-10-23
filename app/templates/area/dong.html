@@ -2,7 +2,8 @@
 {% block title %}{{ dong.name }} 개인회생 | {{ site.brand_seo }}{% endblock %}
 {% block meta_keywords %}{{ dong.name }} 개인회생, {{ site.region }} {{ dong.name }} 개인회생, {{ gu.name }} 개인회생, {{ dong.name }} 개인파산, {{ site.keywords }}{% endblock %}
 {% block meta_desc %}{{ site.region }} {{ dong.name }} 개인회생 안내. 관할 {{ site.court }}, 오시는 길·준비서류·예상 기간.{% endblock %}
-{% block head %}{% include "partials/faq_jsonld.html" %}{% endblock %}
+{% block head %}{% include "partials/page_media.html" %}{% endblock %}
+{% block og_image %}{{ og_image or (site.base_url ~ url_for('static', filename='img/og.jpg')) }}{% endblock %}
 
 {% block content %}
 {% with crumbs=[(site.region ~ ' 지역별 개인회생', url_for('ko.area_hub')), (gu.name, url_for('ko.page', name=gu.name)), (dong.name, None)] %}{% include "_breadcrumb.html" %}{% endwith %}
@@ -54,6 +55,8 @@
       {% include "partials/lf_table.html" %}
     {% endwith %}
 
+    {% include "partials/related_columns.html" %}
+
     <div class="sec-head" style="margin-top:64px"><h2>{{ vtext(seed, 'h_faq', name=dong.name) }}</h2></div>
     <dl class="qa">
       {% for f in faqs %}<dt>{{ f.q }}</dt><dd>{{ f.a }}</dd>{% endfor %}
@@ -79,7 +82,7 @@
       <a class="btn red wide" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>
       <a class="btn wide" href="{{ url_for('contact.contact') }}#form">상담 신청</a>
     </div>
-    <div class="photo" style="margin-top:20px"><img src="{{ url_for('static', filename='img/lawyer-card.webp') }}" alt="이재열 대표변호사" loading="lazy" width="320" height="400"></div>
+    <div class="photo" style="margin-top:20px"><img src="{{ url_for('static', filename='img/lawyer-card.webp') }}" alt="{{ dong.name }} 개인회생 상담 — 이재열 대표변호사" loading="lazy" width="320" height="400"></div>
   </aside>
 </div></section>
 {% endblock %}

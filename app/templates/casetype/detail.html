@@ -2,7 +2,8 @@
 {% block title %}{{ case.name }} 개인회생 | {{ site.brand }}{% endblock %}
 {% block meta_keywords %}{{ case.name }} 개인회생, {{ case.name }} 채무, {{ site.region }} {{ case.name }} 개인회생, {{ site.keywords }}{% endblock %}
 {% block meta_desc %}{{ case.name }} 채무 {{ site.region }}개인회생 안내. 면책 가능 여부와 준비할 것, 주의할 점.{% endblock %}
-{% block head %}{% include "partials/faq_jsonld.html" %}{% endblock %}
+{% block head %}{% include "partials/page_media.html" %}{% endblock %}
+{% block og_image %}{{ og_image or (site.base_url ~ url_for('static', filename='img/og.jpg')) }}{% endblock %}
 
 {% block content %}
 {% with crumbs=[('상황별 개인회생', url_for('ko.case_hub')), (case.name, None)] %}{% include "_breadcrumb.html" %}{% endwith %}
@@ -47,6 +48,8 @@
       {% include "partials/longform.html" %}
       {% include "partials/lf_table.html" %}
     {% endwith %}
+
+    {% include "partials/related_columns.html" %}
 
     <div class="sec-head" style="margin-top:64px"><h2>{{ vtext(seed, 'h_faq', name=case.name) }}</h2></div>
     <dl class="qa">

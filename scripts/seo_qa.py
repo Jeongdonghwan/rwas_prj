@@ -97,7 +97,13 @@ def main():
         pages += [("구", g.name, quote("/%s-개인회생/" % g.name)) for g in Gu.query.all()]
         pages += [("직업", j.name, quote("/%s-개인회생/" % j.slug_ko)) for j in Job.query.all()]
         pages += [("상황", x.name, quote("/%s-개인회생/" % x.slug_ko)) for x in CaseType.query.all()]
-        pages += [("사례", p.title[:14], quote("/사례/%s/" % p.slug)) for p in Post.query.all()]
+        # 사례와 칼럼은 경로가 다르다 — kind 를 안 가리면 칼럼을 /사례/ 로 열어 404 가 난다
+        col = REGION.get("column_path", "법률칼럼")
+        for p in Post.query.filter_by(is_public=True).all():
+            if p.kind == Post.KIND_COLUMN:
+                pages.append(("칼럼", p.title[:14], quote("/%s/%s/" % (col, p.slug))))
+            else:
+                pages.append(("사례", p.title[:14], quote("/사례/%s/" % p.slug)))
 
     errors, warns = [], []
     titles, descs = Counter(), Counter()

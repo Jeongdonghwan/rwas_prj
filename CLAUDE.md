@@ -311,6 +311,17 @@ seed/column_keywords.csv  (scripts/build_column_keywords.py)
 10. **메인에 법률칼럼 캐러셀 + ItemList.** 메인 사례 캐러셀 쿼리가 `kind`를 안 가려 칼럼이 사례로
     섞여 404 링크가 났었다 — `Post.query`에 kind 필터를 빼먹지 말 것.
 
+### 상세 페이지 OG 카드 + ItemList (2026-10-23, 경쟁사 drsoft 실측 비교 후)
+- 동·구·직업·상황 59페이지가 **각자 전용 OG 카드**를 쓴다 — `thumbs.page_og("영통동 개인회생")`,
+  `static/uploads/auto/page/page-<해시>.jpg`(첫 요청 때 그리거나 `flask post-thumbs`가 미리 그림).
+  공통 og.jpg 는 이제 이 페이지들의 폴백일 뿐이다. 이미지 사이트맵(area/job/case)에도 같은 카드가 나간다.
+- head 에 **ItemList**(`partials/page_media.html`): 관련 법률칼럼(키워드에 동→구 이름이 든 것, 최대 20) +
+  하단 링크 목록의 형제 페이지. **화면에 보이는 것만 넣는다** — 관련 칼럼은 본문 롱폼 아래
+  `partials/related_columns.html`로 노출. 이미지는 칼럼 썸네일·형제 페이지 OG 카드뿐, **로고·og.jpg 금지**.
+- 조립은 `routes/ko.py`의 `_media()`. 동 페이지 변호사 사진 alt 에 동 이름 포함.
+- `scripts/snapshot.py`는 이제 `?v=` 캐시 버스터를 지우고 비교한다(CSS 만 고쳐도 478페이지 FAIL 이 났다).
+  `scripts/seo_qa.py`는 칼럼을 `/법률칼럼/`으로 검사한다(전엔 `/사례/`로 열어 404).
+
 ### 대표변호사 사진 보정·카드 재디자인 (2026-09-30)
 - **사진 보정은 `scripts/build_lawyer_photo.py`로 한다.** 원본(Downloads/CSY_5372/CSY_5372.JPG)에서
   다시 만들므로 화질 손실이 없다. 값을 바꾸고 다시 돌리면 3종(card/900/480)이 한 번에 갱신된다.

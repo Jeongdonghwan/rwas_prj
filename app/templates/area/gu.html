@@ -2,7 +2,8 @@
 {% block title %}{% if site.area_mode != 'sido' %}{{ site.region }} {% endif %}{{ gu.name }} 개인회생 | {{ site.brand_seo }}{% endblock %}
 {% block meta_keywords %}{{ gu.name }} 개인회생, {% if site.area_mode != 'sido' %}{{ site.region }} {% endif %}{{ gu.name }} 개인회생, {{ gu.name }} 개인파산, {{ site.keywords }}{% endblock %}
 {% block meta_desc %}{% if site.area_mode == 'sido' %}{{ gu.name }} 개인회생 안내. 주소지 관할 법원 기준 신청자격·비용·절차 정리.{% else %}{{ site.region }} {{ gu.name }} 개인회생 안내. 관할 {{ site.court }}, 오시는 길과 자주 묻는 질문.{% endif %}{% endblock %}
-{% block head %}{% include "partials/faq_jsonld.html" %}{% endblock %}
+{% block head %}{% include "partials/page_media.html" %}{% endblock %}
+{% block og_image %}{{ og_image or (site.base_url ~ url_for('static', filename='img/og.jpg')) }}{% endblock %}
 
 {% block content %}
 {% with crumbs=[(site.region ~ ' 지역별 개인회생', url_for('ko.area_hub')), (gu.name, None)] %}{% include "_breadcrumb.html" %}{% endwith %}
@@ -40,6 +41,8 @@
     {% include "partials/longform.html" %}
     {% include "partials/lf_table.html" %}
   {% endwith %}
+
+    {% include "partials/related_columns.html" %}
 
   <div class="sec-head" style="margin-top:64px"><h2>{{ vtext(seed, 'h_faq', name=gu.name) }}</h2></div>
   <dl class="qa" style="max-width:760px">

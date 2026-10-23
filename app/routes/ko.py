@@ -7,6 +7,8 @@
 
 from flask import Blueprint, abort, render_template
 
+from app import db
+
 from app.content import get_block, pick_faqs
 from app.variants import POOLS
 
@@ -64,6 +66,51 @@ def page(name):
     abort(404)
 
 
+def _related_columns(terms, limit=20):
+    """키워드에 terms 중 하나가 들어간 공개 칼럼. 앞 term 일수록 우선(동 > 구), 그 안에선 최신순."""
+    from app.models import ColumnKeyword, Post
+    rows = (db.session.query(Post, ColumnKeyword.keyword)
+            .join(ColumnKeyword, ColumnKeyword.post_id == Post.id)
+            .filter(Post.is_public.is_(True), Post.kind == Post.KIND_COLUMN)
+            .order_by(Post.published_at.desc()).all())
+    out, seen = [], set()
+    for t in terms:
+        for post, kw in rows:
+            if post.id not in seen and t and t in kw:
+                out.append(post)
+                seen.add(post.id)
+    return out[:limit]
+
+
+def _media(name, terms, siblings):
+    """페이지 전용 OG 카드 + 관련 칼럼 + ItemList 항목.
+
+    ItemList 는 **화면에 실제로 보이는 것만** 넣는다(관련 칼럼 섹션 + 하단 링크 목록).
+    이미지는 칼럼 썸네일, 형제 페이지는 그 페이지의 OG 카드 — 로고·공통 og.jpg 는 절대 쓰지 않는다
+    (네이버 캐러셀 심사 탈락 사유). siblings = [(표시명, url 이름)].
+    """
+    from flask import url_for
+    from app.config import SITE_DEFAULTS
+    from app.thumbs import page_og
+    base = SITE_DEFAULTS["base_url"]
+    try:
+        og = page_og("%s 개인회생" % name)
+    except Exception:          # 이미지 실패로 페이지가 죽으면 안 된다
+        og = None
+    cols = _related_columns(terms)
+    items = [{"name": c.title, "url": base + url_for("board.column_view", slug=c.slug),
+              "image": (base + c.thumb_path) if c.thumb_path else None, "desc": c.excerpt}
+             for c in cols]
+    for label, key in siblings:
+        try:
+            img = base + page_og("%s 개인회생" % key[0])
+        except Exception:
+            img = None
+        items.append({"name": label, "url": base + url_for("ko.page", name=key[1]), "image": img})
+    return {"og_image": (base + og) if og else None, "related_cols": cols,
+            "ld_items": items[:20], "ld_name": "%s 개인회생 관련 안내" % name}
+
+
 def _render_gu(gu):
     faqs = pick_faqs("gu", gu.name, 3, gu=gu.name)
     # 구가 몇 개 안 되면 해시로는 섹션이 우연히 겹친다 → 순번으로 라틴 방진 배분.
@@ -82,6 +129,8 @@ def _render_gu(gu):
         seed=gu.name,
         blocks=_blocks(gu.name),
         lf_rank=rank,
+        **_media(gu.name, [gu.name] + [d.name for d in gu.dongs],
+                 [("%s 개인회생" % d.name, (d.name, d.name)) for d in gu.dongs]),
     )
 
 
@@ -111,6 +160,10 @@ def _render_dong(dong):
         adjacent=adjacent,
         cross_jobs=cross_jobs,
         seed=v,
+        **_media(dong.name, [dong.name, gu.name],
+                 [("%s 개인회생" % a.name, (a.name, a.name)) for a in adjacent]
+                 + [("%s 개인회생 안내" % gu.name, (gu.name, gu.name))]
+                 + [("%s 개인회생" % j.name, (j.name, j.slug_ko)) for j in cross_jobs]),
     )
 
 
@@ -139,6 +192,8 @@ def _render_job(job):
         faqs=faqs,
         related=related,
         seed=v,
+        **_media(job.name, [job.name],
+                 [("%s 개인회생" % r.name, (r.name, r.slug_ko)) for r in related]),
     )
 
 
@@ -158,4 +213,6 @@ def _render_case(case):
         faqs=faqs,
         related=related,
         seed=v,
+        **_media(case.name, [case.name],
+                 [("%s 개인회생" % r.name, (r.name, r.slug_ko)) for r in related]),
     )

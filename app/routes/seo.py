@@ -206,14 +206,25 @@ def sitemap_pages():
     ]))
 
 
+def _og(name):
+    """상세 페이지 전용 OG 카드(이미지 사이트맵용). 실패하면 이미지 없이 — 사이트맵이 죽으면 안 된다."""
+    try:
+        from app.thumbs import page_og
+        return base() + page_og("%s 개인회생" % name)
+    except Exception:
+        return None
+
+
 @bp.route("/sitemap-area.xml")
 def sitemap_area():
     mt = content_mtime(*CONTENT_SOURCES["area"])
     entries = [url_entry(abs_url("ko.area_hub"), mt, "weekly", "0.9")]
     for gu in Gu.query.order_by(Gu.sort).all():
-        entries.append(url_entry(abs_url("ko.page", name=gu.name), mt, "monthly", "0.8"))
+        entries.append(url_entry(abs_url("ko.page", name=gu.name), mt, "monthly", "0.8",
+                                 image=_og(gu.name)))
     for dong in Dong.query.order_by(Dong.sort).all():
-        entries.append(url_entry(abs_url("ko.page", name=dong.name), mt, "monthly", "0.7"))
+        entries.append(url_entry(abs_url("ko.page", name=dong.name), mt, "monthly", "0.7",
+                                 image=_og(dong.name)))
     return xml_response(urlset(entries))
 
 
@@ -222,7 +233,8 @@ def sitemap_job():
     mt = content_mtime(*CONTENT_SOURCES["job"])
     entries = [url_entry(abs_url("ko.job_hub"), mt, "weekly", "0.9")]
     for job in Job.query.order_by(Job.sort).all():
-        entries.append(url_entry(abs_url("ko.page", name=job.slug_ko), mt, "monthly", "0.7"))
+        entries.append(url_entry(abs_url("ko.page", name=job.slug_ko), mt, "monthly", "0.7",
+                                 image=_og(job.name)))
     return xml_response(urlset(entries))
 
 
@@ -231,7 +243,8 @@ def sitemap_case():
     mt = content_mtime(*CONTENT_SOURCES["case"])
     entries = [url_entry(abs_url("ko.case_hub"), mt, "weekly", "0.9")]
     for c in CaseType.query.order_by(CaseType.sort).all():
-        entries.append(url_entry(abs_url("ko.page", name=c.slug_ko), mt, "monthly", "0.7"))
+        entries.append(url_entry(abs_url("ko.page", name=c.slug_ko), mt, "monthly", "0.7",
+                                 image=_og(c.name)))
     return xml_response(urlset(entries))
 
 
