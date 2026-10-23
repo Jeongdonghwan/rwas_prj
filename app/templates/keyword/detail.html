@@ -3,7 +3,12 @@
 {% block title %}{{ k.keyword }} | {{ site.brand_seo }}{% endblock %}
 {% block meta_keywords %}{{ k.keyword }}, {{ k.keyword }} 상담, {{ page.scheme_name }} {{ k.category }}, {{ site.keywords }}{% endblock %}
 {% block meta_desc %}{{ k.keyword }} 안내. {{ site.region }}개인회생 신청자격·비용·기간·준비서류 정리.{% endblock %}
-{% block head %}{% include "partials/faq_jsonld.html" %}{% endblock %}
+{% block head %}
+{# FAQ 는 page.faqs 에 있다 — 예전엔 faqs 를 찾아 FAQPage 가 통째로 빠져 있었다 #}
+{% with faqs = page.faqs %}{% include "partials/faq_jsonld.html" %}{% endwith %}
+{% from "partials/itemlist_jsonld.html" import itemlist %}{{ itemlist(ld_items, k.keyword ~ ' 관련 안내') }}
+{% endblock %}
+{% block og_image %}{{ og_image }}{% endblock %}
 
 {% block content %}
 {% with crumbs=[(page.scheme_name ~ ' 안내', None), (k.category, None), (k.keyword, None)] %}{% include "_breadcrumb.html" %}{% endwith %}

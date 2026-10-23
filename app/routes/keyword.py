@@ -8,7 +8,7 @@
 `create_app`에서 **가장 마지막에 등록**한다. scripts/check_routes.py로 확인할 수 있다.
 """
 
-from flask import Blueprint, abort, render_template
+from flask import Blueprint, abort, render_template, url_for
 
 from app import db
 from app.keyword_render import build
@@ -117,9 +117,17 @@ def page(slug):
         .all()
     )
 
+    from app.config import SITE_DEFAULTS
+    from app.routes.seo import kw_og_path
+    base = SITE_DEFAULTS["base_url"]
+    # ItemList 는 화면 하단 '관련 링크'(제도 간 + 같은 분류)와 같은 목록이다
+    ld_items = [{"name": o.keyword, "url": base + url_for("keyword.page", slug=o.slug_ko),
+                 "image": base + kw_og_path(o)} for o in list(others) + list(same_cat)]
     return render_template(
         "keyword/detail.html",
         page=build(kw),
         others=others,
         same_cat=same_cat,
+        og_image=base + kw_og_path(kw),
+        ld_items=ld_items,
     )

@@ -344,6 +344,35 @@ def rss():
     return xml_response(body, "application/rss+xml; charset=utf-8")
 
 
+def kw_og_path(k):
+    """키워드 페이지 OG 카드 URL 경로. **여기서는 그리지 않는다** — 사이트맵 한 장이 4,000개를
+    부르므로 주소만 만들고, 실제 생성은 kw_og() 가 그 이미지가 처음 요청될 때 한다.
+    v= 는 키워드 문구 해시 — 문구가 바뀌면 캐시도 바뀐다."""
+    from app.content import stable_hash
+    return "/og/kw/%d.jpg?v=%d" % (k.id, stable_hash(k.keyword) % 100000)
+
+
+@bp.route("/og/kw/<int:kid>.jpg")
+def kw_og(kid):
+    """키워드 페이지 전용 OG 카드 — 첫 요청 때 그려 디스크에 두고 이후엔 파일을 준다.
+    11,952(도산 35,784)장을 미리 만들면 수 GB 라서 검색로봇이 실제로 가져가는 것만 만든다."""
+    from flask import current_app, send_file
+    from app.content import stable_hash
+    from app.thumbs import AUTO_DIR, render
+    k = Keyword.query.filter_by(id=kid, is_public=True).first_or_404()
+    d = Path(current_app.static_folder) / AUTO_DIR / "kw"
+    f = d / ("%d-%d.jpg" % (kid, stable_hash(k.keyword) % 100000))
+    if not f.exists():
+        d.mkdir(parents=True, exist_ok=True)
+        for old in d.glob("%d-*.jpg" % kid):
+            old.unlink(missing_ok=True)
+        tmp = f.with_suffix(".tmp")
+        render(k.keyword).save(tmp, "JPEG", quality=86, optimize=True, progressive=True)
+        tmp.replace(f)
+    resp = send_file(f, mimetype="image/jpeg", max_age=60 * 60 * 24 * 30)
+    return resp
+
+
 @bp.route("/sitemap-kw-<scheme>-<int:page>.xml")
 def sitemap_keyword(scheme, page):
     """서브키워드 사이트맵 — 제도별 분할. 비공개(is_public=False)는 넣지 않는다."""
@@ -382,7 +411,8 @@ def sitemap_keyword(scheme, page):
             ))
 
     entries += [
-        url_entry(abs_url("keyword.page", slug=k.slug_ko), mt, "monthly", "0.6")
+        url_entry(abs_url("keyword.page", slug=k.slug_ko), mt, "monthly", "0.6",
+                  image=base() + kw_og_path(k))
         for k in rows
     ]
     return xml_response(urlset(entries))

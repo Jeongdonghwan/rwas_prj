@@ -319,6 +319,11 @@ seed/column_keywords.csv  (scripts/build_column_keywords.py)
   하단 링크 목록의 형제 페이지. **화면에 보이는 것만 넣는다** — 관련 칼럼은 본문 롱폼 아래
   `partials/related_columns.html`로 노출. 이미지는 칼럼 썸네일·형제 페이지 OG 카드뿐, **로고·og.jpg 금지**.
 - 조립은 `routes/ko.py`의 `_media()`. 동 페이지 변호사 사진 alt 에 동 이름 포함.
+- **키워드 11,952페이지도 같은 구조**(2026-10-23): og:image = `/og/kw/<id>.jpg?v=<문구해시>`,
+  ItemList = 하단 관련 링크(제도 간 + 같은 분류)와 같은 목록, 키워드 사이트맵에 image:image.
+  **이미지는 미리 만들지 않는다** — `seo.kw_og` 라우트가 첫 요청 때 그려 `uploads/auto/kw/`에 캐시
+  (전부 만들면 수원 약 540MB, 도산 1.6GB). 이 경로는 Flask 가 받아야 하므로 nginx 가 `/og/`를 정적 처리하면 안 된다.
+- 키워드 페이지 FAQPage 가 통째로 빠져 있던 버그 수정 — FAQ 가 `page.faqs`에 있는데 파셜은 `faqs`를 찾았다.
 - `scripts/snapshot.py`는 이제 `?v=` 캐시 버스터를 지우고 비교한다(CSS 만 고쳐도 478페이지 FAIL 이 났다).
   `scripts/seo_qa.py`는 칼럼을 `/법률칼럼/`으로 검사한다(전엔 `/사례/`로 열어 404).
 
