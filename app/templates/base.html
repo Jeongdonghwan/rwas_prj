@@ -55,7 +55,7 @@
 <div style="position:fixed;left:12px;bottom:72px;z-index:9999;background:#111;color:#fff;border-radius:12px;padding:8px 10px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.3);display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:calc(100vw - 24px)">
   <b style="margin-right:4px">시안</b>
   {% for k, v in preview_themes.items() %}<a href="?theme={{ k }}" title="{{ v }}" style="display:inline-block;min-width:28px;text-align:center;padding:4px 8px;border-radius:7px;background:{{ '#fff' if (preview_theme or '1') == k else 'rgba(255,255,255,.14)' }};color:{{ '#111' if (preview_theme or '1') == k else '#fff' }};font-weight:700">{{ k }}</a>{% endfor %}
-  <a href="?alt={{ '0' if preview_alt else '1' }}" title="하단 섹션도 메인색·흰색 교차" style="display:inline-block;padding:4px 10px;border-radius:7px;margin-left:6px;border:1px solid rgba(255,255,255,.4);background:{{ '#e8dcc4' if preview_alt else 'transparent' }};color:{{ '#111' if preview_alt else '#fff' }};font-weight:700">7 하단 교차 {{ '켜짐' if preview_alt else '꺼짐' }}</a>
+  <a href="?alt={{ '0' if preview_alt else '1' }}" title="하단 색 교차를 끄고 켜서 비교" style="display:inline-block;padding:4px 10px;border-radius:7px;margin-left:6px;border:1px solid rgba(255,255,255,.4);background:{{ '#e8dcc4' if preview_alt else 'transparent' }};color:{{ '#111' if preview_alt else '#fff' }};font-weight:700">7 하단 교차 {{ '켜짐' if preview_alt else '꺼짐' }}</a>
   <span style="opacity:.7;margin-left:4px">{{ preview_themes[preview_theme or '1'] }}</span>
 </div>
 {% endif %}

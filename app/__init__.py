@@ -109,36 +109,36 @@ def create_app():
     # ── 디자인 시안 미리보기 (?theme=1~6) ─────────────────────────────
     # 의뢰인이 운영 사이트에서 시안을 비교하도록 둔 임시 장치. **CSS 만 바뀐다**(본문·URL 동일,
     # canonical 은 쿼리 없는 주소). 쿠키로 유지해 페이지를 옮겨도 같은 시안이 보이고,
-    # ?theme=1 이 현재 디자인(쿠키 삭제). 쿠키 없는 방문자·검색로봇에겐 아무 변화가 없다.
+    # ?theme=1 이 현재 색. 쿠키 없는 방문자·검색로봇에겐 아무 변화가 없다.
     # 시안이 확정되면 site.css 에 합치고 이 블록과 static/themes/ 를 지운다.
     def _preview_theme():
         t = request.args.get("theme") or request.cookies.get("lei_theme")
         return t if t in PREVIEW_THEMES and t != "1" else None
 
+    def _preview_on():
+        """시안 미리보기 중인가 — 시안 링크로 들어온 사람만. 일반 방문자·검색로봇은 False."""
+        return bool(request.args.get("theme") or request.cookies.get("lei_theme")
+                    or request.args.get("alt") or request.cookies.get("lei_alt"))
+
     def _preview_alt():
-        """7번 — 하단 색 교차 켜기/끄기. 색 시안(1~6)과 따로 저장돼 어떤 색과도 겹쳐 본다."""
-        v = request.args.get("alt")
-        if v in ("0", "1"):
-            return v == "1"
-        return request.cookies.get("lei_alt") == "1"
+        """하단 색 교차. 미리보기 중이면 1~6 모두 **기본 켜짐**, 7번 버튼(?alt=0)으로 꺼서 비교한다."""
+        if not _preview_on():
+            return False
+        v = request.args.get("alt") or request.cookies.get("lei_alt")
+        return v != "0"
 
     @app.after_request
     def _remember_alt(resp):
         if has_request_context() and request.args.get("alt") in ("0", "1"):
-            if request.args["alt"] == "1":
-                resp.set_cookie("lei_alt", "1", max_age=60 * 60 * 24 * 14, samesite="Lax")
-            else:
-                resp.delete_cookie("lei_alt")
+            resp.set_cookie("lei_alt", request.args["alt"], max_age=60 * 60 * 24 * 14,
+                            samesite="Lax")
         return resp
 
     @app.after_request
     def _remember_theme(resp):
         if has_request_context() and request.args.get("theme") in PREVIEW_THEMES:
             t = request.args["theme"]
-            if t == "1":
-                resp.delete_cookie("lei_theme")
-            else:
-                resp.set_cookie("lei_theme", t, max_age=60 * 60 * 24 * 14, samesite="Lax")
+            resp.set_cookie("lei_theme", t, max_age=60 * 60 * 24 * 14, samesite="Lax")
         return resp
 
     # Flask는 정적 파일을 파일 핸들 그대로(스트리밍) 내보낸다. 그러면
