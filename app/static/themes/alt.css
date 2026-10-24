@@ -1,0 +1,21 @@
+/* 7번 — 하단 색 교차. 어떤 색 시안(1~6)과도 겹쳐 쓴다 — 띠 색은 그 시안의 메인색(var(--green)).
+   자가진단(어두운 섹션) 아래가 흰·샌드만 이어져 단조롭다는 피드백 → 메인색 띠를 하나 걸러 하나씩 넣는다.
+   순서(사례 글이 없을 때): 절차 밝음 → 비용 띠 → 변호사 밝음 → 지역 띠 → 직업 밝음 → 칼럼 띠 → FAQ 밝음 → 상담 띠 */
+.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult{background:var(--green)!important;color:#fff}
+:is(.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head h2,
+:is(.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head h2 .thin{color:#fff}
+:is(.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head p,
+:is(.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) > .wrap > p{color:rgba(255,255,255,.72)}
+:is(.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .more a{color:#fff}
+/* 띠 안의 흰 카드는 원래 글자색 유지 */
+:is(.costcard,.area-grid>div,.ccard,.quick form){color:var(--ink)}
+/* 비용 섹션 오른쪽 '일하는 방식' 목록 — 카드가 아니라 띠 위에 바로 놓인다 */
+.sec:has(.costcard) .points li{border-color:rgba(255,255,255,.16)}
+.sec:has(.costcard) .points li:first-child{border-top-color:#fff}
+.sec:has(.costcard) .points li h3{color:#fff}
+.sec:has(.costcard) .points li h3::before{background:#e8dcc4}
+.sec:has(.costcard) .points li p{color:rgba(255,255,255,.72)}
+.sec:has(.costcard) .two > div > p,.sec:has(.costcard) small{color:rgba(255,255,255,.6)}
+/* 캐러셀 점·화살표 */
+.sec:has(#carou-columns) .carou-dots button{background:rgba(255,255,255,.35)}
+.sec:has(#carou-columns) .carou-dots button[aria-current="true"],.sec:has(#carou-columns) .carou-dots .on{background:#fff}

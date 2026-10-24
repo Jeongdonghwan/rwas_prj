@@ -88,10 +88,11 @@ def create_app():
         # 한글이라 그대로 쓰면 사이트맵(퍼센트 인코딩)과 달라져 크롤러가 같은 URL로
         # 묶지 못할 수 있다 → 여기서 인코딩해 한 가지 표기로 통일한다.
         canonical = SITE_DEFAULTS["base_url"].rstrip("/")
-        theme = None
+        theme, alt_on = None, False
         if has_request_context():
             canonical += quote(request.path)
             theme = _preview_theme()
+            alt_on = _preview_alt()
         return {
             "site": SITE_DEFAULTS,
             "lawyer": LAWYER,
@@ -102,6 +103,7 @@ def create_app():
             "area_options": _area_options(),
             "preview_theme": theme,
             "preview_themes": PREVIEW_THEMES,
+            "preview_alt": alt_on,
         }
 
     # ── 디자인 시안 미리보기 (?theme=1~6) ─────────────────────────────
@@ -112,6 +114,22 @@ def create_app():
     def _preview_theme():
         t = request.args.get("theme") or request.cookies.get("lei_theme")
         return t if t in PREVIEW_THEMES and t != "1" else None
+
+    def _preview_alt():
+        """7번 — 하단 색 교차 켜기/끄기. 색 시안(1~6)과 따로 저장돼 어떤 색과도 겹쳐 본다."""
+        v = request.args.get("alt")
+        if v in ("0", "1"):
+            return v == "1"
+        return request.cookies.get("lei_alt") == "1"
+
+    @app.after_request
+    def _remember_alt(resp):
+        if has_request_context() and request.args.get("alt") in ("0", "1"):
+            if request.args["alt"] == "1":
+                resp.set_cookie("lei_alt", "1", max_age=60 * 60 * 24 * 14, samesite="Lax")
+            else:
+                resp.delete_cookie("lei_alt")
+        return resp
 
     @app.after_request
     def _remember_theme(resp):
