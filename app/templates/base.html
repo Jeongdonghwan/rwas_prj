@@ -31,7 +31,7 @@
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
 {% if site.naver_site_verification %}<meta name="naver-site-verification" content="{{ site.naver_site_verification }}">{% endif %}
 {% if site.google_site_verification %}<meta name="google-site-verification" content="{{ site.google_site_verification }}">{% endif %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}?v={{ asset_ver }}">
+{% if preview_v0 %}<link rel="stylesheet" href="{{ url_for('static', filename='themes/v0.css') }}?v={{ asset_ver }}">{% else %}<link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}?v={{ asset_ver }}">{% endif %}
 {% if preview_theme %}<link rel="stylesheet" href="{{ url_for('static', filename='themes/' ~ preview_theme ~ '.css') }}?v={{ asset_ver }}">{% endif %}
 {% if preview_alt %}<link rel="stylesheet" href="{{ url_for('static', filename='themes/alt.css') }}?v={{ asset_ver }}">{% endif %}
 {% include "partials/schema_org.html" %}
@@ -51,12 +51,12 @@
 {% include "_mobile_bar.html" %}
 {% include "partials/consult_done_modal.html" %}
 <script src="{{ url_for('static', filename='js/site.js') }}?v={{ asset_ver }}" defer></script>
-{% if preview_theme or preview_alt or request.args.get('theme') or request.args.get('alt') %}
+{% if preview_theme or preview_alt or preview_v0 or request.args.get('theme') or request.args.get('alt') %}
 <div style="position:fixed;left:12px;bottom:72px;z-index:9999;background:#111;color:#fff;border-radius:12px;padding:8px 10px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.3);display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:calc(100vw - 24px)">
   <b style="margin-right:4px">시안</b>
-  {% for k, v in preview_themes.items() %}<a href="?theme={{ k }}" title="{{ v }}" style="display:inline-block;min-width:28px;text-align:center;padding:4px 8px;border-radius:7px;background:{{ '#fff' if (preview_theme or '1') == k else 'rgba(255,255,255,.14)' }};color:{{ '#111' if (preview_theme or '1') == k else '#fff' }};font-weight:700">{{ k }}</a>{% endfor %}
-  <a href="?alt={{ '0' if preview_alt else '1' }}" title="하단 색 교차를 끄고 켜서 비교" style="display:inline-block;padding:4px 10px;border-radius:7px;margin-left:6px;border:1px solid rgba(255,255,255,.4);background:{{ '#e8dcc4' if preview_alt else 'transparent' }};color:{{ '#111' if preview_alt else '#fff' }};font-weight:700">7 하단 교차 {{ '켜짐' if preview_alt else '꺼짐' }}</a>
-  <span style="opacity:.7;margin-left:4px">{{ preview_themes[preview_theme or '1'] }}</span>
+  {% for k, v in preview_themes.items() %}<a href="?theme={{ k }}" title="{{ v }}" style="display:inline-block;min-width:28px;text-align:center;padding:4px 8px;border-radius:7px;background:{{ '#fff' if (('0' if preview_v0 else (preview_theme or '1'))) == k else 'rgba(255,255,255,.14)' }};color:{{ '#111' if (('0' if preview_v0 else (preview_theme or '1'))) == k else '#fff' }};font-weight:700">{{ k }}</a>{% endfor %}
+{% if not preview_v0 %}  <a href="?alt={{ '0' if preview_alt else '1' }}" title="하단 색 교차를 끄고 켜서 비교" style="display:inline-block;padding:4px 10px;border-radius:7px;margin-left:6px;border:1px solid rgba(255,255,255,.4);background:{{ '#e8dcc4' if preview_alt else 'transparent' }};color:{{ '#111' if preview_alt else '#fff' }};font-weight:700">7 하단 교차 {{ '켜짐' if preview_alt else '꺼짐' }}</a>{% endif %}
+  <span style="opacity:.7;margin-left:4px">{{ preview_themes['0' if preview_v0 else (preview_theme or '1')] }}</span>
 </div>
 {% endif %}
 </body>

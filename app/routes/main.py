@@ -1,8 +1,14 @@
-from flask import Blueprint, render_template
+from flask import request, Blueprint, render_template
 
 from app.models import CaseType, Gu, Job, Post
 
 bp = Blueprint("main", __name__)
+
+
+def _v0(name):
+    """시안 0번 미리보기(?theme=0)면 팔레트 교체 이전 원본 템플릿. 확정 후 삭제."""
+    t = request.args.get("theme") or request.cookies.get("lei_theme")
+    return "_v0/" + name if t == "0" else name
 
 
 @bp.route("/")
@@ -29,7 +35,7 @@ def index():
         .all()
     )
     return render_template(
-        "index.html",
+        _v0("index.html"),
         gus=gus,
         jobs=jobs,
         job_groups=job_groups,
@@ -41,7 +47,7 @@ def index():
 
 @bp.route("/about/")
 def about():
-    return render_template("about.html")
+    return render_template(_v0("about.html"))
 
 
 @bp.route("/service/rehab/")
@@ -66,7 +72,7 @@ def service_cost():
 
 @bp.route("/process/")
 def process():
-    return render_template("process.html")
+    return render_template(_v0("process.html"))
 
 
 @bp.route("/faq/")

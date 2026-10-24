@@ -1,0 +1,358 @@
+{# 시안 0번(팔레트 교체 이전 원본, 커밋 0bcef68) — ?theme=0 미리보기에서만 쓴다. 확정 후 폴더째 삭제 #}
+{% extends "base.html" %}
+{% from "partials/carousel.html" import carousel %}
+{% from "partials/itemlist_jsonld.html" import itemlist %}
+{# 메인에도 최신 칼럼 ItemList — 네이버 웹사이트 캐러셀은 목록 구조화 데이터로 심사한다 #}
+{% block head %}
+{%- set _items = [] -%}
+{%- for p in columns -%}
+  {%- set _ = _items.append({'name': p.title, 'url': site.base_url ~ url_for('board.column_view', slug=p.slug),
+        'image': (site.base_url ~ p.thumb_path) if p.thumb_path else none, 'desc': p.excerpt}) -%}
+{%- endfor -%}
+{{ itemlist(_items, site.region ~ '개인회생 법률칼럼') }}
+{% endblock %}
+
+{% macro ico(name) -%}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+{%- if name == 'shield' %}<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>
+{%- elif name == 'award' %}<circle cx="12" cy="8" r="6"/><path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1"/>
+{%- elif name == 'landmark' %}<path d="M3 22h18"/><path d="M6 18v-7"/><path d="M10 18v-7"/><path d="M14 18v-7"/><path d="M18 18v-7"/><path d="m12 2 9 5H3z"/>
+{%- elif name == 'briefcase' %}<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+{%- elif name == 'clipboard' %}<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/>
+{%- elif name == 'phone' %}<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
+{%- elif name == 'banknote' %}<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01"/><path d="M18 12h.01"/>
+{%- elif name == 'calendar' %}<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>
+{%- elif name == 'percent' %}<path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+{%- elif name == 'clock' %}<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+{%- elif name == 'home' %}<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>
+{%- elif name == 'alert' %}<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>
+{%- elif name == 'bulb' %}<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4.6 12.3c.8.7 1.3 1.6 1.5 2.7h6.2c.2-1.1.7-2 1.5-2.7A7 7 0 0 0 12 2z"/>
+{%- elif name == 'user' %}<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+{%- elif name == 'coins' %}<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/>
+{%- elif name == 'search' %}<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+{%- elif name == 'file' %}<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>
+{%- elif name == 'ban' %}<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>
+{%- elif name == 'check' %}<path d="M20 6 9 17l-5-5"/>
+{%- endif %}</svg>
+{%- endmacro %}
+
+{% block content %}
+<section class="hero">
+  {# 배경 슬라이드 — 느린 크로스페이드 + 켄번즈 줌. site.js가 .on을 돌린다.
+     첫 장은 LCP라 eager+fetchpriority, 나머지는 lazy. #}
+  <div class="bg" data-hero-slides>
+    <figure class="slide on"><img src="{{ url_for('static', filename='img/hero-justice.webp') }}" alt="" aria-hidden="true" width="1600" height="1067" fetchpriority="high"></figure>
+    <figure class="slide"><img src="{{ url_for('static', filename='img/bg-court.webp') }}" alt="" aria-hidden="true" width="1600" height="1067" loading="lazy"></figure>
+    <figure class="slide"><img src="{{ url_for('static', filename='img/bg-library.webp') }}" alt="" aria-hidden="true" width="1600" height="1067" loading="lazy"></figure>
+  </div>
+  <div class="hero-dots" data-hero-dots role="tablist" aria-label="배경 이미지"></div>
+  <div class="wrap">
+    <div class="hero-copy">
+      <p class="kicker">개인회생 상담 · 개인파산 상담 · 채무조정 · 법률상담</p>
+      <h1>감당하기 어려워진 채무,<br><em>개인회생</em>으로 다시 시작할 수 있습니다</h1>
+      <p class="sub">채무 문제는 혼자 고민한다고 해결되지 않습니다. 현재 상황을 정확히 확인하고, 개인회생·개인파산 등 적합한 채무조정 방법을 안내해 드립니다.</p>
+      <div class="btns">
+        <a class="btn gold" href="#selfcheck">1분 자격진단 →</a>
+        <a class="btn ghost" href="tel:{{ site.phone_link }}">전화상담 {{ site.phone }}</a>
+      </div>
+      <div class="chips">
+        <span class="chip">전국 비대면 상담</span>
+        <span class="chip">익명 상담 가능</span>
+        <span class="chip">변호사 직접 상담</span>
+        <span class="chip">분할 납부 가능</span>
+      </div>
+    </div>
+  </div>
+  <p class="scroll-hint" aria-hidden="true"><span>SCROLL</span><i class="drip"></i></p>
+</section>
+
+<div class="strip"><div class="wrap stagger reveal">
+  <div class="stat"><span class="ico">{{ ico('clipboard') }}</span><div><b>맞춤형 채무진단</b><span>소득·재산·채무 종합 검토</span></div></div>
+  <div class="stat"><span class="ico">{{ ico('banknote') }}</span><div><b>합리적인 변제계획</b><span>상황에 맞는 변제방안 검토</span></div></div>
+  <div class="stat"><span class="ico">{{ ico('briefcase') }}</span><div><b>체계적인 사건관리</b><span>신청부터 인가까지 단계별 진행</span></div></div>
+  <div class="stat"><span class="ico">{{ ico('phone') }}</span><div><b>신속한 상담안내</b><span>현재 상황에 맞는 해결방안</span></div></div>
+</div></div>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head reveal"><span class="label">진행 방식</span><h2><span class="thin">처음 상담부터 인가까지,</span> 이렇게 진행합니다</h2></div>
+  <div class="cards stagger">
+    <div class="card deep"><span class="ico">{{ ico('clipboard') }}<i>1</i></span><h3>개인회생 가능성 확인</h3><p>현재 소득과 채무 상황을 바탕으로 개인회생 신청 요건과 진행 가능성을 확인합니다.</p></div>
+    <div class="card deep"><span class="ico">{{ ico('banknote') }}<i>2</i></span><h3>상담 및 변제계획 검토</h3><p>채무·재산·소득을 종합적으로 살펴보고 예상 변제금과 적절한 진행 방향을 검토합니다.</p></div>
+    <div class="card deep"><span class="ico">{{ ico('briefcase') }}<i>3</i></span><h3>신청부터 인가까지</h3><p>신청서 작성과 서류 준비, 보정 절차 등 개인회생 인가에 필요한 과정을 체계적으로 진행합니다.</p></div>
+  </div>
+</div></section>
+
+<section class="sec alt"><div class="wrap">
+  <div class="sec-head reveal"><span class="label">이런 경우에도</span><h2><span class="thin">이런 경우에도,</span> 확인해볼 수 있습니다</h2><p>조건이 안 될 거라고 미리 단정하지 않으셔도 됩니다. 상황별로 확인할 부분이 다를 뿐입니다.</p></div>
+  <div class="cards four pastel stagger">
+    <div class="card t1"><span class="ico">{{ ico('clock') }}</span><h3>연체 여부</h3><span class="big">연체 전에도</span><p>아직 연체되지 않았더라도 채무를 감당하기 어렵다면 개인회생 요건을 확인할 수 있습니다.</p></div>
+    <div class="card t2"><span class="ico">{{ ico('banknote') }}</span><h3>최근 대출</h3><span class="big">신규채무 확인</span><p>최근 대출이 있다면 발생 시기와 사용처, 채무 증가 경위를 함께 살펴봅니다.</p></div>
+    <div class="card t3"><span class="ico">{{ ico('home') }}</span><h3>재산 보유</h3><span class="big">재산이 있어도</span><p>자동차·보증금·부동산 등이 있다면 채무와 함께 재산가치를 확인합니다.</p></div>
+    <div class="card t4"><span class="ico">{{ ico('alert') }}</span><h3>독촉·압류</h3><span class="big">법적조치 확인</span><p>독촉·추심이나 압류 등이 진행되고 있다면 현재 단계에 맞는 대응을 확인합니다.</p></div>
+  </div>
+  <div class="infobar reveal"><span class="bico">{{ ico('bulb') }}</span><span>개인회생은 끝이 아니라, <b>새로운 시작을 위한 제도</b>입니다.</span><span class="sub2">정확한 내용은 상담을 통해 확인해보세요.</span></div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head reveal"><span class="label">제도 비교</span><h2><span class="thin">개인회생·파산·신용회복,</span> 뭐가 다를까?</h2><p>소득과 재산, 연체 상태에 따라 먼저 살펴볼 제도가 다릅니다.</p></div>
+  <div class="pcmp stagger">
+    <div class="pcol c1">
+      <div class="phead"><span class="pnum">01</span><div class="pt">{{ ico('file') }} 개인회생</div><p>일정한 소득이 있다면, 다시 일어설 수 있습니다.</p></div>
+      <ul class="prows">
+        <li>{{ ico('user') }}<i>신청 조건</i><b>일정한 소득이 있는 개인</b></li>
+        <li>{{ ico('calendar') }}<i>변제 기간</i><b>원칙 3년 (상황에 따라 2년~5년)</b></li>
+        <li>{{ ico('percent') }}<i>주요 특징</i><b>원금 일부 감면 + 잔여 채무 면책</b></li>
+        <li>{{ ico('landmark') }}<i>진행 기관</i><b>법원</b></li>
+      </ul>
+      <div class="pfoot">꾸준한 소득으로 변제가 가능한 경우,<br>채무를 조정해 경제적 재기를 돕는 제도입니다.</div>
+    </div>
+    <div class="pcol c2">
+      <div class="phead"><span class="pnum">02</span><div class="pt">{{ ico('briefcase') }} 개인파산</div><p>더 이상 갚을 수 없다면, 새 출발이 가능합니다.</p></div>
+      <ul class="prows">
+        <li>{{ ico('user') }}<i>신청 조건</i><b>소득이 없거나 매우 적은 경우</b></li>
+        <li>{{ ico('coins') }}<i>면책 범위</i><b>모든 채무 면책 가능 <span style="font-weight:400;color:var(--ink-3)">(세금 등 비면책채권 제외)</span></b></li>
+        <li>{{ ico('percent') }}<i>주요 특징</i><b>재산을 정리해 채무를 변제</b></li>
+        <li>{{ ico('landmark') }}<i>진행 기관</i><b>법원</b></li>
+      </ul>
+      <div class="pfoot">소득이 없어 변제가 어려운 경우,<br>법원의 판단을 통해 채무를 면책받을 수 있는 제도입니다.</div>
+    </div>
+    <div class="pcol c3">
+      <div class="phead"><span class="pnum">03</span><div class="pt">{{ ico('shield') }} 신용회복</div><p>연체 전후, 채무를 조정할 수 있는 방법입니다.</p></div>
+      <ul class="prows">
+        <li>{{ ico('user') }}<i>신청 조건</i><b>연체 중 또는 연체 우려가 있는 경우</b></li>
+        <li>{{ ico('coins') }}<i>조정 내용</i><b>이자 감면, 상환 기간 연장</b></li>
+        <li>{{ ico('percent') }}<i>주요 특징</i><b>신용 회복 중심의 채무 조정</b></li>
+        <li>{{ ico('landmark') }}<i>진행 기관</i><b>신용회복위원회</b></li>
+      </ul>
+      <div class="pfoot">연체 전후 단계에서 채무를 조정해<br>신용을 회복할 수 있도록 지원하는 제도입니다.</div>
+    </div>
+  </div>
+  <div class="corebox reveal" style="margin-top:22px">세 제도는 우열의 문제가 아니라 상황의 문제입니다. 소득·재산·연체 상태에 따라 먼저 검토할 제도가 달라지며, 정확한 판단은 채무 내역을 확인한 뒤 상담에서 함께 정합니다.</div>
+</div></section>
+
+<section class="sec alt"><div class="wrap">
+  <div class="sec-head reveal"><h2><span class="thin">혹시,</span> 이런 고민을 하고 계신가요?</h2><p>하나라도 해당된다면 현재 채무 상태부터 확인해보세요.</p></div>
+  <div class="imgsplit">
+  <div class="im reveal"><img src="{{ url_for('static', filename='img/consult.webp') }}" alt="상담 서류를 검토하는 모습" loading="lazy" width="600" height="400"></div>
+  <ul class="checks reveal d1" style="columns:1">
+    <li>월급날이 와도 대출과 카드값을 내면 생활비가 거의 남지 않는다</li>
+    <li>빚을 갚기 위해 또 다른 대출이나 카드서비스를 이용하고 있다</li>
+    <li>아직 연체 전이지만 다음 달 상환이 벌써 걱정된다</li>
+    <li>연체가 시작되면서 독촉 전화와 문자가 계속 오고 있다</li>
+    <li>최근 대출이 많아서 개인회생이 가능한지 걱정된다</li>
+    <li>자동차나 보증금·부동산이 있어 개인회생이 안 될까 걱정된다</li>
+    <li>압류나 지급명령 등 법적 절차가 시작될까 불안하다</li>
+    <li>소득은 있지만, 지금 방식으로는 빚을 끝까지 갚기 어렵다고 느낀다</li>
+  </ul>
+  </div>
+</div></section>
+
+<section class="sec dark bgimg" id="selfcheck"><div class="wrap">
+  <div class="sec-head center reveal"><span class="label">1분 자격진단</span><h2><span class="thin">내 상황에 맞는</span> 채무 해결방법은?</h2><p>몇 가지 질문에 답하면 개인회생·개인파산·신용회복 중 어떤 제도를 먼저 살펴볼지 안내해드립니다.</p></div>
+  <div id="quiz" class="quiz reveal d1" data-contact-url="{{ url_for('contact.contact') }}#form" data-tel="{{ site.phone_link }}">
+    <p class="qnum">질문 1 / 4</p>
+    <div class="bar"><i style="width:0%"></i></div>
+    <h3>질문을 불러오는 중입니다…</h3>
+    <div class="opts">
+      <noscript><p style="color:#fff">자가진단은 브라우저에서 동작합니다. 전화 {{ site.phone }} 로 문의주시면 바로 확인해드립니다.</p></noscript>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec alt"><div class="wrap">
+  <div class="sec-head reveal"><span class="label">진행 절차</span><h2><span class="thin">개인회생 진행절차,</span> 신청부터 면책까지</h2><p>처음이라 부담스러워도 괜찮습니다. 전체 흐름을 한눈에 확인해보세요. 개시결정까지는 평균 3~6개월이 걸립니다.</p></div>
+  <ol class="tl stagger">
+    <li><span class="tic">{{ ico('phone') }}<span class="tno">01</span></span><b>상담·검토</b><span>신청 가능 여부와<br>예상 변제금 확인</span></li>
+    <li><span class="tic">{{ ico('file') }}<span class="tno">02</span></span><b>서류 준비</b><span>부채증명서·소득증빙<br>정리 (2~3주)</span></li>
+    <li><span class="tic">{{ ico('landmark') }}<span class="tno">03</span></span><b>법원 신청</b><span>{{ site.court }}에<br>신청서 접수</span></li>
+    <li><span class="tic">{{ ico('ban') }}<span class="tno">04</span></span><b>금지명령</b><span>접수 후 1~2주,<br>압류·추심 중단</span></li>
+    <li><span class="tic">{{ ico('search') }}<span class="tno">05</span></span><b>개시결정</b><span>신청 후 평균 3~6개월,<br>변제계획안에 따라 변제 진행</span></li>
+    <li><span class="tic">{{ ico('check') }}<span class="tno">06</span></span><b>인가결정</b><span>변제계획이<br>인가됨</span></li>
+    <li><span class="tic">{{ ico('award') }}<span class="tno">07</span></span><b>면책</b><span>변제 완료 후<br>남은 채무 면제</span></li>
+  </ol>
+  <p class="more"><a href="{{ url_for('main.process') }}">절차 자세히 보기</a></p>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="two">
+    <div class="reveal">
+      <div class="sec-head"><h2><span class="thin">개인회생 비용,</span> 먼저 확인하고 시작하세요</h2><p>사건마다 필요한 절차와 상황이 달라 비용에도 차이가 있을 수 있습니다. 상담 후 예상 비용과 납부 방법을 안내해드립니다.</p></div>
+      <ul class="costcard">
+        <li><i>변호사 보수</i><div><b>사건 확인 후 안내</b><small>사건의 난이도·채권자 수·채무 상황 등을 확인한 후 서면 안내</small></div></li>
+        <li><i>법원 납부 비용</i><div><b>인지대·송달료·예납금 등 실비</b><small>실제 법원 절차에 필요한 비용으로, 채권자 수에 따라 달라집니다</small></div></li>
+        <li><i>분할 납부</i><div><b>상담 후 분할 납부 가능</b><small>초기 비용 부담을 줄일 수 있도록 안내해드립니다</small></div></li>
+        <li><i>추가 비용</i><div><b>사전 안내</b><small>별도 업무나 비용이 필요한 경우 미리 안내드립니다</small></div></li>
+      </ul>
+      <p style="font-size:13.5px;color:var(--ink-3);margin-top:12px">※ 비용만 먼저 결정하지 않습니다. 신청 가능 여부와 예상 변제 부담을 함께 살펴본 뒤 진행 여부를 판단할 수 있도록 안내합니다.</p>
+      <p class="more"><a href="{{ url_for('main.service_cost') }}">비용 안내 자세히 보기</a></p>
+    </div>
+    <div class="reveal d1">
+      <div class="sec-head"><h2>{{ site.firm_name|josa('이가') }} 일하는 방식</h2></div>
+      <ul class="points">
+        <li><h3>01 변호사가 직접 확인합니다</h3><p>초기 상담부터 사건의 주요 내용을 변호사가 직접 확인하고, 진행 과정에서 필요한 판단을 함께 살펴봅니다.</p></li>
+        <li><h3>02 예상되는 부분부터 설명합니다</h3><p>무조건 가능하다는 설명보다, 소득·재산·채무 상황을 확인하고 진행 과정에서 검토가 필요한 부분을 먼저 안내합니다.</p></li>
+        <li><h3>03 숫자로 함께 확인합니다</h3><p>현재 소득과 생계비, 재산 및 채무 상황을 토대로 예상 변제 부담을 함께 살펴봅니다.</p></li>
+        <li><h3>04 진행상황을 알기 쉽게 안내합니다</h3><p>접수 이후 보정, 개시결정, 채권자집회, 인가 등 현재 어느 단계에 있는지 이해하기 쉽게 안내합니다.</p></li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec alt lawyer-sec"><div class="wrap">
+  <div class="lawyer-photo reveal">
+    <span class="shot">
+      <img src="{{ url_for('static', filename='img/lawyer-card.webp') }}" alt="이재열 대표변호사" width="380" height="475" loading="lazy">
+      <span class="tag"><b>이재열 변호사</b><span>{{ lawyer.name_en }} · LEI LAW OFFICE</span></span>
+    </span>
+  </div>
+  <div class="lawyer-bio reveal d1">
+    <div class="sec-head" style="margin-bottom:20px"><span class="label">대표변호사</span><h2><span class="thin">사건을 맡기면,</span> 변호사가 직접 합니다</h2><p>상담·서류·법원 대응까지 이재열 변호사가 처음부터 끝까지 진행합니다.</p></div>
+    <ul>
+      {% for e in lawyer.edu %}<li>{{ e }}</li>{% endfor %}
+    </ul>
+    <div class="bio-cards">
+      <div class="bio-card"><h3>경 력</h3><ul>{% for c in lawyer.career %}<li>{{ c }}</li>{% endfor %}</ul></div>
+      <div class="bio-card"><h3>주요 활동</h3><ul>{% for a in lawyer.activity %}<li>{{ a }}</li>{% endfor %}</ul></div>
+    </div>
+    <p class="more" style="text-align:left;margin-top:20px"><a href="{{ url_for('main.about') }}">사무소 소개 보기</a></p>
+  </div>
+</div></section>
+
+{% if gus %}
+<section class="sec"><div class="wrap">
+  <div class="sec-head reveal"><h2>{{ site.region }} 지역별 개인회생 안내</h2><p>거주하시는 동에서 사무소까지 오시는 길과 자주 묻는 질문을 동별로 정리했습니다.</p></div>
+  <div class="area-grid stagger">
+    {% for gu in gus %}
+    <div><h3><a href="{{ url_for('ko.page', name=gu.name) }}">{{ gu.name }}</a></h3><ul>
+      {% for dong in gu.dongs %}<li><a href="{{ url_for('ko.page', name=dong.name) }}">{{ dong.name }}</a></li>{% endfor %}
+    </ul></div>
+    {% endfor %}
+  </div>
+  <p class="more"><a href="{{ url_for('ko.area_hub') }}">지역별 안내 전체 보기</a></p>
+</div></section>
+{% endif %}
+
+{% if jobs %}
+<section class="sec alt"><div class="wrap">
+  <div class="sec-head reveal"><h2>직업별 개인회생 안내</h2><p>소득 증빙 방법과 직업 유지 여부가 직업마다 다릅니다.</p></div>
+  <div class="area-grid stagger">
+    {% for category, cat_jobs in job_groups %}
+    <div><h3>{{ category }}</h3><ul>
+      {% for j in cat_jobs %}<li><a href="{{ url_for('ko.page', name=j.slug_ko) }}">{{ j.name }}</a></li>{% endfor %}
+    </ul></div>
+    {% endfor %}
+  </div>
+  {% if cases %}
+  <div class="sec-head reveal" style="margin-top:56px"><h2>상황별 안내</h2><p>채무가 생긴 원인에 따라 준비할 것이 다릅니다.</p></div>
+  {% call carousel('cases-type', label='상황별 안내', per=4) %}
+    {% for c in cases %}
+    <div class="carou-item">
+      <a class="scard" href="{{ url_for('ko.page', name=c.slug_ko) }}">
+        <span class="n">{{ '%02d'|format(loop.index) }}</span>
+        <strong>{{ c.name }}</strong>
+        <span class="go">개인회생 안내 보기</span>
+      </a>
+    </div>
+    {% endfor %}
+  {% endcall %}
+  {% endif %}
+</div></section>
+{% endif %}
+
+{% if posts %}
+<section class="sec alt"><div class="wrap">
+  <div class="sec-head reveal"><span class="label">진행 사례</span><h2><span class="thin">결과가 궁금하다면,</span> 진행 사례부터</h2><p>의뢰인 동의를 받아 사실 위주로 기록합니다. 특정 결과를 보장하지 않습니다.</p></div>
+  {% call carousel('cases', label='진행 사례', per=3, autoplay=6500) %}
+    {% for p in posts %}
+    <div class="carou-item">
+      <article class="ccard">
+        <a class="thumb" href="{{ url_for('board.case_view', slug=p.slug) }}">
+          {% if p.thumb_path %}<img src="{{ p.thumb_path }}" alt="{{ p.thumb_alt or p.title }}" loading="lazy" width="1200" height="630">{% else %}<span class="ph"></span>{% endif %}
+        </a>
+        <div class="bd">
+          <p class="cat">진행 사례</p>
+          <h3><a href="{{ url_for('board.case_view', slug=p.slug) }}">{{ p.title }}</a></h3>
+          <p class="ex">{{ p.excerpt }}</p>
+          <p class="date">{{ p.published_at|kst('%Y.%m.%d') }}</p>
+        </div>
+      </article>
+    </div>
+    {% endfor %}
+  {% endcall %}
+  <p class="more"><a href="{{ url_for('board.case_list') }}">사례 전체 보기</a></p>
+</div></section>
+{% endif %}
+
+{% if columns %}
+<section class="sec"><div class="wrap">
+  <div class="sec-head reveal"><span class="label">법률칼럼</span><h2><span class="thin">신청 전에 많이 묻는 것,</span> 칼럼으로 정리했습니다</h2><p>제도 전반에 대한 일반적인 안내입니다. 개별 사건의 판단은 상담에서 확인하세요.</p></div>
+  {% call carousel('columns', label='법률칼럼', per=3, autoplay=7000) %}
+    {% for p in columns %}
+    <div class="carou-item">
+      <article class="ccard">
+        <a class="thumb" href="{{ url_for('board.column_view', slug=p.slug) }}">
+          {% if p.thumb_path %}<img src="{{ p.thumb_path }}" alt="{{ p.thumb_alt or p.title }}" loading="lazy" width="1200" height="630">{% else %}<span class="ph"></span>{% endif %}
+        </a>
+        <div class="bd">
+          <p class="cat">법률칼럼</p>
+          <h3><a href="{{ url_for('board.column_view', slug=p.slug) }}">{{ p.title }}</a></h3>
+          <p class="ex">{{ p.excerpt }}</p>
+          <p class="date">{{ p.published_at|kst('%Y.%m.%d') }}</p>
+        </div>
+      </article>
+    </div>
+    {% endfor %}
+  {% endcall %}
+  <p class="more"><a href="{{ url_for('board.column_list') }}">칼럼 전체 보기</a></p>
+</div></section>
+{% endif %}
+
+<section class="sec"><div class="wrap">
+  <div class="two">
+    <div class="reveal">
+      <div class="sec-head"><h2>자주 묻는 질문</h2></div>
+      <dl class="qa">
+        <dt>회사에서 알게 되나요?</dt><dd>급여 압류가 없는 한 회사에 통지되지 않습니다. 재직증명·급여명세는 본인이 발급받아 제출합니다.</dd>
+        <dt>가족에게 피해가 가나요?</dt><dd>본인 명의 채무만 대상입니다. 배우자·부모 재산과 신용에는 영향이 없습니다. 다만 배우자 재산과 소득은 생계비 산정에 반영됩니다.</dd>
+        <dt>신용카드는 언제 다시 쓸 수 있나요?</dt><dd>면책 후 신용정보가 정리되며, 보통 면책 결정 후 5년 이내 기록이 삭제됩니다.</dd>
+      </dl>
+      <p class="more"><a href="{{ url_for('main.faq') }}">질문 전체 보기</a></p>
+    </div>
+    <div class="reveal d1">
+      <div class="sec-head"><h2>준비서류</h2></div>
+      <ul class="points">
+        <li><h3>채무 관련</h3><p>각 금융사 부채증명서. 어디서 어떻게 발급받는지 상담에서 목록으로 드립니다.</p></li>
+        <li><h3>소득 관련</h3><p>급여명세서 또는 소득금액증명원. 프리랜서·자영업자는 별도 안내.</p></li>
+        <li><h3>재산·가족 관련</h3><p>주민등록등본, 임대차계약서, 자동차등록증 등.</p></li>
+      </ul>
+      <p class="more"><a href="{{ url_for('main.service_docs') }}">준비서류 전체 보기</a></p>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec alt" id="consult">
+<div class="wrap">
+  <div class="sec-head center reveal"><span class="label">상담 신청</span><h2><span class="thin">지금 문의하면,</span> 30분 안에 연락드립니다</h2><p>남기신 정보는 상담 목적 외에는 사용하지 않습니다.</p></div>
+</div>
+<div class="wrap quick bottom reveal d1">
+  <form id="form" data-consult action="{{ url_for('contact.submit') }}" method="post">
+    <div class="t">
+      <h3>상담 신청</h3>
+      <p>전국 비대면·익명 상담 가능. 접수 후 30분 안에 연락드립니다. 전화가 편하시면 <b style="color:var(--green-2)">{{ site.phone }}</b></p>
+    </div>
+    {% with messages = get_flashed_messages(category_filter=['error']) %}
+      {% for m in messages %}<p class="flash" style="grid-column:1/-1">{{ m }}</p>{% endfor %}
+    {% endwith %}
+    <input type="hidden" name="source_path" value="{{ request.path }}">
+    <input name="name" required placeholder="이름" aria-label="이름">
+    <input name="phone" type="tel" required placeholder="연락처 010-0000-0000" aria-label="연락처">
+    <select name="debt" aria-label="총 채무액"><option value="">총 채무액</option><option>3천만원 이하</option><option>3천–7천만원</option><option>7천만–1억5천</option><option>1억5천 이상</option></select>
+    <select name="area" aria-label="거주 지역"><option value="">거주 지역</option>{% for a in area_options %}<option>{{ a }}</option>{% endfor %}<option>{{ site.region }} 외 경기 남부</option></select>
+    <button class="btn gold" type="submit">상담 신청</button>
+    <label class="agree"><input type="checkbox" name="agree" value="1" required> 개인정보 수집·이용에 동의합니다. (상담 목적 외 사용하지 않습니다)</label>
+  </form>
+</div>
+</div>
+</section>
+
+{% endblock %}

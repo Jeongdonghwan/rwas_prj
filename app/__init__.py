@@ -79,7 +79,7 @@ def create_app():
                 return []
         return _areas
 
-    PREVIEW_THEMES = {"1": "현재", "2": "D1 라인 일러스트", "3": "D2 사진 카드",
+    PREVIEW_THEMES = {"0": "최초 시안", "1": "현재", "2": "D1 라인 일러스트", "3": "D2 사진 카드",
                       "4": "E1 차콜 블랙", "5": "E2 딥 페트롤", "6": "E3 딥 코코아"}
 
     @app.context_processor
@@ -88,11 +88,12 @@ def create_app():
         # 한글이라 그대로 쓰면 사이트맵(퍼센트 인코딩)과 달라져 크롤러가 같은 URL로
         # 묶지 못할 수 있다 → 여기서 인코딩해 한 가지 표기로 통일한다.
         canonical = SITE_DEFAULTS["base_url"].rstrip("/")
-        theme, alt_on = None, False
+        theme, alt_on, v0 = None, False, False
         if has_request_context():
             canonical += quote(request.path)
             theme = _preview_theme()
             alt_on = _preview_alt()
+            v0 = _preview_v0()
         return {
             "site": SITE_DEFAULTS,
             "lawyer": LAWYER,
@@ -104,6 +105,7 @@ def create_app():
             "preview_theme": theme,
             "preview_themes": PREVIEW_THEMES,
             "preview_alt": alt_on,
+            "preview_v0": v0,
         }
 
     # ── 디자인 시안 미리보기 (?theme=1~6) ─────────────────────────────
@@ -113,7 +115,11 @@ def create_app():
     # 시안이 확정되면 site.css 에 합치고 이 블록과 static/themes/ 를 지운다.
     def _preview_theme():
         t = request.args.get("theme") or request.cookies.get("lei_theme")
-        return t if t in PREVIEW_THEMES and t != "1" else None
+        return t if t in PREVIEW_THEMES and t not in ("0", "1") else None
+
+    def _preview_v0():
+        """0번 — 오늘 팔레트·라벨 교체 이전 원본. CSS 와 메인·소개·절차 템플릿을 통째로 옛것으로 쓴다."""
+        return (request.args.get("theme") or request.cookies.get("lei_theme")) == "0"
 
     def _preview_on():
         """시안 미리보기 중인가 — 시안 링크로 들어온 사람만. 일반 방문자·검색로봇은 False."""
@@ -122,7 +128,7 @@ def create_app():
 
     def _preview_alt():
         """하단 색 교차. 미리보기 중이면 1~6 모두 **기본 켜짐**, 7번 버튼(?alt=0)으로 꺼서 비교한다."""
-        if not _preview_on():
+        if not _preview_on() or _preview_v0():
             return False
         v = request.args.get("alt") or request.cookies.get("lei_alt")
         return v != "0"
