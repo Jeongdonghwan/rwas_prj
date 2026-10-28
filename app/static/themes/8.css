@@ -1,0 +1,39 @@
+/* 8번 — 0번(최초 시안) 그대로 + 3번의 사진 카드 + 검은색 교차 띠.
+   0번의 버건디·분홍 히어로, 번호 뱃지, 파스텔 4카드, 라벨은 손대지 않는다. */
+:root{--band:#15171c}
+
+/* ── 사진 카드 (3번에서 가져옴, 0번 색에 맞춰 덧칠만 버건디·차콜로) ── */
+/* 진행 방식 3카드: 위에 사진, 번호 뱃지 아이콘은 사진 아래 그대로 */
+.cards:not(.four) .card{padding:0;overflow:hidden}
+.cards:not(.four) .card::before{content:"";display:block;position:static!important;height:160px!important;width:auto!important;transform:none!important;opacity:1!important;background:center/cover;border-radius:0}
+.cards:not(.four) .card:nth-child(1)::before{background-image:linear-gradient(rgba(21,23,28,.05),rgba(21,23,28,.35)),url(/static/img/consult.webp)}
+.cards:not(.four) .card:nth-child(2)::before{background-image:linear-gradient(rgba(21,23,28,.05),rgba(21,23,28,.35)),url(/static/img/books.webp)}
+.cards:not(.four) .card:nth-child(3)::before{background-image:linear-gradient(rgba(21,23,28,.05),rgba(21,23,28,.35)),url(/static/img/bg-court.webp)}
+.cards:not(.four) .card .ico{margin:-29px 0 14px 30px;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.12)}
+.cards:not(.four) .card h3,.cards:not(.four) .card p{padding:0 30px}
+.cards:not(.four) .card p{padding-bottom:32px}
+
+/* 제도비교 헤더: 사진 + 어두운 덧칠 (번호 뱃지·아이콘 유지) */
+.pcol .phead{position:relative;color:#fff!important;background:center/cover!important;padding:34px 22px}
+.pcol.c1 .phead{background-image:linear-gradient(rgba(124,34,49,.84),rgba(90,22,34,.92)),url(/static/img/consult.webp)!important}
+.pcol.c2 .phead{background-image:linear-gradient(rgba(21,23,28,.82),rgba(21,23,28,.92)),url(/static/img/bg-court.webp)!important}
+.pcol.c3 .phead{background-image:linear-gradient(rgba(60,46,34,.82),rgba(40,30,22,.92)),url(/static/img/bg-library.webp)!important}
+.pcol .phead p{color:rgba(255,255,255,.8)!important}
+.imgsplit .im{border-radius:0 80px 0 80px}
+
+/* ── 검은색 교차 띠 ── 제도비교(위) + 비용·지역·칼럼·상담(아래) */
+.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult{background:var(--band)!important;color:#fff}
+:is(.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head h2,
+:is(.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head h2 .thin{color:#fff}
+:is(.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head p{color:rgba(255,255,255,.7)}
+:is(.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .more a{color:#fff}
+:is(.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head .label{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);color:#fff}
+:is(.pcol,.costcard,.area-grid>div,.ccard,.quick form){color:var(--ink)}
+.pcol{border-color:transparent}
+.sec:has(.pcmp) .corebox{background:rgba(255,255,255,.07);color:rgba(255,255,255,.8)}
+.sec:has(.costcard) .points li{border-color:rgba(255,255,255,.16)}
+.sec:has(.costcard) .points li:first-child{border-top-color:#fff}
+.sec:has(.costcard) .points li h3{color:#fff}
+.sec:has(.costcard) .points li p{color:rgba(255,255,255,.72)}
+.sec:has(.costcard) .two > div > p,.sec:has(.costcard) small{color:rgba(255,255,255,.6)}
+.sec:has(#carou-columns) .carou-dots button{background:rgba(255,255,255,.35)}
