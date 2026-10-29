@@ -173,7 +173,7 @@ def sitemap_index():
     ]
 
     # 서브키워드 — 제도별, 5,000개 넘으면 페이지 분할
-    kw_mt = content_mtime("app/keyword_sections", "app/scheme_facts.py",
+    kw_mt = content_mtime("app/keyword_sections", "app/scheme_facts.py", "app/summary_points.py",
                           "app/keyword_render.py", "app/templates/keyword",
                           "seed/keyword.csv")
     for scheme in SCHEMES:
@@ -390,7 +390,7 @@ def sitemap_keyword(scheme, page):
     """서브키워드 사이트맵 — 제도별 분할. 비공개(is_public=False)는 넣지 않는다."""
     if scheme not in SCHEMES or page < 1:
         abort(404)
-    mt = content_mtime("app/keyword_sections", "app/scheme_facts.py",
+    mt = content_mtime("app/keyword_sections", "app/scheme_facts.py", "app/summary_points.py",
                        "app/keyword_render.py", "app/templates/keyword",
                        "seed/keyword.csv")
     rows = (
