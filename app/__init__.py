@@ -79,6 +79,16 @@ def create_app():
                 return []
         return _areas
 
+    # www.도메인 → 도메인 301. 인증서가 www 도 포함해 www 주소가 같은 내용을 200 으로 내주고 있었다
+    # (5개 사이트 모두, 2026-10-29 실측). canonical 만으로는 네이버가 같은 문서 두 벌로 볼 수 있다.
+    @app.before_request
+    def _strip_www():
+        host = request.host.split(":")[0]
+        if host.startswith("www."):
+            from flask import redirect
+            return redirect(SITE_DEFAULTS["base_url"].rstrip("/") + request.full_path.rstrip("?"),
+                            code=301)
+
     PREVIEW_THEMES = {"0": "최초 시안", "1": "현재", "2": "D1 라인 일러스트", "3": "D2 사진 카드",
                       "4": "E1 차콜 블랙", "5": "E2 딥 페트롤", "6": "E3 딥 코코아",
                       "8": "0번+사진 카드+검정 교차",
