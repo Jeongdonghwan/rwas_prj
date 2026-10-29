@@ -37,3 +37,14 @@
 .sec:has(.costcard) .points li p{color:rgba(255,255,255,.72)}
 .sec:has(.costcard) .two > div > p,.sec:has(.costcard) small{color:rgba(255,255,255,.6)}
 .sec:has(#carou-columns) .carou-dots button{background:rgba(255,255,255,.35)}
+
+/* ── '이런 경우에도' 4카드: 파스텔 대신 곤색·검정 교차 (의뢰인 요청 2026-10-29, 3번 시안 카드) ── */
+.pastel .card,.pastel .card.t1,.pastel .card.t3{background:#1f2b48!important;border:0!important;box-shadow:0 12px 30px rgba(15,18,30,.12)!important;color:#fff}
+.pastel .card.t2,.pastel .card.t4{background:#15171c!important}
+.pastel .card .ico{display:none}
+.pastel .card h3{color:#e8dcc4!important;font-size:13.5px;font-weight:700}
+.pastel .card .big,.pastel .card.t1 .big,.pastel .card.t2 .big,.pastel .card.t3 .big,.pastel .card.t4 .big{color:#fff!important}
+.pastel .card .big::after{background:#e8dcc4!important;opacity:1}
+.pastel .card p{color:rgba(255,255,255,.75)!important}
+.sec:has(.pastel){background:#efe9dc}
+.sec:has(.pastel) .infobar{background:#fff;border:1px solid #e3ded3}
