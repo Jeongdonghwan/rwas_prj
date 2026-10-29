@@ -41,9 +41,9 @@
   {# 배경 슬라이드 — 느린 크로스페이드 + 켄번즈 줌. site.js가 .on을 돌린다.
      첫 장은 LCP라 eager+fetchpriority, 나머지는 lazy. #}
   <div class="bg" data-hero-slides>
-    <figure class="slide on"><img src="{{ url_for('static', filename='img/hero-justice.webp') }}" alt="" aria-hidden="true" width="1600" height="1067" fetchpriority="high"></figure>
-    <figure class="slide"><img src="{{ url_for('static', filename='img/bg-court.webp') }}" alt="" aria-hidden="true" width="1600" height="1067" loading="lazy"></figure>
-    <figure class="slide"><img src="{{ url_for('static', filename='img/bg-library.webp') }}" alt="" aria-hidden="true" width="1600" height="1067" loading="lazy"></figure>
+    <figure class="slide on"><img src="{{ url_for('static', filename='img/hero-justice.webp') }}" alt="{{ site.region }} 개인회생 상담 - 정의의 여신상" aria-hidden="true" width="1600" height="1067" fetchpriority="high"></figure>
+    <figure class="slide"><img src="{{ url_for('static', filename='img/bg-court.webp') }}" alt="개인회생 신청 법원 건물" aria-hidden="true" width="1600" height="1067" loading="lazy"></figure>
+    <figure class="slide"><img src="{{ url_for('static', filename='img/bg-library.webp') }}" alt="법률 서적이 꽂힌 서재" aria-hidden="true" width="1600" height="1067" loading="lazy"></figure>
   </div>
   <div class="hero-dots" data-hero-dots role="tablist" aria-label="배경 이미지"></div>
   <div class="wrap">

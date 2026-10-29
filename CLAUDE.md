@@ -314,6 +314,15 @@ seed/column_keywords.csv  (scripts/build_column_keywords.py)
 10. **메인에 법률칼럼 캐러셀 + ItemList.** 메인 사례 캐러셀 쿼리가 `kind`를 안 가려 칼럼이 사례로
     섞여 404 링크가 났었다 — `Post.query`에 kind 필터를 빼먹지 말 것.
 
+### 네이버 사이트 진단 대응 (2026-10-29)
+- **`alt=""` 를 쓰지 말 것.** 장식 이미지라도 네이버 '사이트 진단'은 빈 alt 를 "Alt 속성 누락"으로 센다
+  (성남 메인이 헤더·푸터 엠블럼 때문에 잡혔다). 엠블럼·히어로 슬라이드까지 전부 설명을 넣었다.
+- **끝 슬래시 리다이렉트는 301.** Flask 기본은 308 인데 네이버가 '리다이렉션된 페이지(수집제한)'로 보고했다.
+  `create_app` 맨 앞에서 `RequestRedirect.code = 301`.
+- **`/favicon.ico`·`/apple-touch-icon*.png` 루트 경로 필수** — 없으면 키워드 라우트(`/<slug>/`)가 잡아
+  `/favicon.ico/` 로 넘긴 뒤 404 가 난다(`routes/seo.py` `root_icons`).
+- **www → 도메인 301**(`_strip_www`). 인증서가 www 를 포함해 www 주소가 같은 내용을 200 으로 냈다.
+
 ### 상세 페이지 OG 카드 + ItemList (2026-10-23, 경쟁사 drsoft 실측 비교 후)
 - 동·구·직업·상황 59페이지가 **각자 전용 OG 카드**를 쓴다 — `thumbs.page_og("영통동 개인회생")`,
   `static/uploads/auto/page/page-<해시>.jpg`(첫 요청 때 그리거나 `flask post-thumbs`가 미리 그림).
