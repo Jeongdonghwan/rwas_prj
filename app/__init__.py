@@ -35,6 +35,12 @@ def kst_day_start_utc(days_ago=0):
 
 
 def create_app():
+    # 끝 슬래시 보정(/법률칼럼 → /법률칼럼/)을 Flask 기본 308 대신 301 로.
+    # 네이버 서치어드바이저가 이 리다이렉트를 '리다이렉션된 페이지(수집제한)'로 보고했고,
+    # 네이버 가이드는 영구 이동에 301 을 권한다(308 은 상대적으로 새 코드라 처리 보장이 없다).
+    from werkzeug.routing import RequestRedirect
+    RequestRedirect.code = 301
+
     app = Flask(__name__)
     app.config.from_object("app.config.Config")
 

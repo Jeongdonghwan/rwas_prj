@@ -104,6 +104,17 @@ def urlset(entries):
 
 # ---------- robots.txt ----------
 
+# 브라우저·검색로봇이 루트에서 찾는 아이콘. 없으면 키워드 페이지 라우트(/<slug>/)가 잡아
+# /favicon.ico → /favicon.ico/ 로 넘긴 뒤 404 가 났다(네이버 '리다이렉션된 페이지'로 잡힘).
+@bp.route("/favicon.ico")
+@bp.route("/apple-touch-icon.png")
+@bp.route("/apple-touch-icon-precomposed.png")
+def root_icons():
+    from flask import current_app, request, send_from_directory
+    name = "favicon.ico" if request.path.endswith(".ico") else "apple-touch-icon.png"
+    return send_from_directory(Path(current_app.static_folder) / "img", name, max_age=60 * 60 * 24 * 30)
+
+
 @bp.route("/robots.txt")
 def robots():
     # 어드민 주소는 **일부러 적지 않는다.** robots.txt는 누구나 읽는 공개 파일이라
@@ -329,7 +340,7 @@ def rss():
         ' xmlns:atom="http://www.w3.org/2005/Atom">\n'
         "  <channel>\n"
         "    <title>%s 진행 사례</title>\n" % escape(site["brand"])
-        + "    <link>%s</link>\n" % escape(abs_url("board.case_list"))
+        + "    <link>%s</link>\n" % escape(abs_url("main.index"))
         # 자기 참조 링크 — 피드 검증기가 요구한다
         + '    <atom:link href="%s" rel="self" type="application/rss+xml"/>\n'
           % escape(base() + "/rss.xml")
