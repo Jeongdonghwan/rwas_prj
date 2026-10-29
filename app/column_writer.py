@@ -26,6 +26,7 @@ import json
 import os
 import re
 import time
+import urllib.error
 import urllib.request
 from html.parser import HTMLParser
 
@@ -144,7 +145,20 @@ def build_prompt(kw):
     return system, user
 
 
-def call_gpt(system, user, model=None, timeout=300):
+class ApiError(Exception):
+    """OpenAI 호출 실패. 글 내용 문제가 아니므로 키워드 시도 횟수에 넣지 않는다.
+    fatal=True 면(크레딧 소진·키 오류) 이번 회차를 바로 멈춘다 — 다음 키워드도 똑같이 실패한다."""
+
+    def __init__(self, msg, fatal=False):
+        super().__init__(msg)
+        self.fatal = fatal
+
+
+# 429(분당 한도)·5xx 는 잠시 뒤 다시 시도한다. 5개 사이트가 같은 키를 써서 한도를 나눠 쓴다.
+RETRY_WAITS = (20, 60, 120)
+
+
+def call_gpt(system, user, model=None, timeout=300, sleep=time.sleep):
     key = os.environ["OPENAI_API_KEY"]
     body = {
         "model": model or os.environ.get("MODEL_WRITER", "gpt-5"),
@@ -152,12 +166,37 @@ def call_gpt(system, user, model=None, timeout=300):
                      {"role": "user", "content": user}],
         "response_format": {"type": "json_object"},
     }
-    req = urllib.request.Request(
-        API, data=json.dumps(body).encode(),
-        headers={"Authorization": "Bearer " + key,
-                 "Content-Type": "application/json"})
-    d = json.loads(urllib.request.urlopen(req, timeout=timeout).read())
-    return json.loads(d["choices"][0]["message"]["content"]), d.get("usage", {})
+    for i in range(len(RETRY_WAITS) + 1):
+        req = urllib.request.Request(
+            API, data=json.dumps(body).encode(),
+            headers={"Authorization": "Bearer " + key,
+                     "Content-Type": "application/json"})
+        try:
+            d = json.loads(urllib.request.urlopen(req, timeout=timeout).read())
+            return json.loads(d["choices"][0]["message"]["content"]), d.get("usage", {})
+        except urllib.error.HTTPError as e:
+            try:
+                err = json.loads(e.read().decode("utf-8", "replace")).get("error") or {}
+            except Exception:
+                err = {}
+            code = err.get("code") or err.get("type") or ""
+            msg = "HTTP %d %s %s" % (e.code, code, (err.get("message") or "")[:120])
+            # 같은 429 라도 크레딧 소진은 기다려도 안 풀린다 — 결제 문제
+            if code == "insufficient_quota" or e.code in (401, 403):
+                raise ApiError(msg + " — OpenAI 결제·크레딧 또는 키를 확인하세요", fatal=True)
+            if (e.code == 429 or e.code >= 500) and i < len(RETRY_WAITS):
+                wait = RETRY_WAITS[i]
+                ra = e.headers.get("Retry-After") if e.headers else None
+                if ra and ra.isdigit():
+                    wait = max(wait, int(ra))
+                sleep(wait)
+                continue
+            raise ApiError(msg)
+        except (urllib.error.URLError, TimeoutError) as e:
+            if i < len(RETRY_WAITS):
+                sleep(RETRY_WAITS[i])
+                continue
+            raise ApiError("네트워크 오류: %s" % e)
 
 
 # ── 정리·검증 ─────────────────────────────────────────────────────
@@ -374,8 +413,21 @@ def _run(n, dry_run, log, pool="any"):
         try:
             system, user = build_prompt(kw)
             data, usage = call_gpt(system, user)
-        except Exception as e:
+        except ApiError as e:
+            # API 쪽 문제 — 키워드 잘못이 아니므로 시도 횟수를 올리지 않고 대기로 남긴다
+            # (예전엔 429 가 3번 나면 멀쩡한 키워드가 '실패'로 빠졌다)
             reason = "API 오류: %s" % e
+            log("  ✗ %s — %s" % (kw.keyword, reason))
+            if not dry_run:
+                kw.last_error = reason[:300]
+                db.session.commit()
+            results.append((kw.keyword, False, reason))
+            if e.fatal:
+                log("  ■ 회차 중단 — 다음 키워드도 같은 이유로 실패한다")
+                break
+            continue
+        except Exception as e:
+            reason = "응답 처리 오류: %s" % e
             log("  ✗ %s — %s" % (kw.keyword, reason))
             if not dry_run:
                 mark_failed(kw, reason)
