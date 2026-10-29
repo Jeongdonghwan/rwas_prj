@@ -81,7 +81,8 @@ def create_app():
 
     PREVIEW_THEMES = {"0": "최초 시안", "1": "현재", "2": "D1 라인 일러스트", "3": "D2 사진 카드",
                       "4": "E1 차콜 블랙", "5": "E2 딥 페트롤", "6": "E3 딥 코코아",
-                      "8": "0번+사진 카드+검정 교차"}
+                      "8": "0번+사진 카드+검정 교차",
+                      "9": "8번+아이콘 제거"}
 
     @app.context_processor
     def inject_site():
@@ -123,7 +124,7 @@ def create_app():
     def _preview_v0():
         """0번 — 오늘 팔레트·라벨 교체 이전 원본. CSS 와 메인·소개·절차 템플릿을 통째로 옛것으로 쓴다."""
         # 8번은 0번 원본 위에 사진 카드·검정 띠를 얹는다 → 원본 CSS·템플릿을 같이 쓴다
-        return (request.args.get("theme") or request.cookies.get("lei_theme")) in ("0", "8")
+        return (request.args.get("theme") or request.cookies.get("lei_theme")) in ("0", "8", "9")
 
     def _preview_on():
         """시안 미리보기 중인가 — 시안 링크로 들어온 사람만. 일반 방문자·검색로봇은 False."""

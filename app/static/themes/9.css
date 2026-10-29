@@ -1,0 +1,66 @@
+/* 9번 = 8번 복사 + 아이콘 제거. 원래 8번 설명: 8번 — 0번(최초 시안) 그대로 + 3번의 사진 카드 + 검은색 교차 띠.
+   0번의 버건디·분홍 히어로, 번호 뱃지, 파스텔 4카드, 라벨은 손대지 않는다. */
+:root{--band:#15171c}
+
+/* ── 사진 카드 (3번에서 가져옴, 0번 색에 맞춰 덧칠만 버건디·차콜로) ── */
+/* 진행 방식 3카드: 위에 사진, 번호 뱃지 아이콘은 사진 아래 그대로 */
+.cards:not(.four) .card{padding:0;overflow:hidden}
+.cards:not(.four) .card::before{content:"";display:block;position:static!important;height:160px!important;width:auto!important;transform:none!important;opacity:1!important;background:center/cover;border-radius:0}
+.cards:not(.four) .card:nth-child(1)::before{background-image:linear-gradient(rgba(21,23,28,.05),rgba(21,23,28,.35)),url(/static/img/consult.webp)}
+.cards:not(.four) .card:nth-child(2)::before{background-image:linear-gradient(rgba(21,23,28,.05),rgba(21,23,28,.35)),url(/static/img/books.webp)}
+.cards:not(.four) .card:nth-child(3)::before{background-image:linear-gradient(rgba(21,23,28,.05),rgba(21,23,28,.35)),url(/static/img/bg-court.webp)}
+.cards:not(.four) .card .ico{margin:-29px 0 14px 30px;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.12)}
+.cards:not(.four) .card h3,.cards:not(.four) .card p{padding:0 30px}
+.cards:not(.four) .card p{padding-bottom:32px}
+
+/* 제도비교 헤더: 사진 + 어두운 덧칠 (번호 뱃지·아이콘 유지) */
+.pcol .phead{position:relative;color:#fff!important;background:center/cover!important;padding:34px 22px}
+.pcol.c1 .phead{background-image:linear-gradient(rgba(124,34,49,.84),rgba(90,22,34,.92)),url(/static/img/consult.webp)!important}
+.pcol.c2 .phead{background-image:linear-gradient(rgba(21,23,28,.82),rgba(21,23,28,.92)),url(/static/img/bg-court.webp)!important}
+.pcol.c3 .phead{background-image:linear-gradient(rgba(60,46,34,.82),rgba(40,30,22,.92)),url(/static/img/bg-library.webp)!important}
+.pcol .phead p{color:rgba(255,255,255,.8)!important}
+.imgsplit .im{border-radius:0 80px 0 80px}
+
+/* ── 검은색 교차 띠 ── 제도비교(위) + 비용·지역·칼럼·상담(아래) */
+.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult{background:var(--band)!important;color:#fff}
+:is(.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head h2,
+:is(.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head h2 .thin{color:#fff}
+:is(.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head p{color:rgba(255,255,255,.7)}
+:is(.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .more a{color:#fff}
+:is(.sec:has(.pcmp),.sec:has(.costcard),.sec:has(.area-grid):not(:has([data-carousel])),.sec:has(#carou-columns),#consult) .sec-head .label{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);color:#fff}
+:is(.pcol,.costcard,.area-grid>div,.ccard,.quick form){color:var(--ink)}
+.pcol{border-color:transparent}
+.sec:has(.pcmp) .corebox{background:rgba(255,255,255,.07);color:rgba(255,255,255,.8)}
+.sec:has(.costcard) .points li{border-color:rgba(255,255,255,.16)}
+.sec:has(.costcard) .points li:first-child{border-top-color:#fff}
+.sec:has(.costcard) .points li h3{color:#fff}
+.sec:has(.costcard) .points li p{color:rgba(255,255,255,.72)}
+.sec:has(.costcard) .two > div > p,.sec:has(.costcard) small{color:rgba(255,255,255,.6)}
+.sec:has(#carou-columns) .carou-dots button{background:rgba(255,255,255,.35)}
+
+/* ── '이런 경우에도' 4카드: 파스텔 대신 곤색·검정 교차 (의뢰인 요청 2026-10-29, 3번 시안 카드) ── */
+.pastel .card,.pastel .card.t1,.pastel .card.t3{background:#1f2b48!important;border:0!important;box-shadow:0 12px 30px rgba(15,18,30,.12)!important;color:#fff}
+.pastel .card.t2,.pastel .card.t4{background:#15171c!important}
+.pastel .card .ico{display:none}
+.pastel .card h3{color:#e8dcc4!important;font-size:13.5px;font-weight:700}
+.pastel .card .big,.pastel .card.t1 .big,.pastel .card.t2 .big,.pastel .card.t3 .big,.pastel .card.t4 .big{color:#fff!important}
+.pastel .card .big::after{background:#e8dcc4!important;opacity:1}
+.pastel .card p{color:rgba(255,255,255,.75)!important}
+.sec:has(.pastel){background:#efe9dc}
+.sec:has(.pastel) .infobar{background:#fff;border:1px solid #e3ded3}
+
+/* ══ 9번 추가: 아이콘 전부 제거 (의뢰인 "아이콘이 너무 많아 눈이 안 간다", 2026-10-29) ══
+   메인 아이콘 34개(상단 띠 4·진행방식 3·4카드 4·안내바 1·제도비교 15·절차 7)를 걷어낸다.
+   순서가 의미 있는 곳(진행방식·절차)은 숫자만 남긴다. 기능 버튼(우측 전화·상담 퀵메뉴)은 유지. */
+.strip .ico{display:none}
+.strip .stat{gap:0}
+.cards:not(.four) .card .ico{display:none}
+.cards:not(.four){counter-reset:c}
+.cards:not(.four) .card h3{margin-top:24px}
+.cards:not(.four) .card h3::before{content:"0" counter(c);counter-increment:c;display:block;font-size:13px;font-weight:800;color:#b13a4a;letter-spacing:.08em;margin-bottom:6px}
+.infobar .bico{display:none}
+.pcol .phead .pt svg{display:none}
+.pcol .prows li{grid-template-columns:76px 1fr}
+.pcol .prows li svg{display:none}
+.tl .tic svg{display:none}
+.tl .tno{position:static;background:none;color:#7c2231;font-size:17px;font-weight:800;padding:0;border-radius:0}

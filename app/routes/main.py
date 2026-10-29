@@ -8,7 +8,7 @@ bp = Blueprint("main", __name__)
 def _v0(name):
     """시안 0번 미리보기(?theme=0)면 팔레트 교체 이전 원본 템플릿. 확정 후 삭제."""
     t = request.args.get("theme") or request.cookies.get("lei_theme")
-    return "_v0/" + name if t in ("0", "8") else name
+    return "_v0/" + name if t in ("0", "8", "9") else name
 
 
 @bp.route("/")
