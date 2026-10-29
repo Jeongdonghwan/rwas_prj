@@ -89,12 +89,13 @@ def create_app():
         # 한글이라 그대로 쓰면 사이트맵(퍼센트 인코딩)과 달라져 크롤러가 같은 URL로
         # 묶지 못할 수 있다 → 여기서 인코딩해 한 가지 표기로 통일한다.
         canonical = SITE_DEFAULTS["base_url"].rstrip("/")
-        theme, alt_on, v0 = None, False, False
+        theme, alt_on, v0, on = None, False, False, False
         if has_request_context():
             canonical += quote(request.path)
             theme = _preview_theme()
             alt_on = _preview_alt()
             v0 = _preview_v0()
+            on = _preview_on()
         return {
             "site": SITE_DEFAULTS,
             "lawyer": LAWYER,
@@ -107,6 +108,7 @@ def create_app():
             "preview_themes": PREVIEW_THEMES,
             "preview_alt": alt_on,
             "preview_v0": v0,
+            "preview_on": on,
         }
 
     # ── 디자인 시안 미리보기 (?theme=1~6) ─────────────────────────────

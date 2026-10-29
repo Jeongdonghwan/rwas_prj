@@ -1,0 +1,7 @@
+/* 히어로만 0번(최초 시안) 기준 — 1~6번 미리보기에 얹는다(0·8번은 원본 CSS 라 필요 없음).
+   0번과 지금 히어로의 차이는 이 네 가지뿐이다: 키커·강조어 분홍, 강조어 밑줄, 주 버튼 버건디. */
+.hero .kicker{color:#d99aa6}
+.hero h1 em{color:#e79aa6}
+.hero h1 em::after{background:rgba(217,120,135,.30)}
+.hero .btns .btn.gold{background:#b13a4a;border-color:#b13a4a;color:#fff}
+.hero .btns .btn.gold:hover{background:#c14453;border-color:#c14453}

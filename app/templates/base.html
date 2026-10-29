@@ -34,6 +34,7 @@
 {% if preview_v0 %}<link rel="stylesheet" href="{{ url_for('static', filename='themes/v0.css') }}?v={{ asset_ver }}">{% else %}<link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}?v={{ asset_ver }}">{% endif %}
 {% if preview_theme %}<link rel="stylesheet" href="{{ url_for('static', filename='themes/' ~ preview_theme ~ '.css') }}?v={{ asset_ver }}">{% endif %}
 {% if preview_alt %}<link rel="stylesheet" href="{{ url_for('static', filename='themes/alt.css') }}?v={{ asset_ver }}">{% endif %}
+{% if preview_on and not preview_v0 %}<link rel="stylesheet" href="{{ url_for('static', filename='themes/hero0.css') }}?v={{ asset_ver }}">{% endif %}
 {% include "partials/schema_org.html" %}
 {% block head %}{% endblock %}
 </head>
