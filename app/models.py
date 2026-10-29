@@ -216,3 +216,12 @@ class Inquiry(db.Model):
     memo = db.Column(db.Text)
     status = db.Column(db.String(20), default="new")  # new / contacted / done / spam
     created_at = db.Column(db.DateTime, default=now_utc)
+
+
+class Setting(db.Model):
+    """어드민에서 바꾸는 운영 설정(키-값). 지금은 칼럼 자동 발행 일정만 쓴다(app/column_settings.py)."""
+
+    __tablename__ = "setting"
+
+    key = db.Column(db.String(40), primary_key=True)
+    value = db.Column(db.String(300))

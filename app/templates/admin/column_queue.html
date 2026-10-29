@@ -4,7 +4,7 @@
 {% block content %}
 <div class="phead">
   <h1>칼럼 자동 발행</h1>
-  <p>매일 새벽 키워드 큐에서 꺼내 작성·검증 후 자동 공개합니다. 검증을 통과하지 못한 키워드는 다음 날 다시 시도하고, 3번 넘게 떨어지면 '실패'로 빠집니다.</p>
+  <p>정해진 시각에 키워드 큐에서 꺼내 작성·검증 후 자동 공개합니다. 검증을 통과하지 못한 키워드는 다음 회차에 다시 시도하고, 3번 넘게 떨어지면 '실패'로 빠집니다.</p>
   <div class="act">
     <a class="btn line" href="{{ url_for('admin.columns') }}">발행된 칼럼 ↗</a>
   </div>
@@ -18,7 +18,33 @@
   <div class="stat"><p class="lb">대기</p><p class="nm">{{ s.get('pending', 0) }}<small>개</small></p></div>
   <div class="stat"><p class="lb">발행</p><p class="nm">{{ s.get('done', 0) }}<small>편</small></p></div>
   <div class="stat{{ ' hl' if s.get('failed') }}"><p class="lb">실패</p><p class="nm">{{ s.get('failed', 0) }}<small>개</small></p></div>
-  <div class="stat"><p class="lb">남은 기간</p><p class="nm">{{ (s.get('pending', 0) // 2) }}<small>일</small></p></div>
+  {% set per_day = (cfg.general_n|int) + (cfg.region_n|int) %}
+  <div class="stat"><p class="lb">하루 발행</p><p class="nm">{{ per_day if cfg.enabled == '1' else 0 }}<small>편</small></p></div>
+</div>
+
+<div class="card">
+  <div class="ct"><h2>자동 발행 설정</h2>{% if cfg.enabled != '1' %}<span class="bd off" style="margin-left:6px">중지됨</span>{% endif %}</div>
+  <form class="form" method="post" action="{{ url_for('admin.column_settings') }}" style="padding:4px 20px 20px">
+    <label class="check"><input type="checkbox" name="enabled" value="1" {{ 'checked' if cfg.enabled == '1' }}> 자동 발행 켜기 <span class="hint" style="font-weight:500;color:var(--ink-3)">끄면 다음 정시부터 새 글이 올라가지 않습니다</span></label>
+    <div class="tblwrap" style="margin-top:14px">
+    <table class="tbl">
+      <thead><tr><th>회차</th><th>하루 편수</th><th>발행 시각</th><th class="hide-sm">남은 키워드</th><th class="hide-sm">마지막 실행</th></tr></thead>
+      <tbody>
+      {% for key, sl in slots.items() %}
+        {% set n = cfg[key ~ '_n']|int %}
+        <tr>
+          <td><b>{{ sl.label }}</b><div class="muted" style="font-size:12.5px">{{ sl.desc }}</div></td>
+          <td><select name="{{ key }}_n">{% for i in range(0, max_n + 1) %}<option value="{{ i }}" {{ 'selected' if i == n }}>{{ i }}편{% if i == 0 %} (쉼){% endif %}</option>{% endfor %}</select></td>
+          <td><select name="{{ key }}_hour">{% for h in range(24) %}<option value="{{ h }}" {{ 'selected' if h == cfg[key ~ '_hour']|int }}>{{ '%02d' % h }}:00{% if h < 6 %} 새벽{% elif h < 12 %} 오전{% elif h < 18 %} 오후{% else %} 저녁{% endif %}</option>{% endfor %}</select></td>
+          <td class="hide-sm num">{{ pending[key] }}개{% if n %} <span class="muted">· 약 {{ pending[key] // n }}일</span>{% endif %}</td>
+          <td class="hide-sm muted">{{ cfg.get(key ~ '_result') or '—' }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <div class="actions"><button class="btn" type="submit">설정 저장</button><span class="muted" style="font-size:13px">한 회차 최대 {{ max_n }}편 · 편당 약 1분 · 저장하면 다음 정시부터 적용</span></div>
+  </form>
 </div>
 
 <div class="card">

@@ -279,14 +279,29 @@ def seed_column_keywords_command():
 @click.option("--dry-run", is_flag=True, help="저장·큐 갱신 없이 생성·검증만")
 @click.option("--pool", type=click.Choice(["any", "general", "region"]), default="any",
               help="general=지역 없는 질문·사례(새벽) / region=지역 키워드(오후)")
+@click.option("--auto", is_flag=True,
+              help="어드민 일정대로 — cron 이 매시간 부르고, 이번 시간에 돌 회차만 쓴다")
 @with_appcontext
-def write_columns_command(n, dry_run, pool):
-    """법률칼럼 자동 작성 — cron 이 매일 새벽 부른다."""
+def write_columns_command(n, dry_run, pool, auto):
+    """법률칼럼 작성. 운영은 cron 매시간 `--auto`(일정·편수는 어드민 /columns/queue)."""
     import os
 
     from app.column_writer import run
 
     db.create_all()
+    if auto:
+        from app.column_settings import due_slots, mark_ran, now_kst
+        slots = due_slots()
+        if not slots:
+            return              # 조용히 끝낸다 — 매시간 로그가 쌓이지 않게
+        for slot, cnt in slots:
+            click.echo("[%s] %s 회차 %d편" % (now_kst().strftime("%Y-%m-%d %H:%M"), slot, cnt))
+            res = run(cnt, dry_run=dry_run, log=click.echo, pool=slot)
+            ok = sum(1 for _, good, _ in res if good)
+            if not dry_run:
+                mark_ran(slot, ok, len(res))
+            click.echo("완료 %d / %d" % (ok, len(res)))
+        return
     n = n or int(os.environ.get("COLUMN_PER_DAY") or 2)
     res = run(n, dry_run=dry_run, log=click.echo, pool=pool)
     ok = sum(1 for _, good, _ in res if good)

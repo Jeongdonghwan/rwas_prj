@@ -505,8 +505,26 @@ def column_queue():
               .limit(50).all())
     recent = (ColumnKeyword.query.filter_by(status="done")
               .order_by(ColumnKeyword.published_at.desc()).limit(20).all())
+    from app.column_settings import MAX_PER_SLOT, SLOTS, get_all
+    cfg = get_all()
+    # 회차별 남은 키워드와 지금 속도로 며칠 가는지
+    pending = {
+        "general": ColumnKeyword.query.filter_by(status="pending", area="").count(),
+        "region": ColumnKeyword.query.filter(ColumnKeyword.status == "pending",
+                                             ColumnKeyword.area != "").count(),
+    }
     return render_template("admin/column_queue.html", nav="column",
-                           s=stats(), failed=failed, recent=recent)
+                           s=stats(), failed=failed, recent=recent,
+                           cfg=cfg, slots=SLOTS, pending=pending, max_n=MAX_PER_SLOT)
+
+
+@bp.route("/columns/settings", methods=["POST"])
+@requires_auth
+def column_settings():
+    from app.column_settings import save
+    save(request.form)
+    flash("자동 발행 설정을 저장했습니다. 다음 정시부터 적용됩니다.", "ok")
+    return redirect(url_for("admin.column_queue"))
 
 
 @bp.route("/columns/queue/<int:kw_id>/retry", methods=["POST"])

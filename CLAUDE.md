@@ -259,8 +259,11 @@ FLASK_APP=run.py flask seed && FLASK_APP=run.py flask seed-keywords
 도산 8043). 사이트마다 도메인·DB·`.env`·systemd 유닛도 따로 필요하다. 아직 안 했다.
 
 ### 법률칼럼 자동 발행 (2026-10-20)
-사이트당 **하루 4편 = 새벽 03시 일반 2편(`--pool general`) + 오후 14시 지역 2편(`--pool region`)**,
-서버 cron(`/etc/cron.d/lei-columns`)이 부른다. 풀은 `ColumnKeyword.area`가 비었는지로 가른다 —
+**일정·편수는 어드민 `/leilaw/columns/queue`의 "자동 발행 설정"에서 바꾼다**(2026-10-29~).
+켜기/끄기, 회차(일반·지역)별 하루 편수 0~5, 발행 시각 0~23시. 기본 = 03시 일반 2편 + 14시 지역 2편.
+서버 cron 은 **매시간** `flask write-columns --auto`를 부르고, `app/column_settings.py`가 지금 시각에
+돌 회차만 골라 쓴다(같은 회차 하루 1번). 그래서 설정을 바꿔도 cron 파일은 손대지 않는다.
+설정은 `setting` 테이블(키-값). `python -m app.column_settings`가 시각·중복·꺼짐 규칙 자가 점검(메모리 DB). 풀은 `ColumnKeyword.area`가 비었는지로 가른다 —
 일반 = 직업·상황 질문·사례·생활·비교(344개, 5사이트 공통), 지역 = 지역×직업·상황·사례·질문
 (수원 419 / 안산 238 / 용인·성남 387 / 도산 663). 지역 질문은 **구·동 단위에만** 쓴다
 (시 단위는 양산 페이지와 자리가 겹친다). 동은 질문 12개 중 4개, 직업·상황 2+2를 해시로 골라 양산형을 피한다.
