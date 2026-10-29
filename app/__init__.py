@@ -95,6 +95,23 @@ def create_app():
             return redirect(SITE_DEFAULTS["base_url"].rstrip("/") + request.full_path.rstrip("?"),
                             code=301)
 
+    # 공개 키워드 페이지가 하나라도 있는지 — 푸터 '모아보기' 링크를 숨길지 정한다.
+    # 지역 사이트는 키워드 세트를 전부 내릴 수 있어(indexing-recovery-plan.md) 빈 허브로 링크하면 안 된다.
+    # 매 요청 쿼리를 피하려고 5분 캐시.
+    _kw_cache = {"t": 0.0, "v": True}
+
+    def _has_keywords():
+        import time
+        if time.time() - _kw_cache["t"] > 300:
+            from app.models import Keyword
+            try:
+                _kw_cache["v"] = db.session.query(Keyword.id).filter(
+                    Keyword.is_public.is_(True)).first() is not None
+            except Exception:
+                _kw_cache["v"] = True
+            _kw_cache["t"] = time.time()
+        return _kw_cache["v"]
+
     PREVIEW_THEMES = {"0": "최초 시안", "1": "현재", "2": "D1 라인 일러스트", "3": "D2 사진 카드",
                       "4": "E1 차콜 블랙", "5": "E2 딥 페트롤", "6": "E3 딥 코코아",
                       "8": "0번+사진 카드+검정 교차",
@@ -126,6 +143,7 @@ def create_app():
             "preview_alt": alt_on,
             "preview_v0": v0,
             "preview_on": on,
+            "has_keywords": _has_keywords(),
         }
 
     # ── 디자인 시안 미리보기 (?theme=1~6) ─────────────────────────────
