@@ -5,7 +5,7 @@
 .cards:not(.four) .card{padding:0;overflow:hidden}
 .cards:not(.four) .card .ico{display:none}
 .cards:not(.four) .card::before{content:"";display:block;position:static!important;height:150px!important;width:auto!important;transform:none!important;opacity:1!important;background:center/cover}
-.cards:not(.four) .card:nth-child(1)::before{background-image:linear-gradient(rgba(31,43,72,.15),rgba(31,43,72,.45)),url(/static/img/consult.webp)}
+.cards:not(.four) .card:nth-child(1)::before{background-image:linear-gradient(rgba(31,43,72,.15),rgba(31,43,72,.45)),url(/static/img/review-docs.webp)}
 .cards:not(.four) .card:nth-child(2)::before{background-image:linear-gradient(rgba(31,43,72,.15),rgba(31,43,72,.45)),url(/static/img/books.webp)}
 .cards:not(.four) .card:nth-child(3)::before{background-image:linear-gradient(rgba(31,43,72,.15),rgba(31,43,72,.45)),url(/static/img/bg-court.webp)}
 .cards:not(.four) .card h3,.cards:not(.four) .card p{padding:0 30px}.cards:not(.four) .card h3{margin-top:24px}.cards:not(.four) .card p{padding-bottom:30px}

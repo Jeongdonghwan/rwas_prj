@@ -6,7 +6,7 @@
 /* 진행 방식 3카드: 위에 사진, 번호 뱃지 아이콘은 사진 아래 그대로 */
 .cards:not(.four) .card{padding:0;overflow:hidden}
 .cards:not(.four) .card::before{content:"";display:block;position:static!important;height:160px!important;width:auto!important;transform:none!important;opacity:1!important;background:center/cover;border-radius:0}
-.cards:not(.four) .card:nth-child(1)::before{background-image:linear-gradient(rgba(21,23,28,.05),rgba(21,23,28,.35)),url(/static/img/consult.webp)}
+.cards:not(.four) .card:nth-child(1)::before{background-image:linear-gradient(rgba(21,23,28,.05),rgba(21,23,28,.35)),url(/static/img/review-docs.webp)}
 .cards:not(.four) .card:nth-child(2)::before{background-image:linear-gradient(rgba(21,23,28,.05),rgba(21,23,28,.35)),url(/static/img/books.webp)}
 .cards:not(.four) .card:nth-child(3)::before{background-image:linear-gradient(rgba(21,23,28,.05),rgba(21,23,28,.35)),url(/static/img/bg-court.webp)}
 .cards:not(.four) .card .ico{margin:-29px 0 14px 30px;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.12)}
