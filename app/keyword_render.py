@@ -18,10 +18,11 @@
 from itertools import combinations
 
 from app.config import REGION
-from app.content import pick, render_tpl, stable_hash
+from app.content import josa, pick, render_tpl, stable_hash
 from app.keyword_rules import SCHEMES, correction_terms
 from app.keyword_sections import SECTIONS
-from app.scheme_facts import SCHEME_FACTS, correction_html
+from app.scheme_facts import COURT_NAME, SCHEME_FACTS, correction_html
+from app.summary_points import LEADS, OTHER_HEADS, POINTS, RELATED_HEADS
 from app.variant_codes import VECTORS
 
 # 분류가 아직 정의되지 않았을 때 쓰는 기본 섹션 세트
@@ -124,14 +125,22 @@ def build(kw):
                 for f in chosen]
 
     terms = correction_terms(_base_keyword(kw), kw.scheme) if kw.needs_correction else []
+    summary, kv_main, kv_side = _summary_block(kw, seed, v)
 
     return {
         "kw": kw,
         "scheme_name": facts["name"],
         "organ": facts["organ"],
         "intro": facts["intro"],
-        "summary": render_tpl(facts["summary"], **v),
-        "kv": facts["kv"],
+        "summary": summary,
+        "desc": _meta_desc(kw.keyword, summary),
+        "kv": kv_main,
+        "kv_side": kv_side,
+        "lead": pick(seed, "lead", LEADS).format(
+            intro=facts["intro"], cat=kw.category, kw=kw.keyword,
+            kw_eul=josa(kw.keyword, "을를")),
+        "related_head": pick(seed, "rhead", RELATED_HEADS).format(cat=kw.category),
+        "other_head": pick(seed, "ohead", OTHER_HEADS),
         "correction": correction_html(terms, kw.scheme),
         "sections": sections,
         "faqs": faqs,
@@ -145,3 +154,54 @@ def _base_keyword(kw):
         text = text[len(kw.region):].strip()
     name = SCHEMES[kw.scheme]
     return text.replace(name, "개인회생") if kw.scheme != "rehab" else text
+
+
+def _summary_block(kw, seed, v):
+    """핵심 요약 문단 + 요약 표 — 페이지마다 다르게 조립한다.
+
+    문단: 첫 문장(3가지 중 1) + 사실 항목 3개(전체 5~6개 중 해시로 골라 순서까지 섞음, 표현 3가지 중 1).
+    표: kv 6줄 중 4줄만 본문에, 나머지는 사이드 박스에. 같은 분류 페이지끼리 표가 통째로 같던 것을 깬다.
+    사실값은 scheme_facts.kv 그대로다 — 표현만 바뀐다.
+    """
+    facts = SCHEME_FACTS[kw.scheme]
+    pts = POINTS.get(kw.scheme)
+    if not pts:                                   # 재료가 없으면 예전 고정 문단
+        summary = render_tpl(facts["summary"], **v)
+    else:
+        order = sorted(range(len(pts["points"])),
+                       key=lambda i: stable_hash("%s::pt::%d" % (seed, i)))[:3]
+        parts = [pick(seed, "open", pts["open"])]
+        parts += [pick(seed, "ph::%d" % i, pts["points"][i]) for i in sorted(order)]
+        summary = render_tpl(" ".join(parts), court=COURT_NAME, **v)
+    rows = list(facts["kv"])
+    take = 4 if len(rows) > 4 else 3
+    idx = sorted(sorted(range(len(rows)),
+                        key=lambda i: stable_hash("%s::kv::%d" % (seed, i)))[:take])
+    kv_main = [rows[i] for i in idx]
+    kv_side = [rows[i] for i in range(len(rows)) if i not in idx] or kv_main[:2]
+    return summary, kv_main, kv_side
+
+
+def _meta_desc(keyword, summary_html, lo=40, hi=79):
+    """메타 설명 — 그 페이지 요약 문단에서 만든다(40~79자).
+
+    예전엔 '{키워드} 안내. 수원개인회생 신청자격·비용·기간·준비서류 정리.'로 1만 2천 페이지가
+    뒷부분이 전부 같았고, 짧은 키워드는 40자 미만이었다.
+    """
+    import re
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", summary_html)).strip()
+    # 첫 문장은 정의라 키워드와 겹친다 → 둘째 문장부터 쓰고, 모자라면 첫 문장까지
+    sents = [x.strip() for x in re.split(r"(?<=[.다요])\s+", text) if x.strip()]
+    body = " ".join(sents[1:]) or text
+    out = "%s — %s" % (keyword, body)
+    if len(out) > hi:
+        cut = out[:hi]
+        end = max(cut.rfind("다."), cut.rfind("요."))
+        if end + 2 >= lo:                       # 문장 끝에서 자를 수 있으면 거기서
+            out = cut[:end + 2]
+        else:
+            sp = out[:hi - 1].rfind(" ")
+            out = out[:sp if sp > lo else hi - 1].rstrip(" ,·—.") + "…"
+    if len(out) < lo:
+        out = (out.rstrip(".") + ". 신청자격·비용·준비서류까지 정리했습니다.")[:hi]
+    return out

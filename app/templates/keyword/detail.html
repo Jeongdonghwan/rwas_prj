@@ -2,7 +2,7 @@
 {% set k = page.kw %}
 {% block title %}{{ k.keyword }} | {{ site.brand_seo }}{% endblock %}
 {% block meta_keywords %}{{ k.keyword }}, {{ k.keyword }} 상담, {{ page.scheme_name }} {{ k.category }}, {{ site.keywords }}{% endblock %}
-{% block meta_desc %}{{ k.keyword }} 안내. {{ site.region }}개인회생 신청자격·비용·기간·준비서류 정리.{% endblock %}
+{% block meta_desc %}{{ page.desc }}{% endblock %}
 {% block head %}
 {# FAQ 는 page.faqs 에 있다 — 예전엔 faqs 를 찾아 FAQPage 가 통째로 빠져 있었다 #}
 {% with faqs = page.faqs %}{% include "partials/faq_jsonld.html" %}{% endwith %}
@@ -17,7 +17,7 @@
   <div class="page-head">
     <p class="cat">{{ page.scheme_name }} · {{ k.category }}{% if k.region %} · {{ k.region }}{% endif %}</p>
     <h1>{{ k.keyword }}</h1>
-    <p class="lead">{{ page.intro }}에 대해, {{ k.category }} 관점에서 정리했습니다.</p>
+    <p class="lead">{{ page.lead }}</p>
   </div>
 </div>
 
@@ -55,14 +55,14 @@
     {% endif %}
 
     {% if others %}
-    <div class="sec-head" style="margin-top:64px"><h2>다른 제도로 보기</h2></div>
+    <div class="sec-head" style="margin-top:64px"><h2>{{ page.other_head }}</h2></div>
     <div class="linklist">
       {% for o in others %}<a href="{{ url_for('keyword.page', slug=o.slug_ko) }}">{{ o.keyword }}</a>{% endfor %}
     </div>
     {% endif %}
 
     {% if same_cat %}
-    <div class="sec-head" style="margin-top:48px"><h2>{{ k.category }} 관련해서 함께 보는 내용</h2></div>
+    <div class="sec-head" style="margin-top:48px"><h2>{{ page.related_head }}</h2></div>
     <div class="linklist">
       {% for o in same_cat %}<a href="{{ url_for('keyword.page', slug=o.slug_ko) }}">{{ o.keyword }}</a>{% endfor %}
       <a href="{{ url_for('main.service_rehab') }}">개인회생 안내</a>
@@ -75,7 +75,7 @@
     <div class="aside">
       <h3>바로 확인</h3>
       <ul class="kv">
-        {% for label, value in page.kv[:4] %}<li><b>{{ label }}</b><span>{{ value }}</span></li>{% endfor %}
+        {% for label, value in page.kv_side %}<li><b>{{ label }}</b><span>{{ value }}</span></li>{% endfor %}
       </ul>
       <a class="btn red wide" href="tel:{{ site.phone_link }}">전화 {{ site.phone }}</a>
       <a class="btn wide" href="{{ url_for('contact.contact') }}#form">상담 신청</a>
