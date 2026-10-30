@@ -64,3 +64,13 @@
 .pcol .prows li svg{display:none}
 .tl .tic svg{display:none}
 .tl .tno{position:static;background:none;color:#7c2231;font-size:17px;font-weight:800;padding:0;border-radius:0}
+
+/* ── 비용 표: 흰 카드 → 검은 띠 위 선 구분 목록 (오른쪽 '일하는 방식'과 같은 형식, 의뢰인 요청 2026-10-30) ── */
+.sec:has(.costcard) .costcard{background:transparent!important;border:0!important;border-top:2px solid #fff!important;border-radius:0!important;box-shadow:none!important;color:#fff!important}
+.sec:has(.costcard) .costcard li{border-bottom:1px solid rgba(255,255,255,.16)!important;padding:20px 4px}
+.sec:has(.costcard) .costcard li:last-child{border-bottom:1px solid rgba(255,255,255,.16)!important}
+.sec:has(.costcard) .costcard li i{color:#fff}
+.sec:has(.costcard) .costcard li i::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#b13a4a;margin-right:9px;vertical-align:2px}
+.sec:has(.costcard) .costcard li b{color:#fff}
+.sec:has(.costcard) .costcard li small{color:rgba(255,255,255,.62)}
+.sec:has(.costcard) .costcard + p{color:rgba(255,255,255,.55)!important}
