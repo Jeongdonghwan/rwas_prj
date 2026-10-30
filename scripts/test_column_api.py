@@ -55,6 +55,16 @@ def main():
     except W.ApiError as e:
         assert e.fatal and waits == [], (e, waits)
 
+    # 운영에서 실제로 받은 코드(2026-10-30) — insufficient_quota 와 이름이 다르다
+    waits.clear()
+    W.urllib.request.urlopen = serve([http(429, {"error": {"code": "credit_balance_exhausted",
+                                                           "message": "You have no credits remaining."}})])
+    try:
+        W.call_gpt("s", "u", sleep=waits.append)
+        raise AssertionError("크레딧 소진(credit_balance_exhausted)인데 통과했다")
+    except W.ApiError as e:
+        assert e.fatal and waits == [], (e, waits)
+
     waits.clear()
     W.urllib.request.urlopen = serve([http(429, {"error": {}})] * 4)
     try:

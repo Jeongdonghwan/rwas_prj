@@ -182,7 +182,10 @@ def call_gpt(system, user, model=None, timeout=300, sleep=time.sleep):
             code = err.get("code") or err.get("type") or ""
             msg = "HTTP %d %s %s" % (e.code, code, (err.get("message") or "")[:120])
             # 같은 429 라도 크레딧 소진은 기다려도 안 풀린다 — 결제 문제
-            if code == "insufficient_quota" or e.code in (401, 403):
+            # 크레딧·한도 소진은 기다려도 안 풀린다 — 코드 이름이 여러 가지다
+            # (insufficient_quota, credit_balance_exhausted 를 실제로 받았다). 메시지로도 잡는다.
+            text = (code + " " + (err.get("message") or "")).lower()
+            if any(w in text for w in ("quota", "credit", "billing")) or e.code in (401, 403):
                 raise ApiError(msg + " — OpenAI 결제·크레딧 또는 키를 확인하세요", fatal=True)
             if (e.code == 429 or e.code >= 500) and i < len(RETRY_WAITS):
                 wait = RETRY_WAITS[i]
