@@ -15,7 +15,8 @@
 .sec:has(.costcard) .points li h3{color:#fff}
 .sec:has(.costcard) .points li h3::before{background:#e8dcc4}
 .sec:has(.costcard) .points li p{color:rgba(255,255,255,.72)}
-.sec:has(.costcard) .two > div > p,.sec:has(.costcard) small{color:rgba(255,255,255,.6)}
+.sec:has(.costcard) .two > div > p{color:rgba(255,255,255,.6)}
+.sec:has(.costcard) .costcard small{color:var(--ink-3)}   /* 흰 카드 안 보조 설명 — 띠 색 규칙에 휩쓸려 흰 글씨가 됐었다 */
 /* 캐러셀 점·화살표 */
 .sec:has(#carou-columns) .carou-dots button{background:rgba(255,255,255,.35)}
 .sec:has(#carou-columns) .carou-dots button[aria-current="true"],.sec:has(#carou-columns) .carou-dots .on{background:#fff}

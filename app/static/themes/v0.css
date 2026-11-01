@@ -1047,3 +1047,12 @@ body.modal-open{overflow:hidden}
 .relcols .ccard .bd{padding:12px 14px 14px}
 .relcols .ccard b{display:block;font-size:14.5px;line-height:1.5;color:var(--ink)}
 @media (max-width:720px){.relcols{grid-template-columns:1fr 1fr}}
+
+/* 메인 '비용 | 일하는 방식' 두 칸 높이 맞춤 — 제목 영역(문장 길이가 달라도)과 목록 영역을 같은 줄에 둔다.
+   subgrid 로 두 칸이 행을 공유: 1행 제목 · 2행 목록(항목을 늘려 아래 선까지 맞춤) · 3·4행 왼쪽 안내·링크. */
+@media (min-width:961px){
+  .two:has(.costcard){grid-template-rows:auto 1fr auto auto;row-gap:0}
+  .two:has(.costcard)>div{display:grid;grid-row:span 4;grid-template-rows:subgrid;row-gap:0}
+  .two:has(.costcard) .costcard,.two:has(.costcard) .points{display:flex;flex-direction:column;margin:0}
+  .two:has(.costcard) .costcard>li,.two:has(.costcard) .points>li{flex:1}
+}
