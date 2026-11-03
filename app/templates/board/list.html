@@ -19,7 +19,6 @@
 {% with crumbs=[('진행 사례', None)] %}{% include "_breadcrumb.html" %}{% endwith %}
 <div class="wrap">
   <div class="page-head">
-    <p class="cat">진행 사례</p>
     <h1>진행 사례</h1>
     <p class="lead">실제 진행한 사건을 의뢰인 동의를 받아 사실 위주로 기록합니다. 개인 사정에 따라 결과는 달라질 수 있으며, 특정 결과를 보장하지 않습니다.</p>
   </div>
@@ -34,7 +33,6 @@
         {% if p.thumb_path %}<img src="{{ p.thumb_path }}" alt="{{ p.thumb_alt or p.title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover">{% else %}<div class="ph"></div>{% endif %}
       </a>
       <div>
-        <p class="cat">진행 사례</p>
         <h3><a href="{{ url_for('board.case_view', slug=p.slug) }}">{{ p.title }}</a></h3>
         <p class="ex">{{ p.excerpt }}</p>
         <p class="date">{{ p.published_at|kst('%Y.%m.%d') }}</p>

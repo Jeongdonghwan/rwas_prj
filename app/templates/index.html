@@ -269,7 +269,6 @@
           {% if p.thumb_path %}<img src="{{ p.thumb_path }}" alt="{{ p.thumb_alt or p.title }}" loading="lazy" width="1200" height="630">{% else %}<span class="ph"></span>{% endif %}
         </a>
         <div class="bd">
-          <p class="cat">진행 사례</p>
           <h3><a href="{{ url_for('board.case_view', slug=p.slug) }}">{{ p.title }}</a></h3>
           <p class="ex">{{ p.excerpt }}</p>
           <p class="date">{{ p.published_at|kst('%Y.%m.%d') }}</p>
