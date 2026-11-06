@@ -34,6 +34,15 @@ def kst_day_start_utc(days_ago=0):
     return start.astimezone(timezone.utc).replace(tzinfo=None)
 
 
+# 확정 디자인. 쿠키나 ?theme= 가 없는 일반 방문자·검색로봇은 이 시안을 본다.
+# 예전엔 시안이 쿠키로만 적용돼, 쿠키가 있는 브라우저에서만 최종 디자인이 보였다.
+DEFAULT_THEME = "8"
+
+
+def theme_choice():
+    return request.args.get("theme") or request.cookies.get("lei_theme") or DEFAULT_THEME
+
+
 def create_app():
     # 끝 슬래시 보정(/법률칼럼 → /법률칼럼/)을 Flask 기본 308 대신 301 로.
     # 네이버 서치어드바이저가 이 리다이렉트를 '리다이렉션된 페이지(수집제한)'로 보고했고,
@@ -152,13 +161,13 @@ def create_app():
     # ?theme=1 이 현재 색. 쿠키 없는 방문자·검색로봇에겐 아무 변화가 없다.
     # 시안이 확정되면 site.css 에 합치고 이 블록과 static/themes/ 를 지운다.
     def _preview_theme():
-        t = request.args.get("theme") or request.cookies.get("lei_theme")
+        t = theme_choice()
         return t if t in PREVIEW_THEMES and t not in ("0", "1") else None
 
     def _preview_v0():
         """0번 — 오늘 팔레트·라벨 교체 이전 원본. CSS 와 메인·소개·절차 템플릿을 통째로 옛것으로 쓴다."""
         # 8번은 0번 원본 위에 사진 카드·검정 띠를 얹는다 → 원본 CSS·템플릿을 같이 쓴다
-        return (request.args.get("theme") or request.cookies.get("lei_theme")) in ("0", "8", "9")
+        return theme_choice() in ("0", "8", "9")
 
     def _preview_on():
         """시안 미리보기 중인가 — 시안 링크로 들어온 사람만. 일반 방문자·검색로봇은 False."""
