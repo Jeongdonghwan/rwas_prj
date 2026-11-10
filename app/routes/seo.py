@@ -264,8 +264,8 @@ def sitemap_board():
     entries = []
     # 사례와 칼럼은 라우트가 달라 따로 돈다. 한 보드로 묶으면 칼럼 글이
     # /사례/<slug>/ 로 잘못된 URL을 사이트맵에 올린다.
+    # 진행 사례는 공개 중단(2026-11-10) — 칼럼만 싣는다
     for kind, list_ep, view_ep in (
-        (Post.KIND_CASE, "board.case_list", "board.case_view"),
         (Post.KIND_COLUMN, "board.column_list", "board.column_view"),
     ):
         posts = (
@@ -284,7 +284,7 @@ def sitemap_board():
                 image=(base() + p.thumb_path) if p.thumb_path else None,
             ))
     if not entries:
-        entries = [url_entry(abs_url("board.case_list"),
+        entries = [url_entry(abs_url("board.column_list"),
                              template_mtime("board"), "daily", "0.9")]
     return xml_response(urlset(entries))
 
@@ -300,7 +300,7 @@ def rss():
     # **사례와 칼럼을 함께 싣는다.** 네이버는 사이트맵보다 RSS를 빨리 먹고,
     # 사례만 실으면 글이 1건에 멈춰 신선도 신호가 없다.
     posts = (
-        Post.query.filter_by(is_public=True)
+        Post.query.filter_by(is_public=True, kind=Post.KIND_COLUMN)
         .order_by(Post.published_at.desc())
         .limit(50)
         .all()
@@ -339,12 +339,12 @@ def rss():
         '<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"'
         ' xmlns:atom="http://www.w3.org/2005/Atom">\n'
         "  <channel>\n"
-        "    <title>%s 진행 사례</title>\n" % escape(site["brand"])
+        "    <title>%s 법률칼럼</title>\n" % escape(site["brand"])
         + "    <link>%s</link>\n" % escape(abs_url("main.index"))
         # 자기 참조 링크 — 피드 검증기가 요구한다
         + '    <atom:link href="%s" rel="self" type="application/rss+xml"/>\n'
           % escape(base() + "/rss.xml")
-        + "    <description>%s개인회생 %s개인파산 진행 사례. 실제 진행한 사건을 사실 위주로 기록합니다.</description>\n"
+        + "    <description>%s개인회생 %s개인파산 법률칼럼. 신청 전에 많이 묻는 내용을 제도별로 정리합니다.</description>\n"
           % (escape(site["region"]), escape(site["region"]))
         + "    <language>ko</language>\n"
         + "    <lastBuildDate>%s</lastBuildDate>\n" % now

@@ -1,5 +1,5 @@
 <div class="topbar"><div class="wrap">
-  <div><span>상담 24시간 · 주말 예약제</span><span>{{ site.court }} 앞 <b>원희캐슬광교 D동 10층 1002호</b></span></div>
+  <div><span>상담 24시간 · 주말 예약제</span></div>
   <div><span>상담 전화 <b>{{ site.phone }}</b></span><span><a href="{{ url_for('contact.contact') }}#form">상담 신청</a></span></div>
 </div></div>
 
@@ -13,10 +13,10 @@
     <a href="{{ url_for('main.service_rehab') }}"{% if request.path.startswith('/service/rehab') %} class="on"{% endif %}>개인회생</a>
     <a href="{{ url_for('main.service_bankruptcy') }}"{% if request.path.startswith('/service/bankruptcy') %} class="on"{% endif %}>개인파산</a>
     <a href="{{ url_for('main.service_cost') }}"{% if request.path.startswith('/service/cost') %} class="on"{% endif %}>비용 안내</a>
-    <a href="{{ url_for('board.case_list') }}"{% if request.path.startswith('/사례') %} class="on"{% endif %}>진행 사례</a>
     <a href="{{ url_for('board.column_list') }}"{% if request.path.startswith('/' ~ site.column_path) %} class="on"{% endif %}>{{ site.column_path }}</a>
-    <a href="{{ url_for('ko.area_hub') }}"{% if request.path.startswith('/지역별') %} class="on"{% endif %}>지역별 안내</a>
-    <a href="{{ url_for('ko.job_hub') }}"{% if request.path.startswith('/직업별') or request.path.startswith('/상황별') %} class="on"{% endif %}>직업별 안내</a>
+    {# 의뢰인 요청(11-10)으로 화면에서만 숨긴다 — HTML 에 링크가 남아 있어야 검색로봇이 허브로 간다 #}
+    <a hidden href="{{ url_for('ko.area_hub') }}"{% if request.path.startswith('/지역별') %} class="on"{% endif %}>지역별 안내</a>
+    <a hidden href="{{ url_for('ko.job_hub') }}"{% if request.path.startswith('/직업별') or request.path.startswith('/상황별') %} class="on"{% endif %}>직업별 안내</a>
     <a href="{{ url_for('main.faq') }}"{% if request.path.startswith('/faq') %} class="on"{% endif %}>자주 묻는 질문</a>
     <a href="{{ url_for('contact.contact') }}"{% if request.path.startswith('/contact') %} class="on"{% endif %}>상담 신청</a>
   </nav>

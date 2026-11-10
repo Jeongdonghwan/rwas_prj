@@ -68,17 +68,19 @@ def _detail(kind, slug, template, list_endpoint):
                            list_endpoint=list_endpoint)
 
 
-# ── 진행 사례 (사람이 직접 작성) ──────────────────────────────────
+# ── 진행 사례 — 공개 중단(2026-11-10 의뢰인 요청) ─────────────────
+# 라우트는 남겨 url_for 가 깨지지 않게 하고 404 만 낸다. 다시 열려면 abort 를 지우고
+# 메뉴(_header)·메인 섹션·사이트맵(seo.sitemap_board)·RSS 를 되돌린다(이 커밋 diff 참고).
 
 @bp.route("/사례/")
 @bp.route("/사례/page/<int:page>/")
 def case_list(page=1):
-    return _paged(Post.KIND_CASE, page, "board/list.html")
+    abort(404)
 
 
 @bp.route("/사례/<slug>/")
 def case_view(slug):
-    return _detail(Post.KIND_CASE, slug, "board/view.html", "board.case_list")
+    abort(404)
 
 
 # ── 법률칼럼 (자동 생성 + 어드민 수정) ──────────────────────────────
