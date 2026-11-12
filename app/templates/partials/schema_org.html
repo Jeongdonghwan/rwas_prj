@@ -11,6 +11,7 @@
   "image": "{{ site.base_url }}{{ url_for('static', filename='img/og.jpg') }}",
   "telephone": {{ site.phone | tojson }},
   "priceRange": "상담 후 안내",
+  "sameAs": [{{ site.youtube | tojson }}],
   "founder": { "@type": "Person", "name": {{ site.ceo | tojson }}, "jobTitle": "대표변호사" },
   "foundingDate": "{{ site.since }}",
   "address": {

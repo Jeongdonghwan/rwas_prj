@@ -69,6 +69,7 @@ seed/                (Phase 3) dong.csv, job.csv, faq.csv
 - **GNB '지역별 안내'·'직업별 안내'는 `<a hidden>`** — 화면에서만 숨기고 HTML 링크는 남긴다(검색로봇이 허브로 가는 길).
   `.gnb a`에 display 를 주면 hidden 이 무력화되니 주의.
 - 상단 띠(topbar)의 법원·사무소 주소 삭제(푸터 주소는 유지).
+- **유튜브 채널**(`SITE_DEFAULTS["youtube"]`, 11-12): 우측 플로팅 퀵메뉴(TOP 위)·푸터 링크·LegalService `sameAs`. 새 창(rel=noopener). 모바일 하단 바에는 넣지 않았다(전화·상담 2분할 유지).
 
 ### 2026-10-23 팔레트 교체 (8번 확정으로 현재 기본값 아님) — 차콜 + 아이보리 + 곤색 (의뢰인 "AI 느낌 제거" 요청)
 - **이 항목이 아래 모든 색상 메모보다 우선한다.** 토큰: 바탕 `--paper #fbf9f4`(아이보리) / 섹션 `--paper-2 #f3efe6` /

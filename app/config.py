@@ -49,6 +49,7 @@ SITE_DEFAULTS = {
     "since": "2016",  # 개업 2016년 3월 15일
     "email": "pasubyeong@naver.com",
     "hours": "24시간 상담, 주말 예약제",
+    "youtube": "https://www.youtube.com/@회생파산이재열변호사",
     "map_embed": "",
     # 도메인 (non-www, https). .env의 SITE_URL로 덮어쓸 수 있음
     "base_url": os.environ.get("SITE_URL", REGION["base_url"]).rstrip("/"),
